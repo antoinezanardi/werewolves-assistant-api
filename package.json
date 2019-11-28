@@ -1,0 +1,42 @@
+{
+  "name": "werewolwes-assistant-api",
+  "version": "0.0.0",
+  "description": "Back end for the werewolves assistant",
+  "main": "app.js",
+  "scripts": {
+    "start": "./node_modules/.bin/nodemon --watch .env --watch . app.js",
+    "lint": "./node_modules/.bin/eslint src/ --ext .js --fix",
+    "doc": "./node_modules/.bin/apidoc -c ./doc/ -i src/routes/ -o public/apidoc/",
+    "start_sandbox": "forever start ./config/forever/sandbox.json",
+    "stop_sandbox": "forever stop werewolves-assistant-api-sandbox",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antoinezanardi/werewolwes-assistant-api.git"
+  },
+  "author": "Antoine ZANARDI",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/antoinezanardi/werewolwes-assistant-api/issues"
+  },
+  "homepage": "https://github.com/antoinezanardi/werewolwes-assistant-api#readme",
+  "devDependencies": {
+    "eslint": "^6.7.1",
+    "nodemon": "^2.0.1"
+  },
+  "dependencies": {
+    "apidoc": "^0.18.0",
+    "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.12",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "requirejs": "^2.3.6"
+  }
+}

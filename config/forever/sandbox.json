@@ -1,0 +1,8 @@
+{
+  "uid": "werewolves-assistant-api-sandbox",
+  "append": true,
+  "silent": true,
+  "watch": false,
+  "script": "app.js"
+}
+
