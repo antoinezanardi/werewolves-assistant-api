@@ -6,9 +6,12 @@
   "scripts": {
     "start": "./node_modules/.bin/nodemon --watch .env --watch . app.js",
     "lint": "./node_modules/.bin/eslint src/ --ext .js --fix",
-    "doc": "./node_modules/.bin/apidoc -c ./doc/ -i src/routes/ -o public/apidoc/",
+    "doc": "./node_modules/.bin/apidoc -c ./config/apidoc -i src/routes/ -o public/apidoc/",
     "start_sandbox": "forever start ./config/forever/sandbox.json",
     "stop_sandbox": "forever stop werewolves-assistant-api-sandbox",
+    "start_production": "forever start ./config/forever/production.json",
+    "stop_production": "forever stop werewolves-assistant-api",
+    "update_version": "./scripts/update-version.sh",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {

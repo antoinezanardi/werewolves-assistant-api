@@ -10,6 +10,8 @@
 * Setting up CI integration. No test for the moment, only deployment on remote server (with staging and production env) is implemented.
 * Setting up `ESLint` on whole project, except migrations.
 * Setting up `forever` JSON config files for remote server.
+* Setting up `apidoc` for API documentation with `models`, `codes` and `routes`.
+* Script `update-version` added in order to update project version on `package.json`, `apidoc` config and API main route.
 
 ### 📦 Packages
 
