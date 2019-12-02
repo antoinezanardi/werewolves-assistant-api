@@ -9,7 +9,11 @@
 * Database is created and the connection is established when app starts. 
 * `README.md` file created with minimal explanations on project purpose, installation and more. 
 
-### 💾 Database changes
+### 🛣️ Routes
+* Route `GET /users` added for retrieving all users. Protected with basic authentication.
+
+
+### 💾 Database
 
 * User schema for collection `users` defined with minimal configuration.
 

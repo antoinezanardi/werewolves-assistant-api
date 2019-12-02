@@ -38,6 +38,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.3.0",
     "jsonwebtoken": "^8.5.1",
+    "mongo-dot-notation": "^1.2.0",
     "mongoose": "^5.7.13",
     "passport": "^0.4.0",
     "passport-http": "^0.3.0",

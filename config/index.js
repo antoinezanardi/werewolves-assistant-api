@@ -6,8 +6,8 @@ const Config = {
         port: process.env.PORT || 4202,
         JWTSecret: process.env.JWT_SECRET || "somethingsecret",
         basicAuth: {
-            username: process.env.BASIC_USERNAME,
-            password: process.env.BASIC_PASSWORD,
+            username: process.env.BASIC_USERNAME || "root",
+            password: process.env.BASIC_PASSWORD || "secret",
         },
     },
     db: {
