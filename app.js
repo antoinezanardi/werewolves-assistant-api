@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("./src/helpers/Passport");
 
 const { bold } = require("colors");
 const express = require("express");
@@ -6,7 +7,10 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const Config = require("./config");
-const { sendError, generateError } = require("./src/helpers/error");
+const { sendError, generateError } = require("./src/helpers/Error");
+const { connect: connectDatabase } = require("./src/helpers/Mongoose");
+
+connectDatabase();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
