@@ -8,10 +8,13 @@
     * Username and password are defined in `.env` file.
 * Database is created and the connection is established when app starts. 
 * `README.md` file created with minimal explanations on project purpose, installation and more. 
+* Users can register and log in. JSON Web Token is provided while logging in.
 
 ### 🛣️ Routes
 
 * Route `GET /users` added for retrieving all users. Protected with basic authentication.
+* Route `POST /users` added for creating a new user account. Protected with basic authentication.
+* Route `POST /users/login` added for logging in and retrieve the JSON Web Token. Protected with basic authentication.
 
 ### 💾 Database
 

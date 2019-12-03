@@ -46,6 +46,24 @@ module.exports = app => {
     ], User.postUser);
 
     /**
+     * @api {POST} /users/login Login
+     * @apiName LoginUser
+     * @apiGroup User
+     *
+     * @apiUse UserRequestBody
+     * @apiPermission Basic
+     * @apiSuccess {String} token JSON Web Token to keep for further route authentication.
+     */
+    app.post("/users/login", passport.authenticate("basic", { session: false }), [
+        body("email")
+            .isEmail().withMessage("Must be a valid email")
+            .trim(),
+        body("password")
+            .isString().withMessage("Must be a string")
+            .isLength({ min: 5 }).withMessage("Must be at least 5 characters long"),
+    ], User.login);
+
+    /**
      * @api {GET} /users Get all users
      * @apiName GetUsers
      * @apiGroup User
