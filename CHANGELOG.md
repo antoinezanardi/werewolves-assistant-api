@@ -10,12 +10,18 @@
 * `README.md` file created with minimal explanations on project purpose, installation and more. 
 
 ### 🛣️ Routes
-* Route `GET /users` added for retrieving all users. Protected with basic authentication.
 
+* Route `GET /users` added for retrieving all users. Protected with basic authentication.
 
 ### 💾 Database
 
 * User schema for collection `users` defined with minimal configuration.
+
+### 🧪 Tests
+
+* Test environment set up. You can run it with `npm run test`.
+* Test for route `GET /` added. 
+* Test for route `GET /users` added. 
 
 ### 📦 Packages
 

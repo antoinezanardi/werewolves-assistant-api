@@ -12,7 +12,7 @@
     "start_production": "forever start ./config/forever/production.json",
     "stop_production": "forever stop werewolves-assistant-api",
     "update_version": "./scripts/update-version.sh",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha ./tests/"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,10 @@
   },
   "homepage": "https://github.com/antoinezanardi/werewolwes-assistant-api#readme",
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "eslint": "^6.7.2",
+    "mocha": "^6.2.2",
     "nodemon": "^2.0.1"
   },
   "dependencies": {

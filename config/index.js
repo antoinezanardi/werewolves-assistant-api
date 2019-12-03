@@ -11,8 +11,12 @@ const Config = {
         },
     },
     db: {
-        name: process.env.DB_NAME || "distribution",
+        name: process.env.DB_NAME || "werewolves-assistant",
     },
 };
+
+if (Config.app.nodeEnv === "test") {
+    Config.db.name += "-test";
+}
 
 module.exports = Config;
