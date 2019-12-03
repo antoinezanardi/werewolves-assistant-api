@@ -1,6 +1,6 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "start_production": "forever start ./config/forever/production.json",
     "stop_production": "forever stop werewolves-assistant-api",
     "update_version": "./scripts/update-version.sh",
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha ./tests/ --exit"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,15 @@
   },
   "homepage": "https://github.com/antoinezanardi/werewolwes-assistant-api#readme",
   "devDependencies": {
-    "eslint": "^6.7.1",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "eslint": "^6.7.2",
+    "mocha": "^6.2.2",
     "nodemon": "^2.0.1"
   },
   "dependencies": {
-    "apidoc": "^0.18.0",
+    "apidoc": "^0.19.0",
+    "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
@@ -37,9 +41,12 @@
     "express": "^4.17.1",
     "express-validator": "^6.3.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.7.12",
+    "mongo-dot-notation": "^1.2.0",
+    "mongoose": "^5.7.13",
     "passport": "^0.4.0",
+    "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
     "requirejs": "^2.3.6"
   }
 }
