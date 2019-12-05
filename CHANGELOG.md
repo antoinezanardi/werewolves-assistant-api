@@ -1,6 +1,28 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.1.0 (2019-12-??)
+## 0.2.0 (2019-12-??)
+
+### 🚀 New features
+
+* Travis badge added in the `README.md` file.
+
+### 🛣️ Routes
+
+* Route `GET /games` added for retrieving all games. Protected with basic authentication.
+* Route `GET /games/repartition` added for getting a random team composition. Protected with basic authentication.
+
+### 💾 Database
+
+* Game schema for collection `games` defined with minimal configuration.
+* Player schema for collection `games` defined with minimal configuration.
+
+### 📚 Documentation
+
+* Model for `user` documented.
+
+---
+
+## 0.1.0 (2019-12-03)
 
 ### 🚀 New features
 
