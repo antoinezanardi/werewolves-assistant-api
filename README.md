@@ -22,7 +22,7 @@ Documentation is available for both environments:
 * **Production**: `https://werewolves-assistant-api.antoinezanardi.fr/apidoc`
 
 ## 🔨 Installation
-1. Install dependencies with `npm install` (add `--production` if you install the project on remote server)
+1. Install dependencies with `npm install` (add `--production` if you install the project on a remote server)
 2. Copy `.env.example` and paste it as `.env`
 3. Replace environment values in the fresh new `.env` file if necessary
     * **DB_NAME**: Name of the MongoDB database.

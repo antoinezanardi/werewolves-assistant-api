@@ -38,6 +38,7 @@ exports.getGames = async(req, res) => {
 exports.getGameRepartition = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
+        
         res.status(200).json(body);
     } catch (e) {
         sendError(res, e);

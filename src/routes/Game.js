@@ -45,10 +45,10 @@ module.exports = app => {
      * @apiSuccess {String} players.name Player's name.
      * @apiSuccess {String} players.role Player's role.
      */
-    app.get("/games/:id", passport.authenticate("basic", { session: false }), [
+    app.get("/games/repartition", passport.authenticate("basic", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .notEmpty().withMessage("Can't be empty"),
+            .isLength({ min: 4 }).withMessage("Must contain between 4 and 20 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()

@@ -20,6 +20,18 @@
 
 * Model for `user` documented.
 
+### 📦 Packages
+
+* `apidoc` updated to version `0.22.0`.
+* `bcrypt` updated to version `4.0.1`.
+* `eslint` updated to version `6.8.0`.
+* `express-validator` updated to version `6.4.1`.
+* `mocha` updated to version `7.1.2`.
+* `mongo-dot-notation` updated to version `2.0.0`.
+* `mongoose` updated to version `5.9.12`.
+* `nodemon` updated to version `2.0.3`.
+* `passport` updated to version `0.4.1`.
+
 ---
 
 ## 0.1.0 (2019-12-03)
