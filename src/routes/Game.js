@@ -6,10 +6,6 @@ const Game = require("../controllers/Game");
 module.exports = app => {
 
     /**
-     * @apiDefine BearerToken Bearer Authorization with User Token
-     */
-
-    /**
      * @apiDefine UserRequestBody
      * @apiParam (Request Body Parameters) {String} email User's email.
      * @apiParam (Request Body Parameters) {String{>=5}} password User's password.
@@ -38,7 +34,7 @@ module.exports = app => {
      * @apiName GetGameRepartition
      * @apiGroup Game
      *
-     * @apiParam (Request Body Parameters) {Array} players Must has at least 4 players.
+     * @apiParam (Request Body Parameters) {Array} players Must contain between 4 and 20 players.
      * @apiParam (Request Body Parameters) {String} players.name Player's name.
      * @apiPermission Basic
      * @apiSuccess {Array} players

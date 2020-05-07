@@ -4,14 +4,16 @@
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon --watch .env --watch . app.js",
-    "lint": "./node_modules/.bin/eslint src/ --ext .js --fix",
-    "doc": "./node_modules/.bin/apidoc -c ./config/apidoc -i src/routes/ -o public/apidoc/",
+    "start": "npx nodemon --watch .env --watch . app.js",
+    "lint": "npx eslint src/ --ext .js --fix",
+    "doc": "npx apidoc -c ./config/apidoc -i src/routes/ -o public/apidoc/",
     "start_sandbox": "forever start ./config/forever/sandbox.json",
     "stop_sandbox": "forever stop werewolves-assistant-api-sandbox",
     "start_production": "forever start ./config/forever/production.json",
     "stop_production": "forever stop werewolves-assistant-api",
     "update_version": "./scripts/update-version.sh",
+    "migrate": "npx migrate-mongo up -f ./config/migrate-mongo/index.js",
+    "migrate_down": "npx migrate-mongo down -f ./config/migrate-mongo/index.js",
     "test": "NODE_ENV=test ./node_modules/.bin/mocha ./tests/ --exit"
   },
   "repository": {
@@ -32,7 +34,7 @@
     "nodemon": "^2.0.3"
   },
   "dependencies": {
-    "apidoc": "^0.22.0",
+    "apidoc": "^0.22.1",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
@@ -41,6 +43,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.4.1",
     "jsonwebtoken": "^8.5.1",
+    "migrate-mongo": "^7.2.1",
     "mongo-dot-notation": "^2.0.0",
     "mongoose": "^5.9.12",
     "passport": "^0.4.1",

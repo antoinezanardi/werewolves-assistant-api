@@ -1,28 +1,38 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.2.0 (2019-12-??)
+## 0.2.0 (2020-05-??)
 
 ### 🚀 New features
 
+* `.editorconfig` file added for code style constancy.
 * Travis badge added in the `README.md` file.
 
 ### 🛣️ Routes
 
 * Route `GET /games` added for retrieving all games. Protected with basic authentication.
 * Route `GET /games/repartition` added for getting a random team composition. Protected with basic authentication.
+* Route `GET /roles` added for getting all available roles. Protected with basic authentication.
 
 ### 💾 Database
 
 * Game schema for collection `games` defined with minimal configuration.
 * Player schema for collection `games` defined with minimal configuration.
+* Role schema for collection `roles` defined with minimal configuration.
+* First roles added in `roles` collection.
 
 ### 📚 Documentation
 
 * Model for `user` documented.
+* Model for `role` documented.
+
+### ♻️ Refactoring
+
+* Moved all database related folders and files in `src/db`.
 
 ### 📦 Packages
 
-* `apidoc` updated to version `0.22.0`.
+* `migrate-mongo` installed with version `7.2.1`.
+* `apidoc` updated to version `0.22.1`.
 * `bcrypt` updated to version `4.0.1`.
 * `eslint` updated to version `6.8.0`.
 * `express-validator` updated to version `6.4.1`.

@@ -1,5 +1,6 @@
 const { flatten } = require("mongo-dot-notation");
-const Game = require("../models/Game");
+const Game = require("../db/models/Game");
+const Role = require("../controllers/Role");
 const { generateError, sendError } = require("../helpers/Error");
 const { checkRouteParameters } = require("../helpers/Express");
 
@@ -35,11 +36,55 @@ exports.getGames = async(req, res) => {
     }
 };
 
+exports.getVillagerRoles = async(players, wolfRoles) => {
+    const villagerRoles = [];
+    const villagerCount = players.length - wolfRoles.length;
+    const availablePowerfulVillagerRoles = await Role.find({ group: "villagers", name: { $not: /villager/ } });
+    const villagerRole = await Role.findOne({ name: "villager" });
+    for (let i = 0; i < villagerCount; i++) {
+        const idx = Math.floor(Math.random() * availablePowerfulVillagerRoles.length);
+        villagerRoles.push(JSON.parse(JSON.stringify(availablePowerfulVillagerRoles[idx])));
+        availablePowerfulVillagerRoles[idx].maxInGame--;
+        if (!availablePowerfulVillagerRoles[idx].maxInGame) {
+            availablePowerfulVillagerRoles.splice(idx, 1);
+        }
+    }
+    return villagerRoles;
+};
+
+exports.getWolfCount = players => {
+    let wolfCount;
+    if (players.length < 12) {
+        wolfCount = 2;
+    } else if (players.length < 17) {
+        wolfCount = 3;
+    } else {
+        wolfCount = 4;
+    }
+    return wolfCount;
+};
+
+exports.getWolfRoles = async players => {
+    const wolfRoles = [];
+    const wolfCount = this.getWolfCount(players);
+    const availableWolfRoles = await Role.find({ group: "wolves" });
+    for (let i = 0; i < wolfCount; i++) {
+        const idx = Math.floor(Math.random() * availableWolfRoles.length);
+        wolfRoles.push(JSON.parse(JSON.stringify(availableWolfRoles[idx])));
+        availableWolfRoles[idx].maxInGame--;
+        if (!availableWolfRoles[idx].maxInGame) {
+            availableWolfRoles.splice(idx, 1);
+        }
+    }
+    return wolfRoles;
+};
+
 exports.getGameRepartition = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
-        
-        res.status(200).json(body);
+        const wolfRoles = await this.getWolfRoles(body.players);
+        const villagerRoles = await this.getVillagerRoles(body.players, wolfRoles);
+        res.status(200).json(villagerRoles);
     } catch (e) {
         sendError(res, e);
     }
