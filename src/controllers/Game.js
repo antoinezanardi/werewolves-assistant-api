@@ -36,20 +36,41 @@ exports.getGames = async(req, res) => {
     }
 };
 
+exports.assignRoleToPlayers = (players, roles) => {
+    for (let i = 0; i < players.length; i++) {
+        const roleIdx = Math.floor(Math.random() * roles.length);
+        players[i].role = roles[roleIdx].name;
+        roles.splice(roleIdx, 1);
+    }
+    return players;
+};
+
 exports.getVillagerRoles = async(players, wolfRoles) => {
     const villagerRoles = [];
     const villagerCount = players.length - wolfRoles.length;
     const availablePowerfulVillagerRoles = await Role.find({ group: "villagers", name: { $not: /villager/ } });
     const villagerRole = await Role.findOne({ name: "villager" });
     for (let i = 0; i < villagerCount; i++) {
-        const idx = Math.floor(Math.random() * availablePowerfulVillagerRoles.length);
-        villagerRoles.push(JSON.parse(JSON.stringify(availablePowerfulVillagerRoles[idx])));
-        availablePowerfulVillagerRoles[idx].maxInGame--;
-        if (!availablePowerfulVillagerRoles[idx].maxInGame) {
-            availablePowerfulVillagerRoles.splice(idx, 1);
+        if (!availablePowerfulVillagerRoles.length) {
+            villagerRoles.push(JSON.parse(JSON.stringify(villagerRole)));
+            villagerRole.maxInGame--;
+        } else {
+            villagerRoles.push(this.pickRandomRole(availablePowerfulVillagerRoles));
         }
     }
     return villagerRoles;
+};
+
+exports.pickRandomRole = roles => {
+    const idx = Math.floor(Math.random() * roles.length);
+    const role = JSON.parse(JSON.stringify(roles[idx]));
+    roles[idx].maxInGame--;
+    if (!roles[idx].maxInGame) {
+        roles.splice(idx, 1);
+    }
+    delete role._id;
+    delete role.maxInGame;
+    return role;
 };
 
 exports.getWolfCount = players => {
@@ -69,12 +90,7 @@ exports.getWolfRoles = async players => {
     const wolfCount = this.getWolfCount(players);
     const availableWolfRoles = await Role.find({ group: "wolves" });
     for (let i = 0; i < wolfCount; i++) {
-        const idx = Math.floor(Math.random() * availableWolfRoles.length);
-        wolfRoles.push(JSON.parse(JSON.stringify(availableWolfRoles[idx])));
-        availableWolfRoles[idx].maxInGame--;
-        if (!availableWolfRoles[idx].maxInGame) {
-            availableWolfRoles.splice(idx, 1);
-        }
+        wolfRoles.push(this.pickRandomRole(availableWolfRoles));
     }
     return wolfRoles;
 };
@@ -84,7 +100,8 @@ exports.getGameRepartition = async(req, res) => {
         const { body } = checkRouteParameters(req);
         const wolfRoles = await this.getWolfRoles(body.players);
         const villagerRoles = await this.getVillagerRoles(body.players, wolfRoles);
-        res.status(200).json(villagerRoles);
+        this.assignRoleToPlayers(body.players, [...villagerRoles, ...wolfRoles]);
+        res.status(200).json(body.players);
     } catch (e) {
         sendError(res, e);
     }

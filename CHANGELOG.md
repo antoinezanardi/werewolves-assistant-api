@@ -6,6 +6,7 @@
 
 * `.editorconfig` file added for code style constancy.
 * Travis badge added in the `README.md` file.
+* Provides a random game repartition for a set of players.
 
 ### 🛣️ Routes
 
@@ -34,7 +35,7 @@
 * `migrate-mongo` installed with version `7.2.1`.
 * `apidoc` updated to version `0.22.1`.
 * `bcrypt` updated to version `4.0.1`.
-* `eslint` updated to version `6.8.0`.
+* `eslint` updated to version `7.0.0`.
 * `express-validator` updated to version `6.4.1`.
 * `mocha` updated to version `7.1.2`.
 * `mongo-dot-notation` updated to version `2.0.0`.
