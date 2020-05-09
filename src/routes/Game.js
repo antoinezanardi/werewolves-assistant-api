@@ -6,12 +6,6 @@ const Game = require("../controllers/Game");
 module.exports = app => {
 
     /**
-     * @apiDefine UserRequestBody
-     * @apiParam (Request Body Parameters) {String} email User's email.
-     * @apiParam (Request Body Parameters) {String{>=5}} password User's password.
-     */
-
-    /**
      * @apiDefine GameResponse
      * @apiSuccess {MongoId} _id Game's ID.
      * @apiSuccess {Date} createdAt When the game was created.
@@ -63,4 +57,16 @@ module.exports = app => {
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.getGame);
+
+    /**
+     * @api {POST} /games Create a game
+     * @apiName CreateGame
+     * @apiGroup Game
+     *
+     * @apiPermission BearerToken
+     * @apiUse GameResponse
+     */
+    // app.post("/games", passport.authenticate("jwt", { session: false }), [
+    //
+    // ], Game.postGame);
 };

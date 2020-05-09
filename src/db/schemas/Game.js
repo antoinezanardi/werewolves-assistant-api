@@ -19,7 +19,7 @@ const game = new Schema({
         default: "night",
     },
     waiting: {
-        role: {
+        for: {
             type: String,
             enum: waitingForPossibilities,
             required: true,
