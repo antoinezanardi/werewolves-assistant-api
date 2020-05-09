@@ -1,6 +1,7 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
-const { gameStatuses, waitingForPossibilities, gameActions, gamePhases } = require("../../helpers/Game");
+const { gameStatuses, waitingForPossibilities, gamePhases } = require("../../helpers/Game");
+const { playerActions } = require("../../helpers/Player");
 
 const game = new Schema({
     gameMaster: {
@@ -26,7 +27,7 @@ const game = new Schema({
         },
         to: {
             type: String,
-            enum: gameActions,
+            enum: playerActions,
             required: true,
         },
     },

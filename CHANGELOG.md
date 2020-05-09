@@ -26,6 +26,8 @@
 * Model for `user` documented.
 * Model for `role` documented.
 * `Player Roles` documented.
+* `Player Groups` documented.
+* `Game Statuses` documented.
 
 ### ♻️ Refactoring
 

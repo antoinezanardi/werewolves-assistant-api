@@ -1,5 +1,18 @@
 # Codes & Values
 
+## <a id="game-statuses"></a>Game Statuses
+| Status            |                 Description                                |
+|:-----------------:|------------------------------------------------------------|
+| assigning-roles   | In the lobby, before the game, roles are being assigned to players. |
+| playing           | The game is currently playing. |
+| done              | The game is finished, no more actions are required to proceed. |
+
+## <a id="player-groups"></a>Player Groups
+| Group     |                 Description                                |
+|:---------:|------------------------------------------------------------|
+| wolves    | They teaming up are against `villagers` and need to kill them all to win the game.  |
+| villagers | They teaming up are against `wolves` and need to kill them all to win the game.  |
+
 ## <a id="player-roles"></a>Player Roles
 
 | Role      | [Group](#player-groups) |                 Description                                |
@@ -11,6 +24,13 @@
 | hunter    | villagers | If he dies, he shoots a victim to take his revenge.            |
 | raven     | villagers | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                      |
 | villagers | villagers | Has no powers, can only count on his speech.       |
+
+## <a id="player-actions"></a>Player Actions
+
+| Action    | [Role](#player-roles) |                 Description                                |
+|:---------:|:---------------------:|------------------------------------------------------------|
+| wolf      | wolves                | Each night, his group eats a villager chosen by the majority.                               |
+
 
 ## <a id="errors"></a>Errors
 

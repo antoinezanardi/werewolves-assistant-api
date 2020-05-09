@@ -24,6 +24,7 @@
 | phase                | String   | Each turn has two phases, `day` or `night`.                                                    |
 | waiting              | Object   |                                                |
 | &emsp;&emsp;for      | String   | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) for possibilities_)                                         |
+| &emsp;&emsp;to       | String   | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                         |
 | createdAt            | Date     | When the user created his account.                                                     |
 | updatedAt            | Date     | When the user updated his account.                                                     |
 

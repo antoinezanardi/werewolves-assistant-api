@@ -4,7 +4,7 @@
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
-    "start": "npx nodemon --watch .env --watch . app.js",
+    "start": "npx nodemon --watch .env --watch . --ignore 'public/apidoc/' app.js",
     "lint": "npx eslint src/ --ext .js --fix",
     "doc": "npx apidoc -c ./config/apidoc -i src/routes/ -o public/apidoc/",
     "start_sandbox": "forever start ./config/forever/sandbox.json",
