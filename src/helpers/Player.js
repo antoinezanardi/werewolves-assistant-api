@@ -1,0 +1,1 @@
+exports.playerAttributes = ["mayor", "eaten", "drank-life-potion", "drank-death-potion", "protected", "raven-marked"];

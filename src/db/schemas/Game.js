@@ -1,5 +1,6 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
+const { gameStatuses, waitingForPossibilities, gameActions, gamePhases } = require("../../helpers/Game");
 
 const game = new Schema({
     gameMaster: {
@@ -14,21 +15,25 @@ const game = new Schema({
     },
     phase: {
         type: String,
+        enum: gamePhases,
         default: "night",
     },
     waiting: {
         role: {
             type: String,
+            enum: waitingForPossibilities,
             required: true,
         },
         to: {
             type: String,
+            enum: gameActions,
             required: true,
         },
     },
     status: {
         type: String,
-        default: "distributing-roles",
+        enum: gameStatuses,
+        default: "assigning-roles",
     },
 }, {
     timestamps: true,
