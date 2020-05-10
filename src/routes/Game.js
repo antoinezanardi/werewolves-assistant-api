@@ -2,6 +2,7 @@
 const passport = require("passport");
 const { param, body } = require("express-validator");
 const Game = require("../controllers/Game");
+const { roleNames } = require("../helpers/Role");
 
 module.exports = app => {
 
@@ -72,19 +73,21 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiPermission BearerToken
+     * @apiParam (Request Body Parameters) {Array} players Must contain between 4 and 20 players.
+     * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
+     * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles) for possibilities_)
      * @apiUse GameResponse
      */
-    // app.post("/games", passport.authenticate("jwt", { session: false }), [
-    //     body("players")
-    //         .isArray().withMessage("Must be a valid array")
-    //         .isLength({ min: 4 }).withMessage("Must contain between 4 and 20 players"),
-    //     body("players.*.name")
-    //         .isString().withMessage("Must be a valid string")
-    //         .trim()
-    //         .notEmpty().withMessage("Can't be empty"),
-    //     body("players.*.name")
-    //         .isString().withMessage("Must be a valid string")
-    //         .trim()
-    //         .notEmpty().withMessage("Can't be empty"),
-    // ], Game.postGame);
+    app.post("/games", passport.authenticate("jwt", { session: false }), [
+        body("players")
+            .isArray().withMessage("Must be a valid array")
+            .isLength({ min: 4 }).withMessage("Must contain between 4 and 20 players"),
+        body("players.*.name")
+            .isString().withMessage("Must be a valid string")
+            .trim()
+            .notEmpty().withMessage("Can't be empty"),
+        body("players.*.role")
+            .isString().withMessage("Must be a valid string")
+            .isIn(roleNames).withMessage(`Must be equal to one of the following values: ${roleNames}`),
+    ], Game.postGame);
 };

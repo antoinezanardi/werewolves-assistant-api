@@ -38,11 +38,7 @@ passport.use(new JWTStrategy({
         if (err) {
             return cb(err);
         } else if (user) {
-            if (user.active) {
-                return cb(null, user);
-            } else {
-                return cb(null);
-            }
+            return cb(null, user);
         } else {
             return cb(null);
         }

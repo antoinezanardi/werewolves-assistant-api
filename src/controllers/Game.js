@@ -127,3 +127,17 @@ exports.getGame = async(req, res) => {
         sendError(res, e);
     }
 };
+
+exports.checkDataBeforeCreate = data => {
+    this.checkUniqueNameInPlayers(data.players);
+};
+
+exports.postGame = async(req, res) => {
+    try {
+        const { body } = checkRouteParameters(req);
+        this.checkDataBeforeCreate(body);
+        res.status(200).json(body);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
