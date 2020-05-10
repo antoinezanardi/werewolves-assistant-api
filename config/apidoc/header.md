@@ -4,7 +4,7 @@
 
 ### Fields annotated with `*` are optional.
 
-## <a id="user-model"></a>User
+## <a id="user-model"></a>👤 User
 
 | Field                | Type     | Description                                                         |
 |----------------------|----------|---------------------------------------------------------------------|
@@ -13,7 +13,7 @@
 | createdAt            | Date     | When the user created his account.                                                     |
 | updatedAt            | Date     | When the user updated his account.                                                     |
 
-## <a id="game-model"></a>Game
+## <a id="game-model"></a>🎲 Game
 
 | Field                | Type     | Description                                                         |
 |----------------------|----------|---------------------------------------------------------------------|
@@ -30,7 +30,7 @@
 | createdAt            | Date     | When the user created his account.                                                     |
 | updatedAt            | Date     | When the user updated his account.                                                     |
 
-## <a id="player-model"></a>Player
+## <a id="player-model"></a>🐺⚡🧙 ‍Player
 
 | Field                      | Type     | Description                                                         |
 |----------------------------|----------|---------------------------------------------------------------------|
@@ -43,10 +43,10 @@
 | attributes                 | Array    | An attribute is an effect or a status on a player.                                                     |
 | &emsp;&emsp;attribute      | String   | Attribute's name on the player. (_See [Codes - Player Attributes](#player-attributes) for possibilities_)                                                    |
 | &emsp;&emsp;source         | String   | Which role or group gave this attribute to the player. (_See [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
-| **&emsp;&emsp;remaining*** | String   | Remaining time for this attribute before disappear. Expressed in `phases` (_e.g: `2 phases`_), it decrease after each phase. |
+| **&emsp;&emsp;remaining*** | String   | Remaining time for this attribute before disappear. Expressed in `phases` (_e.g: `2 phases`_), decreases after each phase. |
 | isAlive                    | Boolean  | If the player is currently alive or not.                                                     |
 
-## <a id="role-model"></a>Role
+## <a id="role-model"></a>🃏 Role
 
 | Field                | Type     | Description                                                         |
 |----------------------|----------|---------------------------------------------------------------------|

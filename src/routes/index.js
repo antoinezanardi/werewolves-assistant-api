@@ -4,9 +4,9 @@ module.exports = app => {
     fs.readdirSync(__dirname).forEach(file => {
         if (file === "index.js") {
             /**
-             * @api {GET} / Get API info
+             * @api {GET} / A] Get API info
              * @apiName GetAPIInfo
-             * @apiGroup API
+             * @apiGroup API 🔌
              *
              * @apiSuccess {String} name API's name
              * @apiSuccess {String} version API's version

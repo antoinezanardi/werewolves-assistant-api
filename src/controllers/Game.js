@@ -95,9 +95,17 @@ exports.getWolfRoles = async players => {
     return wolfRoles;
 };
 
+exports.checkUniqueNameInPlayers = players => {
+    const playerSet = [...new Set(players.map(player => player.name))];
+    if (playerSet.length !== players.length) {
+        throw generateError("PLAYERS_NAME_NOT_UNIQUE", "Players don't all have unique name.");
+    }
+};
+
 exports.getGameRepartition = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
+        this.checkUniqueNameInPlayers(body.players);
         const wolfRoles = await this.getWolfRoles(body.players);
         const villagerRoles = await this.getVillagerRoles(body.players, wolfRoles);
         this.assignRoleToPlayers(body.players, [...villagerRoles, ...wolfRoles]);

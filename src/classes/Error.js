@@ -27,6 +27,10 @@ const ErrorEnum = {
         code: 7,
         statusCode: 401,
     },
+    PLAYERS_NAME_NOT_UNIQUE: {
+        code: 8,
+        statusCode: 400,
+    },
 };
 
 class Error {

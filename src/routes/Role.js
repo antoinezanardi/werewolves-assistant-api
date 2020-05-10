@@ -13,9 +13,9 @@ module.exports = app => {
      */
 
     /**
-     * @api {GET} /roles Get all roles
+     * @api {GET} /roles A] Get all roles
      * @apiName GetRoles
-     * @apiGroup Game
+     * @apiGroup Roles 🃏
      *
      * @apiPermission Basic
      * @apiUse RoleResponse

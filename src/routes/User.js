@@ -28,9 +28,19 @@ module.exports = app => {
      */
 
     /**
-     * @api {POST} /users Create new user
+     * @api {GET} /users A] Get all users
+     * @apiName GetUsers
+     * @apiGroup Users 👤
+     *
+     * @apiPermission Basic
+     * @apiUse UserResponse
+     */
+    app.get("/users", passport.authenticate("basic", { session: false }), User.getUsers);
+
+    /**
+     * @api {POST} /users B] Create new user
      * @apiName CreateUser
-     * @apiGroup User
+     * @apiGroup Users 👤
      *
      * @apiUse UserRequestBody
      * @apiPermission Basic
@@ -46,9 +56,9 @@ module.exports = app => {
     ], User.postUser);
 
     /**
-     * @api {POST} /users/login Login
+     * @api {POST} /users/login C] Login
      * @apiName LoginUser
-     * @apiGroup User
+     * @apiGroup Users 👤
      *
      * @apiUse UserRequestBody
      * @apiPermission Basic
@@ -62,14 +72,4 @@ module.exports = app => {
             .isString().withMessage("Must be a string")
             .isLength({ min: 5 }).withMessage("Must be at least 5 characters long"),
     ], User.login);
-
-    /**
-     * @api {GET} /users Get all users
-     * @apiName GetUsers
-     * @apiGroup User
-     *
-     * @apiPermission Basic
-     * @apiUse UserResponse
-     */
-    app.get("/users", passport.authenticate("basic", { session: false }), User.getUsers);
 };

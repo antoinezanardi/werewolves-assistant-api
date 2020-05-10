@@ -12,7 +12,7 @@
   },
   "template": {
     "forceLanguage": "en",
-    "withCompare": false,
+    "withCompare": true,
     "withGenerator": false
   }
 }
