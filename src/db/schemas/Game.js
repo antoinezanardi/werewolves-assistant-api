@@ -13,11 +13,13 @@ const game = new Schema({
     turn: {
         type: Number,
         default: 1,
+        required: true,
     },
     phase: {
         type: String,
         enum: gamePhases,
         default: "night",
+        required: true,
     },
     waiting: {
         for: {
@@ -35,7 +37,9 @@ const game = new Schema({
         type: String,
         enum: gameStatuses,
         default: "assigning-roles",
+        required: true,
     },
+    winners: [PlayerSchema],
 }, {
     timestamps: true,
     versionKey: false,

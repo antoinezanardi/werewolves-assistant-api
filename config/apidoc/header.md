@@ -25,8 +25,23 @@
 | waiting              | Object   |                                                |
 | &emsp;&emsp;for      | String   | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) for possibilities_)                                         |
 | &emsp;&emsp;to       | String   | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                         |
+| status               | String   | Game's current status. (_See: [Codes - Game Statuses](#game-statuses) for possibilities_)                                                |
+| **winners***         | Player[] | Winners of the game when status is `done`. (_See: [Models - Player](#player-model)_)                                                |
 | createdAt            | Date     | When the user created his account.                                                     |
 | updatedAt            | Date     | When the user updated his account.                                                     |
+
+## <a id="player-model"></a>Player
+
+| Field                   | Type     | Description                                                         |
+|-------------------------|----------|---------------------------------------------------------------------|
+| _id                     | ObjectId | Player's ID.                                                     |
+| name                    | String   | Player's name.                                                     |
+| role                    | Object   |                                                      |
+| &emsp;&emsp;original    | String   | Player's Original role when the game started. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
+| &emsp;&emsp;current     | String   | Player's current role. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
+| &emsp;&emsp;group       | String   | Player's current group. (_See [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
+| attributes              | Array    | An attribute is an effect or a status on a player.                                                     |
+| &emsp;&emsp;attribute   | String   | Attribute's name on the player. (_See [Codes - Player Attributes](#player-attributes) for possibilities_)                                                    |
 
 ## <a id="role-model"></a>Role
 

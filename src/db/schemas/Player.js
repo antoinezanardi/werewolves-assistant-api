@@ -24,10 +24,6 @@ const player = new Schema({
             required: true,
         },
     },
-    isAlive: {
-        type: Boolean,
-        default: true,
-    },
     attributes: [{
         attribute: {
             type: String,
@@ -43,6 +39,10 @@ const player = new Schema({
             type: String,
         },
     }],
+    isAlive: {
+        type: Boolean,
+        default: true,
+    },
 }, {
     timestamps: true,
     versionKey: false,
