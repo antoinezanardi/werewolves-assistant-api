@@ -26,6 +26,7 @@
 * Model for `user` documented.
 * Model for `role` documented.
 * Model for `game` documented.
+* Model for `player` documented.
 * `Player Roles` documented.
 * `Player Groups` documented.
 * `Player Actions` documented.

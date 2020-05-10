@@ -32,16 +32,19 @@
 
 ## <a id="player-model"></a>Player
 
-| Field                   | Type     | Description                                                         |
-|-------------------------|----------|---------------------------------------------------------------------|
-| _id                     | ObjectId | Player's ID.                                                     |
-| name                    | String   | Player's name.                                                     |
-| role                    | Object   |                                                      |
-| &emsp;&emsp;original    | String   | Player's Original role when the game started. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
-| &emsp;&emsp;current     | String   | Player's current role. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
-| &emsp;&emsp;group       | String   | Player's current group. (_See [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
-| attributes              | Array    | An attribute is an effect or a status on a player.                                                     |
-| &emsp;&emsp;attribute   | String   | Attribute's name on the player. (_See [Codes - Player Attributes](#player-attributes) for possibilities_)                                                    |
+| Field                      | Type     | Description                                                         |
+|----------------------------|----------|---------------------------------------------------------------------|
+| _id                        | ObjectId | Player's ID.                                                     |
+| name                       | String   | Player's name.                                                     |
+| role                       | Object   |                                                      |
+| &emsp;&emsp;original       | String   | Player's Original role when the game started. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
+| &emsp;&emsp;current        | String   | Player's current role. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
+| &emsp;&emsp;group          | String   | Player's current group. (_See [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
+| attributes                 | Array    | An attribute is an effect or a status on a player.                                                     |
+| &emsp;&emsp;attribute      | String   | Attribute's name on the player. (_See [Codes - Player Attributes](#player-attributes) for possibilities_)                                                    |
+| &emsp;&emsp;source         | String   | Which role or group gave this attribute to the player. (_See [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
+| **&emsp;&emsp;remaining*** | String   | Remaining time for this attribute before disappear. Expressed in `phases` (_e.g: `2 phases`_), it decrease after each phase. |
+| isAlive                    | Boolean  | If the player is currently alive or not.                                                     |
 
 ## <a id="role-model"></a>Role
 
