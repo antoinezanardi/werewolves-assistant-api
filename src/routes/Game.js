@@ -16,7 +16,7 @@ module.exports = app => {
      * @apiSuccess {String} waiting.for Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) for possibilities_)
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions) for possibilities_)
      * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses) for possibilities_)
-     * @apiSuccess {Players[]} winners Winners of the game when status is `done`. (_See: [Models - Player](#player-model)_)
+     * @apiSuccess {Players[]} [winners] Winners of the game when status is `done`. (_See: [Models - Player](#player-model)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
      */
@@ -47,7 +47,8 @@ module.exports = app => {
     app.get("/games/repartition", passport.authenticate("basic", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .isLength({ min: 4 }).withMessage("Must contain between 4 and 20 players"),
+            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
+            .withMessage("Must contain between 4 and 20 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
@@ -81,7 +82,8 @@ module.exports = app => {
     app.post("/games", passport.authenticate("jwt", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .isLength({ min: 4 }).withMessage("Must contain between 4 and 20 players"),
+            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
+            .withMessage("Must contain between 4 and 20 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()

@@ -8,6 +8,7 @@
 * Travis badge added in the `README.md` file.
 * Provides a random game repartition for a set of players.
 * Check for unique names when players are provided during game random composition or creation.
+* Check for roles compatibility before game creation.
 
 ### 🛣️ Routes
 

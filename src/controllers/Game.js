@@ -128,14 +128,32 @@ exports.getGame = async(req, res) => {
     }
 };
 
-exports.checkDataBeforeCreate = data => {
+exports.checkRolesCompatibility = players => {
+    if (!players.filter(player => player.role.group === "wolves").length) {
+        throw generateError("NO_WOLF_IN_GAME_COMPOSITION", "No player has the `wolf` role in game composition.");
+    } else if (!players.filter(player => player.role.group === "villagers").length) {
+        throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
+    }
+};
+
+exports.fillPlayersData = async players => {
+    const roles = await Role.find();
+    for (const player of players) {
+        const role = roles.find(role => role.name === player.role);
+        player.role = { original: role.name, current: role.name, group: role.group };
+    }
+};
+
+exports.checkAndFillDataBeforeCreate = async data => {
     this.checkUniqueNameInPlayers(data.players);
+    await this.fillPlayersData(data.players);
+    this.checkRolesCompatibility(data.players);
 };
 
 exports.postGame = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
-        this.checkDataBeforeCreate(body);
+        await this.checkAndFillDataBeforeCreate(body);
         res.status(200).json(body);
     } catch (e) {
         sendError(res, e);

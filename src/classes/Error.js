@@ -31,6 +31,14 @@ const ErrorEnum = {
         code: 8,
         statusCode: 400,
     },
+    NO_WOLF_IN_GAME_COMPOSITION: {
+        code: 9,
+        statusCode: 400,
+    },
+    NO_VILLAGER_IN_GAME_COMPOSITION: {
+        code: 10,
+        statusCode: 400,
+    },
 };
 
 class Error {
