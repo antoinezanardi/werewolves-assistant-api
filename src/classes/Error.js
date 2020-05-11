@@ -43,6 +43,10 @@ const ErrorEnum = {
         code: 11,
         statusCode: 400,
     },
+    GAME_DOESNT_BELONG_TO_USER: {
+        code: 12,
+        statusCode: 401,
+    },
 };
 
 class Error {

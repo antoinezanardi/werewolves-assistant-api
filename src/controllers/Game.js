@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
 const Role = require("../controllers/Role");
@@ -14,8 +15,8 @@ exports.findOne = async(search, projection, options = {}) => await Game.findOne(
 // };
 
 exports.checkUserCurrentGames = async userId => {
-    if (await Game.count({ gameMaster: userId, status: { $ne: "done" } })) {
-        throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already games with status `on-going` or `done`.");
+    if (await Game.countDocuments({ gameMaster: userId, status: "playing" })) {
+        throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already game with status `playing`.");
     }
 };
 
@@ -173,9 +174,26 @@ exports.postGame = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
         const game = await this.create({
-            gameMaster: req.user._id,
+            gameMaster: mongoose.Types.ObjectId(req.user._id),
             players: body.players,
         });
+        res.status(200).json(game);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.checkGameBelongsToUser = async(gameId, userId) => {
+    if (!await this.findOne({ _id: gameId, gameMaster: { _id: userId } })) {
+        throw generateError("GAME_DOESNT_BELONG_TO_USER", `Game with id ${gameId} doesn't belong to user with id ${userId}`);
+    }
+};
+
+exports.patchGame = async(req, res) => {
+    try {
+        const { params, body } = checkRouteParameters(req);
+        await this.checkGameBelongsToUser(params.id, req.user._id);
+        const game = await this.findOneAndUpdate({ _id: params.id }, body);
         res.status(200).json(game);
     } catch (e) {
         sendError(res, e);

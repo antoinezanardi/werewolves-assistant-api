@@ -3,6 +3,7 @@ const passport = require("passport");
 const { param, body } = require("express-validator");
 const Game = require("../controllers/Game");
 const { roleNames } = require("../helpers/Role");
+const { patchableGameStatuses } = require("../helpers/Game");
 
 module.exports = app => {
 
@@ -92,4 +93,21 @@ module.exports = app => {
             .isString().withMessage("Must be a valid string")
             .isIn(roleNames).withMessage(`Must be equal to one of the following values: ${roleNames}`),
     ], Game.postGame);
+
+    /**
+     * @api {PATCH} /games/:id E] Update a game
+     * @apiName UpdateGame
+     * @apiGroup Games 🎲
+     *
+     * @apiPermission BearerToken
+     * @apiParam (Request Body Parameters) {String="canceled"} [status] Game master can cancel a game only if its status is set to `playing`.
+     * @apiUse GameResponse
+     */
+    app.patch("/games/:id", passport.authenticate("jwt", { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+        body("status")
+            .optional()
+            .isIn(patchableGameStatuses).withMessage(`Must be equal to one of the following values: ${patchableGameStatuses}`),
+    ], Game.patchGame);
 };

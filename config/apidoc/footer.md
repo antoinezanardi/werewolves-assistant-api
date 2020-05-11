@@ -5,6 +5,7 @@
 |:-----------------:|------------------------------------------------------------|
 | playing           | The game is currently playing. |
 | done              | The game is finished, no more actions are required to proceed. |
+| canceled          | The game has been canceled by game master and cannot be played any longer. |
 
 ## <a id="player-groups"></a>👥 Player Groups
 | Group     |                 Description                                |

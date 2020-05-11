@@ -2,7 +2,9 @@ const { roleNames, groupNames } = require("./Role");
 
 exports.gamePhases = ["day", "night"];
 
-exports.gameStatuses = ["playing", "done"];
+exports.gameStatuses = ["playing", "done", "canceled"];
+
+exports.patchableGameStatuses = ["canceled"];
 
 exports.waitingForPossibilities = [...roleNames, ...groupNames, "mayor"];
 
