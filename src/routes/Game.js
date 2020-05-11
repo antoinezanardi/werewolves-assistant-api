@@ -61,6 +61,7 @@ module.exports = app => {
      * @apiName GetGame
      * @apiGroup Games 🎲
      *
+     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiPermission Basic
      * @apiUse GameResponse
      */
@@ -100,6 +101,7 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiPermission BearerToken
+     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String="canceled"} [status] Game master can cancel a game only if its status is set to `playing`.
      * @apiUse GameResponse
      */
@@ -107,7 +109,24 @@ module.exports = app => {
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("status")
+            .isIn(patchableGameStatuses).withMessage(`Must be equal to one of the following values: ${patchableGameStatuses}`)
+            .optional(),
+    ], Game.patchGame);
+
+    /**
+     * @api {POST} /games/:id/play F] Make a play
+     * @apiName MakeAPlayInGame
+     * @apiGroup Games 🎲
+     *
+     * @apiPermission BearerToken
+     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiUse GameResponse
+     */
+    app.post("/games/:id/play", passport.authenticate("jwt", { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+        body("status")
             .optional()
             .isIn(patchableGameStatuses).withMessage(`Must be equal to one of the following values: ${patchableGameStatuses}`),
-    ], Game.patchGame);
+    ], Game.play);
 };

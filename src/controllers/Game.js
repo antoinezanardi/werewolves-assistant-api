@@ -199,3 +199,15 @@ exports.patchGame = async(req, res) => {
         sendError(res, e);
     }
 };
+
+exports.play = async(req, res) => {
+    try {
+        const { params, body } = checkRouteParameters(req);
+        await this.checkGameBelongsToUser(params.id, req.user._id);
+        const game = await this.findOne({ _id: params.id });
+        console.log(game.waiting);
+        res.status(200).json(body);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
