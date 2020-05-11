@@ -3,7 +3,6 @@
 ## <a id="game-statuses"></a>🎲 Game Statuses
 | Status            |                 Description                                |
 |:-----------------:|------------------------------------------------------------|
-| assigning-roles   | In the lobby, before the game, roles are being assigned to players. |
 | playing           | The game is currently playing. |
 | done              | The game is finished, no more actions are required to proceed. |
 

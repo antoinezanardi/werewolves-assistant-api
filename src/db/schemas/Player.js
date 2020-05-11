@@ -1,5 +1,5 @@
 const { Schema } = require("mongoose");
-const { playerAttributes } = require("../../helpers/Player");
+const { playerAttributes, playerActions } = require("../../helpers/Player");
 const { groupNames, roleNames } = require("../../helpers/Role");
 
 const player = new Schema({
@@ -42,9 +42,20 @@ const player = new Schema({
     isAlive: {
         type: Boolean,
         default: true,
+        required: true,
+    },
+    murdered: {
+        by: {
+            type: String,
+            enum: [...roleNames, ...groupNames],
+        },
+        of: {
+            type: String,
+            enum: playerActions,
+        },
     },
 }, {
-    timestamps: true,
+    timestamps: false,
     versionKey: false,
 });
 

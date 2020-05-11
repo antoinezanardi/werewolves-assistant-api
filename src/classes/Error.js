@@ -39,6 +39,10 @@ const ErrorEnum = {
         code: 10,
         statusCode: 400,
     },
+    GAME_MASTER_HAS_ON_GOING_GAMES: {
+        code: 11,
+        statusCode: 400,
+    },
 };
 
 class Error {

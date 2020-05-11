@@ -45,6 +45,9 @@
 | &emsp;&emsp;source         | String   | Which role or group gave this attribute to the player. (_See [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
 | **&emsp;&emsp;remaining*** | String   | Remaining time for this attribute before disappear. Expressed in `phases` (_e.g: `2 phases`_), decreases after each phase. |
 | isAlive                    | Boolean  | If the player is currently alive or not.                                                     |
+| **murdered***              | Object   | Set if `isAlive` is `false`.                                                    |
+| &emsp;&emsp;by             | String   | Which role or group killed the player. (_See [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) for possibilities_)                                                   |
+| &emsp;&emsp;of             | String   | What action killed the player. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                 |
 
 ## <a id="role-model"></a>🃏 Role
 

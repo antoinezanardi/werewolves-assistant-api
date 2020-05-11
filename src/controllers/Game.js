@@ -5,20 +5,61 @@ const { generateError, sendError } = require("../helpers/Error");
 const { checkRouteParameters } = require("../helpers/Express");
 const { populate } = require("../helpers/Game");
 
+exports.find = async(search, projection, options = {}) => await Game.find(search, projection, options).populate(populate);
+
+exports.findOne = async(search, projection, options = {}) => await Game.findOne(search, projection, options).populate(populate);
+
+// exports.getGameNextAction = game => {
+//
+// };
+
+exports.checkUserCurrentGames = async userId => {
+    if (await Game.count({ gameMaster: userId, status: { $ne: "done" } })) {
+        throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already games with status `on-going` or `done`.");
+    }
+};
+
+exports.checkRolesCompatibility = players => {
+    if (!players.filter(player => player.role.group === "wolves").length) {
+        throw generateError("NO_WOLF_IN_GAME_COMPOSITION", "No player has the `wolf` role in game composition.");
+    } else if (!players.filter(player => player.role.group === "villagers").length) {
+        throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
+    }
+};
+
+exports.fillPlayersData = async players => {
+    const roles = await Role.find();
+    for (const player of players) {
+        const role = roles.find(role => role.name === player.role);
+        player.role = { original: role.name, current: role.name, group: role.group };
+    }
+};
+
+exports.checkUniqueNameInPlayers = players => {
+    const playerSet = [...new Set(players.map(player => player.name))];
+    if (playerSet.length !== players.length) {
+        throw generateError("PLAYERS_NAME_NOT_UNIQUE", "Players don't all have unique name.");
+    }
+};
+
+exports.checkAndFillDataBeforeCreate = async data => {
+    this.checkUniqueNameInPlayers(data.players);
+    await this.fillPlayersData(data.players);
+    this.checkRolesCompatibility(data.players);
+    await this.checkUserCurrentGames(data.gameMaster);
+};
+
 exports.create = async(data, options = {}) => {
     const { toJSON } = options;
     delete options.toJSON;
     if (!Array.isArray(data)) {
         options = null;
     }
+    await this.checkAndFillDataBeforeCreate(data);
     const game = await Game.create(data, options);
     await game.populate(populate).execPopulate();
     return toJSON ? game.toJSON() : game;
 };
-
-exports.find = async(search, projection, options = {}) => await Game.find(search, projection, options).populate(populate);
-
-exports.findOne = async(search, projection, options = {}) => await Game.findOne(search, projection, options).populate(populate);
 
 exports.findOneAndUpdate = async(search, data, options = {}) => {
     const { toJSON } = options;
@@ -102,13 +143,6 @@ exports.getWolfRoles = async players => {
     return wolfRoles;
 };
 
-exports.checkUniqueNameInPlayers = players => {
-    const playerSet = [...new Set(players.map(player => player.name))];
-    if (playerSet.length !== players.length) {
-        throw generateError("PLAYERS_NAME_NOT_UNIQUE", "Players don't all have unique name.");
-    }
-};
-
 exports.getGameRepartition = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
@@ -135,38 +169,14 @@ exports.getGame = async(req, res) => {
     }
 };
 
-// exports.checkUserCurrentGames = userId => {
-    // const currentGames = await this.find({ gameMaster })
-// };
-
-exports.checkRolesCompatibility = players => {
-    if (!players.filter(player => player.role.group === "wolves").length) {
-        throw generateError("NO_WOLF_IN_GAME_COMPOSITION", "No player has the `wolf` role in game composition.");
-    } else if (!players.filter(player => player.role.group === "villagers").length) {
-        throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
-    }
-};
-
-exports.fillPlayersData = async players => {
-    const roles = await Role.find();
-    for (const player of players) {
-        const role = roles.find(role => role.name === player.role);
-        player.role = { original: role.name, current: role.name, group: role.group };
-    }
-};
-
-exports.checkAndFillDataBeforeCreate = async(data, userId) => {
-    this.checkUniqueNameInPlayers(data.players);
-    await this.fillPlayersData(data.players);
-    this.checkRolesCompatibility(data.players);
-    // await this.checkUserCurrentGames(userId);
-};
-
 exports.postGame = async(req, res) => {
     try {
         const { body } = checkRouteParameters(req);
-        await this.checkAndFillDataBeforeCreate(body, req.user._id);
-        res.status(200).json(body);
+        const game = await this.create({
+            gameMaster: req.user._id,
+            players: body.players,
+        });
+        res.status(200).json(game);
     } catch (e) {
         sendError(res, e);
     }

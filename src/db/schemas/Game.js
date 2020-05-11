@@ -6,7 +6,7 @@ const { playerActions } = require("../../helpers/Player");
 const game = new Schema({
     gameMaster: {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "users",
         required: true,
     },
     players: [PlayerSchema],
@@ -25,18 +25,20 @@ const game = new Schema({
         for: {
             type: String,
             enum: waitingForPossibilities,
+            default: "all",
             required: true,
         },
         to: {
             type: String,
             enum: playerActions,
+            default: "elect-mayor",
             required: true,
         },
     },
     status: {
         type: String,
         enum: gameStatuses,
-        default: "assigning-roles",
+        default: "playing",
         required: true,
     },
     winners: [PlayerSchema],
