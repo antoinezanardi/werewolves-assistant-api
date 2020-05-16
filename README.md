@@ -1,6 +1,7 @@
 # 🐺 Werewolves Assistant API
 
 [![Build Status](https://travis-ci.org/antoinezanardi/werewolves-assistant-api.svg?branch=master)](https://travis-ci.org/antoinezanardi/werewolves-assistant-api)
+[![GitHub license](https://img.shields.io/github/license/antoinezanardi/werewolves-assistant-api.svg)](https://github.com/antoinezanardi/https://img.shields.io/github/license/werewolves-assistant-api.svg/blob/master/LICENSE)
 
 ## 🐺 Description
 Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.

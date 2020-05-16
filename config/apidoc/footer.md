@@ -54,20 +54,22 @@
 
 ## <a id="errors"></a>⚠️ Errors
 
-If you have an error from the API, you'll get a generic structure with a field `code`. This field has an integer value.
+If you have an error from the API, you'll get a generic structure. (_See: [Classes - Error](#error-class)_)
 
-| Code | HTTP Code |                 Description                                 |
-|:----:|:---------:|-------------------------------------------------------------|
-| 1    | 400       | You provided incorrect params.                              |
-| 2    | 401       | You're not authorized.                                      |
-| 3    | 400       | The email provided already exists.                          |
-| 4    | 404       | The requested resource is not found.                        |
-| 5    | 500       | The server got an error, this is not your fault.            |
-| 6    | 400       | You provided a bad or malformed token.                      |
-| 7    | 401       | The credentials provided don't match any in database.       |
-| 8    | 400       | Players provided don't have unique `name`.                  |
-| 9    | 400       | There is no wolf in game composition.                  |
-| 10   | 400       | There is no villager in game composition.                  |
-| 11   | 400       | The game master has already on-going game(s).                  |
-| 12   | 401       | This game doesn't belong to user.                  |
-| 13   | 400       | The play is not allowed in current game's state.                  |
+Description for each case below:
+
+| Code | Type                              | HTTP Code |                 Description                                 |
+|:----:|:---------------------------------:|:---------:|-------------------------------------------------------------|
+| 1    | BAD_REQUEST                       | 400       | You provided incorrect params.                              |
+| 2    | UNAUTHORIZED                      | 401       | You're not authorized.                                      |
+| 3    | EMAIL_EXISTS                      | 400       | The email provided already exists.                          |
+| 4    | NOT_FOUND                         | 404       | The requested resource is not found.                        |
+| 5    | INTERNAL_SERVER_ERROR             | 500       | The server got an error, this is not your fault.            |
+| 6    | BAD_TOKEN                         | 400       | You provided a bad or malformed token.                      |
+| 7    | BAD_CREDENTIALS                   | 401       | The credentials provided don't match any in database.       |
+| 8    | PLAYERS_NAME_NOT_UNIQUE           | 400       | Players provided don't have unique `name`.                  |
+| 9    | NO_WOLF_IN_GAME_COMPOSITION       | 400       | There is no wolf in game composition.                  |
+| 10   | NO_VILLAGER_IN_GAME_COMPOSITION   | 400       | There is no villager in game composition.                  |
+| 11   | GAME_MASTER_HAS_ON_GOING_GAMES    | 400       | The game master has already on-going game(s).                  |
+| 12   | GAME_DOESNT_BELONG_TO_USER        | 401       | This game doesn't belong to user.                  |
+| 13   | BAD_PLAY                          | 400       | The play is not allowed in current game's state.                  |

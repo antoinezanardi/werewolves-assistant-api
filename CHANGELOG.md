@@ -6,13 +6,14 @@
 
 * `.editorconfig` file added for code style constancy.
 * Travis badge added in the `README.md` file.
+* License badge added in the `README.md` file.
 * Provides a random game repartition for a set of players.
 * Check for unique names when players are provided during game random composition or creation.
 * Check for roles compatibility before game creation.
 * Games can be created by user. User can't create a game if there is already one playing.
-* Games can be canceled at any moment.
+* Games can be canceled at any moment by game master.
 
-## Bug fixes
+### 🐛 Bug fixes
 
 * Check if `errorType` provided to `Error constructor` is known to prevent unhandled exception. Otherwise, default `INTERNAL_SERVER_ERROR` is sent. 
 
@@ -33,6 +34,7 @@
 
 ### 📚 Documentation
 
+* API documentation improved.
 * Model for `user` documented.
 * Model for `role` documented.
 * Model for `game` documented.

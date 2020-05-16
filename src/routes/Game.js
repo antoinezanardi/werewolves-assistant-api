@@ -11,14 +11,14 @@ module.exports = app => {
     /**
      * @apiDefine GameResponse
      * @apiSuccess {MongoId} _id Game's ID.
-     * @apiSuccess {User} gameMaster User who created the game and managing it. (_See: [Models - User](#user-model)_)
-     * @apiSuccess {Player} players Players of the game. (_See: [Models - Player](#player-model)_)
+     * @apiSuccess {User} gameMaster User who created the game and managing it. (_See: [Models - User](#user-class)_)
+     * @apiSuccess {Player} players Players of the game. (_See: [Models - Player](#player-class)_)
      * @apiSuccess {Number} turn=1 Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {String} waiting.for Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) for possibilities_)
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions) for possibilities_)
      * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses) for possibilities_)
-     * @apiSuccess {Players[]} [winners] Winners of the game when status is `done`. (_See: [Models - Player](#player-model)_)
+     * @apiSuccess {Players[]} [winners] Winners of the game when status is `done`. (_See: [Models - Player](#player-class)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
      */
