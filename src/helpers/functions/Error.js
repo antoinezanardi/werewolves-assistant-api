@@ -1,15 +1,7 @@
 const Error = require("../../classes/Error");
 const Config = require("../../../config");
 
-exports.generateError = (errorType, error) => {
-    if (typeof error === "string") {
-        error = [{ msg: error }];
-    }
-    if (!Array.isArray(error)) {
-        error = [error];
-    }
-    return new Error(errorType, error);
-};
+exports.generateError = (errorType, data) => new Error(errorType, data);
 
 exports.sendUniqueViolationError = (res, e) => {
     const myRegexp = new RegExp(`${Config.db.name}.([a-z]+)`);

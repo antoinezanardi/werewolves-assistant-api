@@ -6,7 +6,7 @@ class Error {
         this.code = knownErrorType ? errorMetadata[errorType].code : 5;
         this.HTTPCode = knownErrorType ? errorMetadata[errorType].HTTPCode : 500;
         this.type = knownErrorType ? errorType : "INTERNAL_SERVER_ERROR";
-        this.errors = e;
+        this.data = e;
     }
 }
 

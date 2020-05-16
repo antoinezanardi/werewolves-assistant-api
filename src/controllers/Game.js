@@ -4,15 +4,15 @@ const Game = require("../db/models/Game");
 const Role = require("../controllers/Role");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
-const { populate } = require("../helpers/constants/Game");
+const { populate, firstNightPreActionsOrder, nightActionsOrder } = require("../helpers/constants/Game");
 
 exports.find = async(search, projection, options = {}) => await Game.find(search, projection, options).populate(populate);
 
 exports.findOne = async(search, projection, options = {}) => await Game.findOne(search, projection, options).populate(populate);
 
-// exports.getGameNextAction = game => {
-//
-// };
+exports.getNextGameWaiting = gameId => {
+
+};
 
 exports.checkUserCurrentGames = async userId => {
     if (await Game.countDocuments({ gameMaster: userId, status: "playing" })) {
@@ -207,7 +207,7 @@ exports.checkPlayValidity = async play => {
     if (!game) {
         throw generateError("NOT_FOUND", `Game with id ${play.gameId} not found`);
     } else if (game.status !== "playing") {
-        throw generateError("BAD_PLAY", `Game with id ${play.gameId} is not playing but with status "${game.status}"`);
+        throw generateError("BAD_PLAY", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
     } else if (game.waiting.for !== play.source) {
         throw generateError("BAD_PLAY", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
     } else if (game.waiting.to !== play.action) {
@@ -215,16 +215,26 @@ exports.checkPlayValidity = async play => {
     }
 };
 
+exports.allPlay = play => {
+    console.log("all plays");
+};
+
 exports.play = async play => {
     await this.checkPlayValidity(play);
+    const playMethods = {
+        all: this.allPlay,
+    };
+    await playMethods[play.source](play);
+    const waiting = await this.getNextGameWaiting(play.gameId);
+    return await this.findOneAndUpdate({ _id: play.gameId }, { waiting });
 };
 
 exports.postPlay = async(req, res) => {
     try {
         const { params, body } = checkRequestData(req);
         await this.checkGameBelongsToUser(params.id, req.user._id);
-        await this.play({ ...body, gameId: params.id });
-        res.status(200).json(body);
+        const game = await this.play({ ...body, gameId: params.id });
+        res.status(200).json(game);
     } catch (e) {
         sendError(res, e);
     }
