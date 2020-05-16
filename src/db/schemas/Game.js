@@ -1,7 +1,7 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
-const { gameStatuses, waitingForPossibilities, gamePhases } = require("../../helpers/Game");
-const { playerActions } = require("../../helpers/Player");
+const { gameStatuses, waitingForPossibilities, gamePhases } = require("../../helpers/constants/Game");
+const { playerActions } = require("../../helpers/constants/Player");
 
 const game = new Schema({
     gameMaster: {

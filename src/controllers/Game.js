@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
 const Role = require("../controllers/Role");
-const { generateError, sendError } = require("../helpers/Error");
-const { checkRouteParameters } = require("../helpers/Express");
-const { populate } = require("../helpers/Game");
+const { generateError, sendError } = require("../helpers/functions/Error");
+const { checkRequestData } = require("../helpers/functions/Express");
+const { populate } = require("../helpers/constants/Game");
 
 exports.find = async(search, projection, options = {}) => await Game.find(search, projection, options).populate(populate);
 
@@ -77,7 +77,7 @@ exports.findOneAndUpdate = async(search, data, options = {}) => {
 
 exports.getGames = async(req, res) => {
     try {
-        checkRouteParameters(req);
+        checkRequestData(req);
         const games = await this.find({});
         res.status(200).json(games);
     } catch (e) {
@@ -146,7 +146,7 @@ exports.getWolfRoles = async players => {
 
 exports.getGameRepartition = async(req, res) => {
     try {
-        const { body } = checkRouteParameters(req);
+        const { body } = checkRequestData(req);
         this.checkUniqueNameInPlayers(body.players);
         const wolfRoles = await this.getWolfRoles(body.players);
         const villagerRoles = await this.getVillagerRoles(body.players, wolfRoles);
@@ -159,7 +159,7 @@ exports.getGameRepartition = async(req, res) => {
 
 exports.getGame = async(req, res) => {
     try {
-        const { params } = checkRouteParameters(req);
+        const { params } = checkRequestData(req);
         const game = await this.findOne({ _id: params.id });
         if (!game) {
             throw generateError("NOT_FOUND", `Game not found with id "${params.id}"`);
@@ -172,7 +172,7 @@ exports.getGame = async(req, res) => {
 
 exports.postGame = async(req, res) => {
     try {
-        const { body } = checkRouteParameters(req);
+        const { body } = checkRequestData(req);
         const game = await this.create({
             gameMaster: mongoose.Types.ObjectId(req.user._id),
             players: body.players,
@@ -184,14 +184,16 @@ exports.postGame = async(req, res) => {
 };
 
 exports.checkGameBelongsToUser = async(gameId, userId) => {
-    if (!await this.findOne({ _id: gameId, gameMaster: { _id: userId } })) {
+    const game = await this.findOne({ _id: gameId, gameMaster: { _id: userId } });
+    if (!game) {
         throw generateError("GAME_DOESNT_BELONG_TO_USER", `Game with id ${gameId} doesn't belong to user with id ${userId}`);
     }
+    return game;
 };
 
 exports.patchGame = async(req, res) => {
     try {
-        const { params, body } = checkRouteParameters(req);
+        const { params, body } = checkRequestData(req);
         await this.checkGameBelongsToUser(params.id, req.user._id);
         const game = await this.findOneAndUpdate({ _id: params.id }, body);
         res.status(200).json(game);
@@ -200,12 +202,28 @@ exports.patchGame = async(req, res) => {
     }
 };
 
-exports.play = async(req, res) => {
+exports.checkPlayValidity = async play => {
+    const game = await this.findOne({ _id: play.gameId });
+    if (!game) {
+        throw generateError("NOT_FOUND", `Game with id ${play.gameId} not found`);
+    } else if (game.status !== "playing") {
+        throw generateError("BAD_PLAY", `Game with id ${play.gameId} is not playing but with status "${game.status}"`);
+    } else if (game.waiting.for !== play.source) {
+        throw generateError("BAD_PLAY", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
+    } else if (game.waiting.to !== play.action) {
+        throw generateError("BAD_PLAY", `Game is waiting for "${game.waiting.for}" to "${game.waiting.to}", not "${play.action}"`);
+    }
+};
+
+exports.play = async play => {
+    await this.checkPlayValidity(play);
+};
+
+exports.postPlay = async(req, res) => {
     try {
-        const { params, body } = checkRouteParameters(req);
+        const { params, body } = checkRequestData(req);
         await this.checkGameBelongsToUser(params.id, req.user._id);
-        const game = await this.findOne({ _id: params.id });
-        console.log(game.waiting);
+        await this.play({ ...body, gameId: params.id });
         res.status(200).json(body);
     } catch (e) {
         sendError(res, e);

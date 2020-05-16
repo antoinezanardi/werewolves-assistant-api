@@ -2,8 +2,9 @@
 const passport = require("passport");
 const { param, body } = require("express-validator");
 const Game = require("../controllers/Game");
-const { roleNames } = require("../helpers/Role");
-const { patchableGameStatuses } = require("../helpers/Game");
+const { roleNames } = require("../helpers/constants/Role");
+const { patchableGameStatuses, waitingForPossibilities } = require("../helpers/constants/Game");
+const { playerActions } = require("../helpers/constants/Player");
 
 module.exports = app => {
 
@@ -125,8 +126,9 @@ module.exports = app => {
     app.post("/games/:id/play", passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
-        body("status")
-            .optional()
-            .isIn(patchableGameStatuses).withMessage(`Must be equal to one of the following values: ${patchableGameStatuses}`),
-    ], Game.play);
+        body("source")
+            .isIn(waitingForPossibilities).withMessage(`Must be equal to one of the following values: ${waitingForPossibilities}`),
+        body("action")
+            .isIn(playerActions).withMessage(`Must be equal to one of the following values: ${playerActions}`),
+    ], Game.postPlay);
 };

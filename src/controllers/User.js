@@ -3,8 +3,8 @@ const { sign } = require("jsonwebtoken");
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const User = require("../db/models/User");
-const { generateError, sendError } = require("../helpers/Error");
-const { checkRouteParameters } = require("../helpers/Express");
+const { generateError, sendError } = require("../helpers/functions/Error");
+const { checkRequestData } = require("../helpers/functions/Express");
 const Config = require("../../config");
 
 exports.create = async(data, options = {}) => {
@@ -52,7 +52,7 @@ exports.generateSaltAndHash = body => new Promise((resolve, reject) => {
 
 exports.postUser = async(req, res) => {
     try {
-        const { body } = checkRouteParameters(req);
+        const { body } = checkRequestData(req);
         await this.generateSaltAndHash(body);
         const newUser = await this.create(body, { lean: true });
         delete newUser.password;
@@ -73,7 +73,7 @@ exports.getUsers = async(req, res) => {
 
 exports.login = (req, res) => {
     try {
-        checkRouteParameters(req);
+        checkRequestData(req);
         passport.authenticate("local", { session: false }, (err, user, info) => {
             if (err || !user) {
                 return res.status(401).json(generateError("BAD_CREDENTIALS", info));

@@ -12,6 +12,10 @@
 * Games can be created by user. User can't create a game if there is already one playing.
 * Games can be canceled at any moment.
 
+## Bug fixes
+
+* Check if `errorType` provided to `Error constructor` is known to prevent unhandled exception. Otherwise, default `INTERNAL_SERVER_ERROR` is sent. 
+
 ### 🛣️ Routes
 
 * Route `GET /games` added for retrieving all games. Protected with basic authentication.
@@ -42,6 +46,8 @@
 ### ♻️ Refactoring
 
 * Moved all database related folders and files in `src/db`.
+* Divided `helpers` files into `functions` and `constants` folders.
+* `checkRouteParameters` helper function renamed into `checkRequestData`.
 
 ### 📦 Packages
 
@@ -52,8 +58,8 @@
 * `express-validator` updated to version `6.4.1`.
 * `mocha` updated to version `7.1.2`.
 * `mongo-dot-notation` updated to version `2.0.0`.
-* `mongoose` updated to version `5.9.13`.
-* `nodemon` updated to version `2.0.3`.
+* `mongoose` updated to version `5.9.14`.
+* `nodemon` updated to version `2.0.4`.
 * `passport` updated to version `0.4.1`.
 
 ---

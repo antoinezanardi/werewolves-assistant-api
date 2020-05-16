@@ -1,7 +1,7 @@
 const { validationResult, matchedData } = require("express-validator");
-const Error = require("../classes/Error");
+const Error = require("../../classes/Error");
 
-exports.checkRouteParameters = req => {
+exports.checkRequestData = req => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         throw new Error("BAD_REQUEST", errors.array());

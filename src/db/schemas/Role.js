@@ -1,5 +1,5 @@
 const { Schema } = require("mongoose");
-const { roleNames, groupNames } = require("../../helpers/Role");
+const { roleNames, groupNames } = require("../../helpers/constants/Role");
 
 const role = new Schema({
     name: {

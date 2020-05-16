@@ -66,3 +66,8 @@ If you have an error from the API, you'll get a generic structure with a field `
 | 6    | 400       | You provided a bad or malformed token.                      |
 | 7    | 401       | The credentials provided don't match any in database.       |
 | 8    | 400       | Players provided don't have unique `name`.                  |
+| 9    | 400       | There is no wolf in game composition.                  |
+| 10   | 400       | There is no villager in game composition.                  |
+| 11   | 400       | The game master has already on-going game(s).                  |
+| 12   | 401       | This game doesn't belong to user.                  |
+| 13   | 400       | The play is not allowed in current game's state.                  |

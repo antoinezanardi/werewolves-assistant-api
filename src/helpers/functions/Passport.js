@@ -3,8 +3,8 @@ const bcrypt = require("bcrypt");
 const { Strategy: LocalStrategy } = require("passport-local");
 const { Strategy: JWTStrategy, ExtractJwt: ExtractJWT } = require("passport-jwt");
 const { BasicStrategy } = require("passport-http");
-const User = require("../db/models/User");
-const Config = require("../../config");
+const User = require("../../db/models/User");
+const Config = require("../../../config");
 
 passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, cb) => User.findOne({ email: email }, (err, user) => {
     if (err) {

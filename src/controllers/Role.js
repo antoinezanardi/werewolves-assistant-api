@@ -1,5 +1,5 @@
 const Role = require("../db/models/Role");
-const { sendError } = require("../helpers/Error");
+const { sendError } = require("../helpers/functions/Error");
 
 exports.find = async(search, projection, options = {}) => await Role.find(search, projection, options);
 
