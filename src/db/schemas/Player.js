@@ -1,6 +1,7 @@
 const { Schema } = require("mongoose");
 const { playerAttributes, playerActions } = require("../../helpers/constants/Player");
 const { groupNames, roleNames } = require("../../helpers/constants/Role");
+const { waitingForPossibilities } = require("../../helpers/constants/Game");
 
 const player = new Schema({
     name: {
@@ -32,13 +33,18 @@ const player = new Schema({
         },
         source: {
             type: String,
-            enum: [...roleNames, ...groupNames],
+            enum: waitingForPossibilities,
             required: true,
         },
         remaining: {
             type: String,
         },
     }],
+    hasPlayed: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
     isAlive: {
         type: Boolean,
         default: true,
@@ -47,7 +53,7 @@ const player = new Schema({
     murdered: {
         by: {
             type: String,
-            enum: [...roleNames, ...groupNames],
+            enum: waitingForPossibilities,
         },
         of: {
             type: String,

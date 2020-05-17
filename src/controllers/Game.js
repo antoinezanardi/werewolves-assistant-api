@@ -4,14 +4,23 @@ const Game = require("../db/models/Game");
 const Role = require("../controllers/Role");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
-const { populate, firstNightPreActionsOrder, nightActionsOrder } = require("../helpers/constants/Game");
+const { populate, turnPreActionsOrder, turnActionsOrder } = require("../helpers/constants/Game");
+const { groupNames } = require("../helpers/constants/Role");
 
-exports.find = async(search, projection, options = {}) => await Game.find(search, projection, options).populate(populate);
+exports.find = async(search, projection, options = {}) => {
+    let games = await Game.find(search, projection, options).populate(populate);
+    if (options.toJSON) {
+        games = games.map(game => game.toJSON());
+    }
+    return games;
+};
 
-exports.findOne = async(search, projection, options = {}) => await Game.findOne(search, projection, options).populate(populate);
-
-exports.getNextGameWaiting = gameId => {
-
+exports.findOne = async(search, projection, options = {}) => {
+    let game = await Game.findOne(search, projection, options).populate(populate);
+    if (game && options.toJSON) {
+        game = game.toJSON();
+    }
+    return game;
 };
 
 exports.checkUserCurrentGames = async userId => {
@@ -202,6 +211,50 @@ exports.patchGame = async(req, res) => {
     }
 };
 
+exports.isSourceAvailableInPlayers = (players, source) => {
+    if (source === "all" || source === "mayor") {
+        return true;
+    }
+    const sourceType = groupNames.includes(source) ? "group" : "role";
+    for (const player of players) {
+        if (sourceType === "group" && player.role.group === source && player.isAlive ||
+            sourceType === "role" && player.role.current === source && player.isAlive) {
+            return true;
+        }
+    }
+    return false;
+};
+
+exports.getNextGameAction = game => {
+    const actionsOrder = game.turn === 1 ? [...turnPreActionsOrder, ...turnActionsOrder] : [...turnActionsOrder];
+    for (let i = 0; i < actionsOrder.length; i++) {
+        if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
+            i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
+            console.log(actionsOrder[i + 1]);
+            return actionsOrder[i + 1];
+        }
+    }
+    return turnActionsOrder[0];
+};
+
+exports.nextGameAction = game => {
+    const { source, action } = this.getNextGameAction(game);
+    game.waiting.for = source;
+    game.waiting.to = action;
+};
+
+exports.wolvesPlay = async(play, game) => {
+    console.log("wolves plays");
+};
+
+exports.seerPlay = async(play, game) => {
+    console.log("seer plays");
+};
+
+exports.allPlay = async(play, game) => {
+    console.log("all plays");
+};
+
 exports.checkPlayValidity = async play => {
     const game = await this.findOne({ _id: play.gameId });
     if (!game) {
@@ -215,18 +268,20 @@ exports.checkPlayValidity = async play => {
     }
 };
 
-exports.allPlay = play => {
-    console.log("all plays");
-};
-
 exports.play = async play => {
     await this.checkPlayValidity(play);
+    const game = await this.findOne({ _id: play.gameId }, "-gameMaster", { toJSON: true });
     const playMethods = {
         all: this.allPlay,
+        seer: this.seerPlay,
+        wolves: this.wolvesPlay,
     };
-    await playMethods[play.source](play);
-    const waiting = await this.getNextGameWaiting(play.gameId);
-    return await this.findOneAndUpdate({ _id: play.gameId }, { waiting });
+    await playMethods[play.source](play, game);
+    game.tick++;
+    if (game.waiting.for === play.source && game.waiting.to === play.action) {
+        this.nextGameAction(game);
+    }
+    return await this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
 exports.postPlay = async(req, res) => {

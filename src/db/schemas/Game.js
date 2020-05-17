@@ -9,7 +9,10 @@ const game = new Schema({
         ref: "users",
         required: true,
     },
-    players: [PlayerSchema],
+    players: {
+        type: [PlayerSchema],
+        required: true,
+    },
     turn: {
         type: Number,
         default: 1,
@@ -19,6 +22,11 @@ const game = new Schema({
         type: String,
         enum: gamePhases,
         default: "night",
+        required: true,
+    },
+    tick: {
+        type: Number,
+        default: 1,
         required: true,
     },
     waiting: {
