@@ -53,6 +53,7 @@
 * Moved all database related folders and files in `src/db`.
 * Divided `helpers` files into `functions` and `constants` folders.
 * `checkRouteParameters` helper function renamed into `checkRequestData`.
+*  All play methods moved from `Game` controller to brand new `Player` controller.
 * `errors` field from `Error` class renamed to `data`.
 
 ### 📦 Packages

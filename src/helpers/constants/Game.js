@@ -12,7 +12,7 @@ exports.populate = [
     { path: "gameMaster", select: "-password" },
 ];
 
-exports.turnPreNighttActionsOrder = [
+exports.turnPreNightActionsOrder = [
     { source: "all", action: "elect-mayor" },
 ];
 

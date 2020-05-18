@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
+const Player = require("../controllers/Player");
 const Role = require("../controllers/Role");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
@@ -211,7 +212,7 @@ exports.patchGame = async(req, res) => {
     }
 };
 
-exports.nextGameTick = (game, newPhase) => {
+exports.nextGameTick = (game, newPhase = false) => {
     game.tick++;
     if (newPhase) {
         if (game.phase === "night") {
@@ -222,6 +223,8 @@ exports.nextGameTick = (game, newPhase) => {
         }
     }
 };
+
+exports.getNextGameDayAction = () => ({ for: "villagers", to: "vote" });
 
 exports.isSourceAvailableInPlayers = (players, source) => {
     if (source === "all" || source === "mayor") {
@@ -240,66 +243,28 @@ exports.isSourceAvailableInPlayers = (players, source) => {
 exports.getNextGameNightAction = game => {
     const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
     for (let i = 0; i < actionsOrder.length; i++) {
+        console.log(actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to && i + 1 !== actionsOrder.length );
         if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
             i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
-            console.log(actionsOrder[i + 1]);
-            return actionsOrder[i + 1];
+            const nextGameNightAction = actionsOrder[i + 1];
+            return { for: nextGameNightAction.source, to: nextGameNightAction.action };
         }
     }
-    throw generateError("INTERNAL_SERVER_ERROR", "Unable to predict next night action");
+    throw generateError("INTERNAL_SERVER_ERROR", "Unable to predict next night action.");
 };
 
-exports.nextGameAction = game => {
-    const { waiting, newPhase } = game.phase === "night" ? this.getNextGameNightAction(game) : this.getNextDay;
-    this.nextGameTick(game, newPhase);
-};
-
-exports.mayorPlays = async(play, game) => {
-    console.log("mayor plays");
-};
-
-exports.wolvesPlay = async(play, game) => {
-    console.log("wolves play");
-};
-
-exports.hunterPlays = async(play, game) => {
-    console.log("hunter plays");
-};
-
-exports.ravenPlays = async(play, game) => {
-    console.log("protector plays");
-};
-
-exports.protectorPlays = async(play, game) => {
-    console.log("protector plays");
-};
-
-exports.witchPlays = async(play, game) => {
-    console.log("witch plays");
-};
-
-exports.seerPlays = async(play, game) => {
-    console.log("seer plays");
-};
-
-exports.villagersPlay = async(play, game) => {
-    console.log("villagers play");
-};
-
-exports.allPlay = async(play, game) => {
-    console.log("all plays");
-};
+exports.getNextGameAction = game => game.phase === "night" ? this.getNextGameNightAction(game) : this.getNextGameDayAction(game);
 
 exports.generatePlayMethods = () => ({
-    all: this.allPlay,
-    villagers: this.villagersPlay,
-    seer: this.seerPlays,
-    witch: this.witchPlays,
-    protector: this.protectorPlays,
-    raven: this.ravenPlays,
-    hunter: this.hunterPlays,
-    wolves: this.wolvesPlay,
-    mayor: this.mayorPlays,
+    all: Player.allPlay,
+    villagers: Player.villagersPlay,
+    seer: Player.seerPlays,
+    witch: Player.witchPlays,
+    protector: Player.protectorPlays,
+    raven: Player.ravenPlays,
+    hunter: Player.hunterPlays,
+    wolves: Player.wolvesPlay,
+    mayor: Player.mayorPlays,
 });
 
 exports.checkPlayValidity = async play => {
@@ -320,10 +285,10 @@ exports.play = async play => {
     const game = await this.findOne({ _id: play.gameId }, "-gameMaster", { toJSON: true });
     const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game);
-    game.tick++;
     if (game.waiting.for === play.source && game.waiting.to === play.action) {
-        this.nextGameAction(game);
+        game.waiting = this.getNextGameAction(game);
     }
+    this.nextGameTick(game);
     return await this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
