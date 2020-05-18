@@ -34,8 +34,8 @@ const gameHistory = new Schema({
         enum: playerActions,
         required: true,
     },
-    target: {
-        type: Player,
+    targets: {
+        type: [Player],
     },
 }, {
     timestamps: true,

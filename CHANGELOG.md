@@ -40,11 +40,13 @@
 * Model for `role` documented.
 * Model for `game` documented.
 * Model for `player` documented.
+* Model for `gameHistory` documented.
 * `Player Roles` documented.
 * `Player Groups` documented.
 * `Player Actions` documented.
 * `Player Attributes` documented.
 * `Game Statuses` documented.
+* `Game History` documented.
 
 ### ♻️ Refactoring
 

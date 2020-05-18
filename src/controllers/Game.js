@@ -4,7 +4,7 @@ const Game = require("../db/models/Game");
 const Role = require("../controllers/Role");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
-const { populate, turnPreActionsOrder, turnActionsOrder } = require("../helpers/constants/Game");
+const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 
 exports.find = async(search, projection, options = {}) => {
@@ -211,6 +211,18 @@ exports.patchGame = async(req, res) => {
     }
 };
 
+exports.nextGameTick = (game, newPhase) => {
+    game.tick++;
+    if (newPhase) {
+        if (game.phase === "night") {
+            game.phase = "day";
+        } else {
+            game.phase = "night";
+            game.turn++;
+        }
+    }
+};
+
 exports.isSourceAvailableInPlayers = (players, source) => {
     if (source === "all" || source === "mayor") {
         return true;
@@ -225,8 +237,8 @@ exports.isSourceAvailableInPlayers = (players, source) => {
     return false;
 };
 
-exports.getNextGameAction = game => {
-    const actionsOrder = game.turn === 1 ? [...turnPreActionsOrder, ...turnActionsOrder] : [...turnActionsOrder];
+exports.getNextGameNightAction = game => {
+    const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
     for (let i = 0; i < actionsOrder.length; i++) {
         if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
             i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
@@ -234,26 +246,61 @@ exports.getNextGameAction = game => {
             return actionsOrder[i + 1];
         }
     }
-    return turnActionsOrder[0];
+    throw generateError("INTERNAL_SERVER_ERROR", "Unable to predict next night action");
 };
 
 exports.nextGameAction = game => {
-    const { source, action } = this.getNextGameAction(game);
-    game.waiting.for = source;
-    game.waiting.to = action;
+    const { waiting, newPhase } = game.phase === "night" ? this.getNextGameNightAction(game) : this.getNextDay;
+    this.nextGameTick(game, newPhase);
+};
+
+exports.mayorPlays = async(play, game) => {
+    console.log("mayor plays");
 };
 
 exports.wolvesPlay = async(play, game) => {
-    console.log("wolves plays");
+    console.log("wolves play");
 };
 
-exports.seerPlay = async(play, game) => {
+exports.hunterPlays = async(play, game) => {
+    console.log("hunter plays");
+};
+
+exports.ravenPlays = async(play, game) => {
+    console.log("protector plays");
+};
+
+exports.protectorPlays = async(play, game) => {
+    console.log("protector plays");
+};
+
+exports.witchPlays = async(play, game) => {
+    console.log("witch plays");
+};
+
+exports.seerPlays = async(play, game) => {
     console.log("seer plays");
+};
+
+exports.villagersPlay = async(play, game) => {
+    console.log("villagers play");
 };
 
 exports.allPlay = async(play, game) => {
     console.log("all plays");
 };
+
+exports.generatePlayMethods = () => ({
+    all: this.allPlay,
+    villagers: this.villagersPlay,
+    seer: this.seerPlays,
+    witch: this.witchPlays,
+    protector: this.protectorPlays,
+    raven: this.ravenPlays,
+    hunter: this.hunterPlays,
+    wolves: this.wolvesPlay,
+    mayor: this.mayorPlays,
+});
 
 exports.checkPlayValidity = async play => {
     const game = await this.findOne({ _id: play.gameId });
@@ -271,11 +318,7 @@ exports.checkPlayValidity = async play => {
 exports.play = async play => {
     await this.checkPlayValidity(play);
     const game = await this.findOne({ _id: play.gameId }, "-gameMaster", { toJSON: true });
-    const playMethods = {
-        all: this.allPlay,
-        seer: this.seerPlay,
-        wolves: this.wolvesPlay,
-    };
+    const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game);
     game.tick++;
     if (game.waiting.for === play.source && game.waiting.to === play.action) {
