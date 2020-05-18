@@ -16,6 +16,7 @@ const game = new Schema({
     turn: {
         type: Number,
         default: 1,
+        min: 1,
         required: true,
     },
     phase: {
@@ -27,6 +28,7 @@ const game = new Schema({
     tick: {
         type: Number,
         default: 1,
+        min: 1,
         required: true,
     },
     waiting: {

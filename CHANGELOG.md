@@ -11,7 +11,7 @@
 * Check for unique names when players are provided during game random composition or creation.
 * Check for roles compatibility before game creation.
 * Games can be created by user. User can't create a game if there is already one playing.
-* Games can be canceled at any moment by game master.
+* Games can be canceled at any moment by the game master.
 
 ### 🐛 Bug fixes
 
@@ -22,12 +22,13 @@
 * Route `GET /games` added for retrieving all games. Protected with basic authentication.
 * Route `GET /games/repartition` added for getting a random team composition. Protected with basic authentication.
 * Route `POST /games` added for creating games. Protected with JWT.
-* Route `PATCH /games` added for patching games. Protected with JWT.
+* Route `PATCH /games` added for updating games. Protected with JWT.
 * Route `GET /roles` added for getting all available roles. Protected with basic authentication.
 
 ### 💾 Database
 
 * Game schema for collection `games` defined with minimal configuration.
+* Game history schema for collection `gameHistory` defined with minimal configuration.
 * Player schema for collection `games` defined with minimal configuration.
 * Role schema for collection `roles` defined with minimal configuration.
 * First roles added in `roles` collection.
@@ -58,7 +59,7 @@
 * `apidoc` updated to version `0.22.1`.
 * `bcrypt` updated to version `4.0.1`.
 * `eslint` updated to version `7.0.0`.
-* `express-validator` updated to version `6.4.1`.
+* `express-validator` updated to version `6.5.0`.
 * `mocha` updated to version `7.1.2`.
 * `mongo-dot-notation` updated to version `2.0.0`.
 * `mongoose` updated to version `5.9.14`.

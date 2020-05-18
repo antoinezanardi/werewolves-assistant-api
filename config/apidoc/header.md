@@ -65,6 +65,12 @@
 | group                | String   | Role's group.                                                     |
 | maxInGame            | Number   | Maximum possible of this role in a game.                                                     |
 
+## <a id="game-history-class"></a>📜 Game History
+
+| Field                | Type     | Description                                                         |
+|----------------------|:--------:|---------------------------------------------------------------------|
+| _id                  | ObjectId | Game history entry's ID.                                                     |
+
 ## <a id="error-class"></a>⚠️ API Error
 
 Class returned from API HTTP requests when something went wrong.
