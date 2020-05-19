@@ -65,20 +65,28 @@
 | group                | String   | Role's group.                                                     |
 | maxInGame            | Number   | Maximum possible of this role in a game.                                                     |
 
+## <a id="play-class"></a>🕹 Play
+| Field                            | Type                      | Description                                                         |
+|----------------------------------|:-------------------------:|---------------------------------------------------------------------|
+| &emsp;&emsp;action               | String                    | Action of the play. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                      |
+| &emsp;&emsp;source               | String                    | Action of the play. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                      |
+| &emsp;&emsp;**targets***         | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
+
 ## <a id="game-history-class"></a>📜 Game History
 
 Each time a play is done by anyone or any group, an entry in game's history is saved. Each entry has the following structure:
 
-| Field                | Type                      | Description                                                         |
-|----------------------|:-------------------------:|---------------------------------------------------------------------|
-| _id                  | ObjectId                  | Game history entry's ID.                                                     |
-| gameId               | ObjectId                  | Game's ID.                                                     |
-| turn                 | Number                    | Game's turn.                                                     |
-| phase                | Number                    | Game's phase.                                                     |
-| tick                 | Number                    | Game's tick.                                                     |
-| source               | String                    | Source of the play. Can be either [Player Roles](#player-roles), [Player Groups](#player-groups) or `mayor` in [Player Attributes](#player-attributes).                                                     |
-| action               | String                    | Action of the play. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                      |
-| **targets***         | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
+| Field                            | Type                      | Description                                                         |
+|----------------------------------|:-------------------------:|---------------------------------------------------------------------|
+| _id                              | ObjectId                  | Game history entry's ID.                                                     |
+| gameId                           | ObjectId                  | Game's ID.                                                     |
+| turn                             | Number                    | Game's turn.                                                     |
+| phase                            | Number                    | Game's phase.                                                     |
+| tick                             | Number                    | Game's tick.                                                     |
+| source                           | String                    | Source of the play. Can be either [Player Roles](#player-roles), [Player Groups](#player-groups) or `mayor` in [Player Attributes](#player-attributes).                                                     |
+| play                             | Object                    |                                                       |
+
+
 
 ## <a id="error-class"></a>⚠️ API Error
 

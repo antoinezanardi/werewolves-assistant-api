@@ -3,6 +3,22 @@ const Player = require("./Player");
 const { gamePhases, waitingForPossibilities } = require("../../helpers/constants/Game");
 const { playerActions } = require("../../helpers/constants/Player");
 
+const play = {
+    action: {
+        type: String,
+        enum: playerActions,
+        required: true,
+    },
+    source: {
+        type: String,
+        enum: waitingForPossibilities,
+        required: true,
+    },
+    targets: {
+        type: [Player],
+    },
+};
+
 const gameHistory = new Schema({
     gameId: {
         type: Schema.Types.ObjectId,
@@ -24,19 +40,8 @@ const gameHistory = new Schema({
         min: 1,
         required: true,
     },
-    source: {
-        type: String,
-        enum: waitingForPossibilities,
-        required: true,
-    },
-    action: {
-        type: String,
-        enum: playerActions,
-        required: true,
-    },
-    targets: {
-        type: [Player],
-    },
+    play,
+    // TODO: event structure
 }, {
     timestamps: true,
     versionKey: false,

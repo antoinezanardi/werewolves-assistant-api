@@ -1,5 +1,6 @@
 const { Schema } = require("mongoose");
 const { roleNames, groupNames } = require("../../helpers/constants/Role");
+const { playerActions } = require("../../helpers/constants/Player");
 
 const role = new Schema({
     name: {
@@ -16,6 +17,11 @@ const role = new Schema({
         type: Number,
         required: true,
     },
+    powers: [{
+        type: String,
+        enum: playerActions,
+        required: true,
+    }],
 }, {
     timestamps: true,
     versionKey: false,
