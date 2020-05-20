@@ -30,9 +30,9 @@
 | phase                | String                    | Each turn has two phases, `day` or `night`. Starting at `night`.                                                    |
 | tick                 | Number                    | Starting at `1`, tick increments each time a play is made.                                                    |
 | waiting              | Object                    |                                                |
-| &emsp;&emsp;for      | String                    | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) for possibilities_)                                         |
-| &emsp;&emsp;to       | String                    | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                         |
-| status               | String                    | Game's current status. (_See: [Codes - Game Statuses](#game-statuses) for possibilities_)                                                |
+| &emsp;&emsp;for      | String                    | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                         |
+| &emsp;&emsp;to       | String                    | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)                                         |
+| status               | String                    | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                |
 | **winners***         | [Player[]](#player-class) | Winners of the game when status is `done`. (_See: [Classes - Player](#player-class)_)                                                |
 | createdAt            | Date                      | When the user created his account.                                                     |
 | updatedAt            | Date                      | When the user updated his account.                                                     |
@@ -44,17 +44,17 @@
 | _id                        | ObjectId | Player's ID.                                                     |
 | name                       | String   | Player's name.                                                     |
 | role                       | Object   |                                                      |
-| &emsp;&emsp;original       | String   | Player's Original role when the game started. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
-| &emsp;&emsp;current        | String   | Player's current role. (_See [Codes - Player Roles](#player-roles) for possibilities_)                                                    |
-| &emsp;&emsp;group          | String   | Player's current group. (_See [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
+| &emsp;&emsp;original       | String   | Player's Original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
+| &emsp;&emsp;current        | String   | Player's current role. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
+| &emsp;&emsp;group          | String   | Player's current group. (_Possibilities: [Codes - Player Groups](#player-groups)_)                                                    |
 | attributes                 | Array    | An attribute is an effect or a status on a player.                                                     |
-| &emsp;&emsp;attribute      | String   | Attribute's name on the player. (_See [Codes - Player Attributes](#player-attributes) for possibilities_)                                                    |
-| &emsp;&emsp;source         | String   | Which role or group gave this attribute to the player. (_See [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) for possibilities_)                                                    |
+| &emsp;&emsp;attribute      | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                    |
+| &emsp;&emsp;source         | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                    |
 | **&emsp;&emsp;remaining*** | String   | Remaining time for this attribute before disappear. Expressed in `phases` (_e.g: `2 phases`_), decreases after each phase. |
 | isAlive                    | Boolean  | If the player is currently alive or not.                                                     |
 | **murdered***              | Object   | Set if `isAlive` is `false`.                                                    |
-| &emsp;&emsp;by             | String   | Which role or group killed the player. (_See [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) for possibilities_)                                                   |
-| &emsp;&emsp;of             | String   | What action killed the player. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                 |
+| &emsp;&emsp;by             | String   | Which role or group killed the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                   |
+| &emsp;&emsp;of             | String   | What action killed the player. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                 |
 
 ## <a id="role-class"></a>🃏 Role
 
@@ -64,13 +64,6 @@
 | name                 | String   | Role's name.                                                     |
 | group                | String   | Role's group.                                                     |
 | maxInGame            | Number   | Maximum possible of this role in a game.                                                     |
-
-## <a id="play-class"></a>🕹 Play
-| Field                            | Type                      | Description                                                         |
-|----------------------------------|:-------------------------:|---------------------------------------------------------------------|
-| &emsp;&emsp;action               | String                    | Action of the play. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                      |
-| &emsp;&emsp;source               | String                    | Action of the play. (_See: [Codes - Player Actions](#player-actions) for possibilities_)                                                      |
-| &emsp;&emsp;**targets***         | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
 
 ## <a id="game-history-class"></a>📜 Game History
 
@@ -83,10 +76,14 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 | turn                             | Number                    | Game's turn.                                                     |
 | phase                            | Number                    | Game's phase.                                                     |
 | tick                             | Number                    | Game's tick.                                                     |
-| source                           | String                    | Source of the play. Can be either [Player Roles](#player-roles), [Player Groups](#player-groups) or `mayor` in [Player Attributes](#player-attributes).                                                     |
-| play                             | Object                    |                                                       |
+| play                             | [Play](#play-class)       | Game's play                                                      |
 
-
+## <a id="play-class"></a>🕹 Play
+| Field                            | Type                      | Description                                                         |
+|----------------------------------|:-------------------------:|---------------------------------------------------------------------|
+| &emsp;&emsp;source               | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
+| &emsp;&emsp;action               | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
+| &emsp;&emsp;**targets***         | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
 
 ## <a id="error-class"></a>⚠️ API Error
 
@@ -99,4 +96,4 @@ Class returned from API HTTP requests when something went wrong.
 | type                 | String   | Unique type.                                                     |
 | data                 | any      | Error's data. Can be anything.                                                     |
 
-See [Codes - Errors](#errors) for more information about each property and values.
+See: [Codes - Errors](#errors) for more information about each property and values.

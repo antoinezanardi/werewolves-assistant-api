@@ -41,7 +41,6 @@ const gameHistory = new Schema({
         required: true,
     },
     play,
-    // TODO: event structure
 }, {
     timestamps: true,
     versionKey: false,

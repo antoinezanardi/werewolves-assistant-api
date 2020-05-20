@@ -36,11 +36,11 @@
 ### 📚 Documentation
 
 * API documentation improved.
-* Model for `user` documented.
-* Model for `role` documented.
-* Model for `game` documented.
-* Model for `player` documented.
-* Model for `gameHistory` documented.
+* `User Class` documented.
+* `Role Class` documented.
+* `Game Class` documented.
+* `Player Class` documented.
+* `GameHistory Class` documented.
 * `Player Roles` documented.
 * `Player Groups` documented.
 * `Player Actions` documented.

@@ -17,9 +17,9 @@ module.exports = app => {
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {Number} tick=1 Starting at `1`, tick increments each time a play is made.
      * @apiSuccess {Object} waiting
-     * @apiSuccess {String} waiting.for Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) for possibilities_)
-     * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions) for possibilities_)
-     * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses) for possibilities_)
+     * @apiSuccess {String} waiting.for Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
+     * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)
+     * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {Players[]} [winners] Winners of the game when status is `done`. (_See: [Models - Player](#player-class)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
@@ -81,7 +81,7 @@ module.exports = app => {
      * @apiPermission BearerToken
      * @apiParam (Request Body Parameters) {Array} players Must contain between 4 and 20 players.
      * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
-     * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles) for possibilities_)
+     * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiUse GameResponse
      */
     app.post("/games", passport.authenticate("jwt", { session: false }), [
@@ -123,6 +123,13 @@ module.exports = app => {
      *
      * @apiPermission BearerToken
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiParam (Request Body Parameters) {String} source Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_).
+     * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_).
+     * @apiParam (Request Body Parameters) {Array} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
+     * @apiParam (Request Body Parameters) {ObjectId} targets._id Player's id.
+     * @apiParam (Request Body Parameters) {Array} [votes] Required when **action** is `elect-mayor`, `eat` or `vote`.
+     * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
+     * @apiParam (Request Body Parameters) {ObjectId} votes.against Vote's target.
      * @apiUse GameResponse
      */
     app.post("/games/:id/play", passport.authenticate("jwt", { session: false }), [
@@ -132,5 +139,19 @@ module.exports = app => {
             .isIn(waitingForPossibilities).withMessage(`Must be equal to one of the following values: ${waitingForPossibilities}`),
         body("action")
             .isIn(playerActions).withMessage(`Must be equal to one of the following values: ${playerActions}`),
+        body("targets")
+            .optional()
+            .isArray().withMessage("Must be an array")
+            .custom(value => value.length ? Promise.resolve() : Promise.reject()).withMessage("Array can't be empty"),
+        body("targets.*._id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+        body("votes")
+            .optional()
+            .isArray().withMessage("Must be an array")
+            .custom(value => value.length ? Promise.resolve() : Promise.reject()).withMessage("Array can't be empty"),
+        body("votes.*.from")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+        body("votes.*.against")
+            .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.postPlay);
 };
