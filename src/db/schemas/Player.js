@@ -40,11 +40,6 @@ const player = new Schema({
             type: String,
         },
     }],
-    isAlive: {
-        type: Boolean,
-        default: true,
-        required: true,
-    },
     powers: [{
         action: {
             type: String,
@@ -55,6 +50,11 @@ const player = new Schema({
             required: true,
         },
     }],
+    isAlive: {
+        type: Boolean,
+        default: true,
+        required: true,
+    },
     murdered: {
         by: {
             type: String,

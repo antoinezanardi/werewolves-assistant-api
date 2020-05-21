@@ -267,7 +267,7 @@ exports.generatePlayMethods = () => ({
     mayor: Player.mayorPlays,
 });
 
-exports.checkPlayValidity = async play => {
+exports.checkPlay = async play => {
     const game = await this.findOne({ _id: play.gameId });
     if (!game) {
         throw generateError("NOT_FOUND", `Game with id ${play.gameId} not found`);
@@ -281,7 +281,7 @@ exports.checkPlayValidity = async play => {
 };
 
 exports.play = async play => {
-    await this.checkPlayValidity(play);
+    await this.checkPlay(play);
     const game = await this.findOne({ _id: play.gameId }, "-gameMaster", { toJSON: true });
     const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game);

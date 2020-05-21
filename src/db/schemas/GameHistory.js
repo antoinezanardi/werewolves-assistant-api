@@ -19,6 +19,21 @@ const play = {
     },
 };
 
+const event = {
+    type: {
+        type: String,
+        required: true,
+    },
+    source: {
+        type: String,
+        enum: waitingForPossibilities,
+        required: true,
+    },
+    targets: {
+        type: [Player],
+    },
+};
+
 const gameHistory = new Schema({
     gameId: {
         type: Schema.Types.ObjectId,
@@ -41,6 +56,7 @@ const gameHistory = new Schema({
         required: true,
     },
     play,
+    event,
 }, {
     timestamps: true,
     versionKey: false,

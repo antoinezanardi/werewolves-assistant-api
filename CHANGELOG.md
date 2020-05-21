@@ -41,12 +41,12 @@
 * `Game Class` documented.
 * `Player Class` documented.
 * `GameHistory Class` documented.
+* `Play Class` documented.
 * `Player Roles` documented.
 * `Player Groups` documented.
 * `Player Actions` documented.
 * `Player Attributes` documented.
 * `Game Statuses` documented.
-* `Game History` documented.
 
 ### ♻️ Refactoring
 

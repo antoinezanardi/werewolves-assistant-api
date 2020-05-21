@@ -127,9 +127,12 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_).
      * @apiParam (Request Body Parameters) {Array} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets._id Player's id.
+     * @apiParam (Request Body Parameters) {Object} [targets.potion]
+     * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life.
+     * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
      * @apiParam (Request Body Parameters) {Array} [votes] Required when **action** is `elect-mayor`, `eat` or `vote`.
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
-     * @apiParam (Request Body Parameters) {ObjectId} votes.against Vote's target.
+     * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
      * @apiUse GameResponse
      */
     app.post("/games/:id/play", passport.authenticate("jwt", { session: false }), [
@@ -141,8 +144,7 @@ module.exports = app => {
             .isIn(playerActions).withMessage(`Must be equal to one of the following values: ${playerActions}`),
         body("targets")
             .optional()
-            .isArray().withMessage("Must be an array")
-            .custom(value => value.length ? Promise.resolve() : Promise.reject()).withMessage("Array can't be empty"),
+            .isArray().withMessage("Must be an array"),
         body("targets.*._id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("votes")
@@ -151,7 +153,7 @@ module.exports = app => {
             .custom(value => value.length ? Promise.resolve() : Promise.reject()).withMessage("Array can't be empty"),
         body("votes.*.from")
             .isMongoId().withMessage("Must be a valid MongoId"),
-        body("votes.*.against")
+        body("votes.*.for")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.postPlay);
 };
