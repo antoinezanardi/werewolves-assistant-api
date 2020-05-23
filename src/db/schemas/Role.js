@@ -2,7 +2,7 @@ const { Schema } = require("mongoose");
 const { roleNames, groupNames } = require("../../helpers/constants/Role");
 const { playerActions } = require("../../helpers/constants/Player");
 
-const role = new Schema({
+const roleSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -27,4 +27,4 @@ const role = new Schema({
     versionKey: false,
 });
 
-module.exports = role;
+module.exports = roleSchema;

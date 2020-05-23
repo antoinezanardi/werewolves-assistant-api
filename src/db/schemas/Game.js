@@ -3,7 +3,7 @@ const PlayerSchema = require("./Player");
 const { gameStatuses, waitingForPossibilities, gamePhases } = require("../../helpers/constants/Game");
 const { playerActions } = require("../../helpers/constants/Player");
 
-const game = new Schema({
+const gameSchema = new Schema({
     gameMaster: {
         type: Schema.Types.ObjectId,
         ref: "users",
@@ -57,4 +57,4 @@ const game = new Schema({
     versionKey: false,
 });
 
-module.exports = game;
+module.exports = gameSchema;

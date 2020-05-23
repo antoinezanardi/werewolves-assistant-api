@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 
-const user = new Schema({
+const userSchema = new Schema({
     email: {
         type: String,
         required: true,
@@ -15,4 +15,4 @@ const user = new Schema({
     versionKey: false,
 });
 
-module.exports = user;
+module.exports = userSchema;

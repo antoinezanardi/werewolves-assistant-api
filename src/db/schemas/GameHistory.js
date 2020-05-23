@@ -3,7 +3,7 @@ const Player = require("./Player");
 const { gamePhases, waitingForPossibilities } = require("../../helpers/constants/Game");
 const { playerActions } = require("../../helpers/constants/Player");
 
-const play = {
+const playSchema = new Schema({
     action: {
         type: String,
         enum: playerActions,
@@ -16,10 +16,29 @@ const play = {
     },
     targets: {
         type: [Player],
+        default: undefined,
     },
-};
+    votes: {
+        type: [{
+            from: {
+                type: Player,
+                required: true,
+            },
+            for: {
+                type: Player,
+                required: true,
+            },
+        }],
+        _id: false,
+        default: undefined,
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
 
-const event = {
+const eventSchema = new Schema({
     type: {
         type: String,
         required: true,
@@ -31,10 +50,16 @@ const event = {
     },
     targets: {
         type: [Player],
+        default: undefined,
     },
-};
+    required: false,
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
 
-const gameHistory = new Schema({
+const gameHistorySchema = new Schema({
     gameId: {
         type: Schema.Types.ObjectId,
         ref: "games",
@@ -55,11 +80,15 @@ const gameHistory = new Schema({
         min: 1,
         required: true,
     },
-    play,
-    event,
+    play: {
+        type: playSchema,
+    },
+    event: {
+        type: eventSchema,
+    },
 }, {
     timestamps: true,
     versionKey: false,
 });
 
-module.exports = gameHistory;
+module.exports = gameHistorySchema;

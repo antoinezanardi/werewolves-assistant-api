@@ -3,7 +3,7 @@ const { playerAttributes, playerActions } = require("../../helpers/constants/Pla
 const { groupNames, roleNames } = require("../../helpers/constants/Role");
 const { waitingForPossibilities } = require("../../helpers/constants/Game");
 
-const player = new Schema({
+const playerSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -28,7 +28,7 @@ const player = new Schema({
     attributes: [{
         attribute: {
             type: String,
-            enum: playerAttributes,
+            enum: playerAttributes.map(playerAttribute => playerAttribute.attribute),
             required: true,
         },
         source: {
@@ -70,4 +70,4 @@ const player = new Schema({
     versionKey: false,
 });
 
-module.exports = player;
+module.exports = playerSchema;

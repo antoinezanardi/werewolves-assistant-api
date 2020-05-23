@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
-const Player = require("../controllers/Player");
-const Role = require("../controllers/Role");
+const Player = require("./Player");
+const GameHistory = require("./GameHistory");
+const Role = require("./Role");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
@@ -243,7 +244,6 @@ exports.isSourceAvailableInPlayers = (players, source) => {
 exports.getNextGameNightAction = game => {
     const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
     for (let i = 0; i < actionsOrder.length; i++) {
-        console.log(actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to && i + 1 !== actionsOrder.length );
         if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
             i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
             const nextGameNightAction = actionsOrder[i + 1];
@@ -267,6 +267,14 @@ exports.generatePlayMethods = () => ({
     mayor: Player.mayorPlays,
 });
 
+exports.generateGameHistoryEntry = (game, play) => ({
+    gameId: game._id,
+    turn: game.turn,
+    phase: game.phase,
+    tick: game.tick,
+    play,
+});
+
 exports.checkPlay = async play => {
     const game = await this.findOne({ _id: play.gameId });
     if (!game) {
@@ -283,13 +291,16 @@ exports.checkPlay = async play => {
 exports.play = async play => {
     await this.checkPlay(play);
     const game = await this.findOne({ _id: play.gameId }, "-gameMaster", { toJSON: true });
+    const gameHistoryEntry = this.generateGameHistoryEntry(game, play);
     const playMethods = this.generatePlayMethods();
-    await playMethods[play.source](play, game);
-    if (game.waiting.for === play.source && game.waiting.to === play.action) {
-        game.waiting = this.getNextGameAction(game);
-    }
-    this.nextGameTick(game);
-    return await this.findOneAndUpdate({ _id: play.gameId }, game);
+    await playMethods[play.source](play, game, gameHistoryEntry);
+    await GameHistory.create(gameHistoryEntry);
+    return game;
+    // if (game.waiting.for === play.source && game.waiting.to === play.action) {
+    //     game.waiting = this.getNextGameAction(game);
+    // }
+    // this.nextGameTick(game);
+    // return await this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
 exports.postPlay = async(req, res) => {

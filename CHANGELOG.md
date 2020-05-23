@@ -12,6 +12,7 @@
 * Check for roles compatibility before game creation.
 * Games can be created by user. User can't create a game if there is already one playing.
 * Games can be canceled at any moment by the game master.
+* Each time a play is done, a game history entry is saved.
 
 ### 🐛 Bug fixes
 
@@ -61,9 +62,9 @@
 * `migrate-mongo` installed with version `7.2.1`.
 * `apidoc` updated to version `0.22.1`.
 * `bcrypt` updated to version `4.0.1`.
-* `eslint` updated to version `7.0.0`.
+* `eslint` updated to version `7.1.0`.
 * `express-validator` updated to version `6.5.0`.
-* `mocha` updated to version `7.1.2`.
+* `mocha` updated to version `7.2.0`.
 * `mongo-dot-notation` updated to version `2.0.0`.
 * `mongoose` updated to version `5.9.15`.
 * `nodemon` updated to version `2.0.4`.
