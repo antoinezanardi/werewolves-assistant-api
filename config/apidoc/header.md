@@ -81,9 +81,9 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 ## <a id="play-class"></a>🕹 Play
 | Field                            | Type                      | Description                                                         |
 |----------------------------------|:-------------------------:|---------------------------------------------------------------------|
-| &emsp;&emsp;source               | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
-| &emsp;&emsp;action               | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
-| &emsp;&emsp;**targets***         | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
+| source                           | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
+| action                           | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
+| **targets***                     | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
 
 ## <a id="error-class"></a>⚠️ API Error
 

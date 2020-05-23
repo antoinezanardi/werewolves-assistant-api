@@ -74,7 +74,24 @@ module.exports = app => {
     ], Game.getGame);
 
     /**
-     * @api {POST} /games D] Create a game
+     * @api {GET} /games/:id/history D] Get game history
+     * @apiName GetGameHistory
+     * @apiGroup Games 🎲
+     *
+     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiPermission Basic
+     * @apiSuccess {Object[]}  - Game history.
+     * @apiSuccess {ObjectId}  -._id Game history entry's ID.
+     * @apiSuccess {ObjectId}  -.gameId Game's ID.
+     * @apiSuccess {ObjectId}  -.gameId Game's ID.
+     */
+    app.get("/games/:id", passport.authenticate("basic", { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+    ], Game.getGameHistory);
+
+    /**
+     * @api {POST} /games E] Create a game
      * @apiName CreateGame
      * @apiGroup Games 🎲
      *
@@ -99,7 +116,7 @@ module.exports = app => {
     ], Game.postGame);
 
     /**
-     * @api {PATCH} /games/:id E] Update a game
+     * @api {PATCH} /games/:id F] Update a game
      * @apiName UpdateGame
      * @apiGroup Games 🎲
      *
@@ -117,7 +134,7 @@ module.exports = app => {
     ], Game.patchGame);
 
     /**
-     * @api {POST} /games/:id/play F] Make a play
+     * @api {POST} /games/:id/play G] Make a play
      * @apiName MakeAPlayInGame
      * @apiGroup Games 🎲
      *

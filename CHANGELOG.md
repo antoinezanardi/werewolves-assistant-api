@@ -12,7 +12,7 @@
 * Check for roles compatibility before game creation.
 * Games can be created by user. User can't create a game if there is already one playing.
 * Games can be canceled at any moment by the game master.
-* Each time a play is done, a game history entry is saved.
+* Each time a play is done by anyone or any group, an entry in game's history is saved.
 
 ### 🐛 Bug fixes
 
