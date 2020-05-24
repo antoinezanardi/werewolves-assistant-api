@@ -1,6 +1,31 @@
 const { playerAttributes } = require("../helpers/constants/Player");
 const { generateError } = require("../helpers/functions/Error");
 
+exports.checkTargetDependingOnAction = (target, action) => {
+    if (action === "look" && target.role.current === "seer") {
+        throw generateError("BAD_PLAY", "Seer can't see herself.");
+    }
+};
+
+exports.checkAndFillTargets = (targets, game, { canBeEmpty, expectedTargetLength, action }) => {
+    if (!targets || !Array.isArray(targets)) {
+        throw generateError("BAD_PLAY", `"targets" needs to be set and to be an array.`);
+    } else if (!canBeEmpty && !targets.length) {
+        throw generateError("BAD_PLAY", "`targets` can't be empty.");
+    } else if (expectedTargetLength !== undefined && targets.length !== expectedTargetLength) {
+        throw generateError("BAD_PLAY", `"targets" needs to contain exactly ${expectedTargetLength} items.`);
+    }
+    for (let i = 0; i < targets.length; i++) {
+        targets[i] = game.players.find(player => player._id.toString() === targets[i]);
+        if (!targets[i]) {
+            throw generateError("BAD_PLAY", `Target with id "${targets[i]._id}" is not targetable because the player is not in the game.`);
+        } else if (!targets[i].isAlive) {
+            throw generateError("BAD_PLAY", `Target with id "${targets[i]._id}" is not targetable because the player is dead.`);
+        }
+        this.checkTargetDependingOnAction(targets[i], action);
+    }
+};
+
 exports.addPlayerAttribute = (playerId, attribute, game) => {
     const player = game.players.find(player => player._id.toString() === playerId);
     const playerAttribute = playerAttributes.find(playerAttribute => playerAttribute.attribute === attribute);
@@ -43,8 +68,6 @@ exports.checkVoteTarget = (playerId, players, { action }) => {
         throw generateError("BAD_PLAY", `Player with id "${playerId}" is not in game and so can't be a vote's target.`);
     } else if (!player.isAlive) {
         throw generateError("BAD_PLAY", `Player with id "${playerId}" is dead and so can't be a vote's target.`);
-    } else if (action === "eat" && player.role.group === "wolves") {
-        throw generateError("BAD_PLAY", `Player with id "${playerId}" has group "${player.role.group}" and so can't be a vote's target for action ${action}.`);
     }
 };
 
@@ -54,8 +77,6 @@ exports.checkPlayerAbilityToVote = (playerId, players, { action }) => {
         throw generateError("BAD_PLAY", `Player with id "${playerId}" is not in game and so can't vote.`);
     } else if (!player.isAlive) {
         throw generateError("BAD_PLAY", `Player with id "${playerId}" is dead and so can't vote.`);
-    } else if (action === "eat" && player.role.group !== "wolves") {
-        throw generateError("BAD_PLAY", `Player with id "${playerId}" has group "${player.role.group}" and so can't vote for action "${action}". Needs to be group "wolves".`);
     }
 };
 
@@ -114,7 +135,8 @@ exports.witchPlays = async(play, game) => {
 };
 
 exports.seerPlays = async(play, game) => {
-    console.log("seer plays");
+    const { targets } = play;
+    this.checkAndFillTargets(targets, game, { expectedTargetLength: 1, action: play.action });
 };
 
 exports.villagersPlay = async(play, game) => {

@@ -26,5 +26,3 @@ exports.turnNightActionsOrder = [
     { source: "protector", action: "protect" },
     { source: "raven", action: "mark" },
 ];
-
-exports.eventTypes = ["BECAME_MAYOR", "LOOKED", "PLANNED_TO_EAT", "USED_LIFE_POTION", "USED_DEATH_POTION", "PROTECTED", "SAVED", "DIED"];

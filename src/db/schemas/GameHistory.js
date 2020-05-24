@@ -38,25 +38,25 @@ const playSchema = new Schema({
     versionKey: false,
 });
 
-const eventSchema = new Schema({
-    type: {
-        type: String,
-        required: true,
-    },
-    source: {
-        type: String,
-        enum: waitingForPossibilities,
-        required: true,
-    },
-    targets: {
-        type: [Player],
-        default: undefined,
-    },
-}, {
-    _id: false,
-    timestamps: false,
-    versionKey: false,
-});
+// const eventSchema = new Schema({
+//     type: {
+//         type: String,
+//         required: true,
+//     },
+//     source: {
+//         type: String,
+//         enum: waitingForPossibilities,
+//         required: true,
+//     },
+//     targets: {
+//         type: [Player],
+//         default: undefined,
+//     },
+// }, {
+//     _id: false,
+//     timestamps: false,
+//     versionKey: false,
+// });
 
 const gameHistorySchema = new Schema({
     gameId: {
@@ -83,10 +83,10 @@ const gameHistorySchema = new Schema({
         type: playSchema,
         required: false,
     },
-    event: {
-        type: eventSchema,
-        required: false,
-    },
+    // event: {
+    //     type: eventSchema,
+    //     required: false,
+    // },
 }, {
     timestamps: true,
     versionKey: false,
