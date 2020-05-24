@@ -12,7 +12,7 @@ module.exports = app => {
      * @apiDefine GameResponse
      * @apiSuccess {MongoId} _id Game's ID.
      * @apiSuccess {User} gameMaster User who created the game and managing it. (_See: [Models - User](#user-class)_)
-     * @apiSuccess {Player} players Players of the game. (_See: [Models - Player](#player-class)_)
+     * @apiSuccess {Player[]} players Players of the game. (_See: [Models - Player](#player-class)_)
      * @apiSuccess {Number} turn=1 Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {Number} tick=1 Starting at `1`, tick increments each time a play is made.
@@ -20,7 +20,10 @@ module.exports = app => {
      * @apiSuccess {String} waiting.for Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)
      * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)
-     * @apiSuccess {Players[]} [winners] Winners of the game when status is `done`. (_See: [Models - Player](#player-class)_)
+     * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
+     * @apiSuccess {Object} [won] Winners of the game when status is `done`.
+     * @apiSuccess {String={"wolves", "villagers"}} won.by Can be either a group or a role. (_Possibilities: `wolves` or `villagers`_)
+     * @apiSuccess {Player[]} won.players List of player(s) who won. (_See: [Classes - Player](#player-class)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
      */
@@ -72,23 +75,6 @@ module.exports = app => {
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.getGame);
-
-    /**
-     * @api {GET} /games/:id/history D] Get game history
-     * @apiName GetGameHistory
-     * @apiGroup Games 🎲
-     *
-     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
-     * @apiPermission Basic
-     * @apiSuccess {Object[]}  - Game history.
-     * @apiSuccess {ObjectId}  -._id Game history entry's ID.
-     * @apiSuccess {ObjectId}  -.gameId Game's ID.
-     * @apiSuccess {ObjectId}  -.gameId Game's ID.
-     */
-    app.get("/games/:id", passport.authenticate("basic", { session: false }), [
-        param("id")
-            .isMongoId().withMessage("Must be a valid MongoId"),
-    ], Game.getGameHistory);
 
     /**
      * @api {POST} /games E] Create a game

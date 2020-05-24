@@ -4,7 +4,11 @@ const { generateError } = require("../helpers/functions/Error");
 exports.addPlayerAttribute = (playerId, attribute, game) => {
     const player = game.players.find(player => player._id.toString() === playerId);
     const playerAttribute = playerAttributes.find(playerAttribute => playerAttribute.attribute === attribute);
-    player.attributes.push(playerAttribute);
+    if (player.attributes) {
+        player.attributes.push(playerAttribute);
+    } else {
+        player.attributes = [playerAttribute];
+    }
 };
 
 exports.getVotesResults = (votes, allowTie = false) => {

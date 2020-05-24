@@ -8,8 +8,11 @@ exports.patchableGameStatuses = ["canceled"];
 
 exports.waitingForPossibilities = [...roleNames, ...groupNames, "mayor", "all"];
 
+exports.wonByPossibilities = ["wolves", "villagers"];
+
 exports.populate = [
     { path: "gameMaster", select: "-password" },
+    { path: "history" },
 ];
 
 exports.turnPreNightActionsOrder = [

@@ -3,7 +3,61 @@ const { playerAttributes, playerActions } = require("../../helpers/constants/Pla
 const { groupNames, roleNames } = require("../../helpers/constants/Role");
 const { waitingForPossibilities } = require("../../helpers/constants/Game");
 
-const playerSchema = new Schema({
+const PlayerAttributeSchema = new Schema({
+    attribute: {
+        type: String,
+        enum: playerAttributes.map(playerAttribute => playerAttribute.attribute),
+        required: true,
+    },
+    source: {
+        type: String,
+        enum: waitingForPossibilities,
+        required: true,
+    },
+    remaining: {
+        type: String,
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
+
+const PlayerPowerSchema = new Schema({
+    action: {
+        type: String,
+        required: true,
+    },
+    used: {
+        type: Boolean,
+        required: true,
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
+
+const MurderedSchema = new Schema({
+    murdered: {
+        by: {
+            type: String,
+            enum: waitingForPossibilities,
+            required: true,
+        },
+        of: {
+            type: String,
+            enum: playerActions,
+            required: true,
+        },
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
+
+const PlayerSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -25,49 +79,26 @@ const playerSchema = new Schema({
             required: true,
         },
     },
-    attributes: [{
-        attribute: {
-            type: String,
-            enum: playerAttributes.map(playerAttribute => playerAttribute.attribute),
-            required: true,
-        },
-        source: {
-            type: String,
-            enum: waitingForPossibilities,
-            required: true,
-        },
-        remaining: {
-            type: String,
-        },
-    }],
-    powers: [{
-        action: {
-            type: String,
-            required: true,
-        },
-        used: {
-            type: Boolean,
-            required: true,
-        },
-    }],
+    attributes: {
+        type: [PlayerAttributeSchema],
+        default: undefined,
+    },
+    powers: {
+        type: [PlayerPowerSchema],
+        default: undefined,
+    },
     isAlive: {
         type: Boolean,
         default: true,
         required: true,
     },
     murdered: {
-        by: {
-            type: String,
-            enum: waitingForPossibilities,
-        },
-        of: {
-            type: String,
-            enum: playerActions,
-        },
+        type: MurderedSchema,
+        required: false,
     },
 }, {
     timestamps: false,
     versionKey: false,
 });
 
-module.exports = playerSchema;
+module.exports = PlayerSchema;

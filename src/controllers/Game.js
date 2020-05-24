@@ -295,12 +295,11 @@ exports.play = async play => {
     const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game, gameHistoryEntry);
     await GameHistory.create(gameHistoryEntry);
-    return game;
     // if (game.waiting.for === play.source && game.waiting.to === play.action) {
     //     game.waiting = this.getNextGameAction(game);
     // }
     // this.nextGameTick(game);
-    // return await this.findOneAndUpdate({ _id: play.gameId }, game);
+    return await this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
 exports.postPlay = async(req, res) => {

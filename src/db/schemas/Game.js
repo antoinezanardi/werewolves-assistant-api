@@ -1,9 +1,25 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
-const { gameStatuses, waitingForPossibilities, gamePhases } = require("../../helpers/constants/Game");
+const { gameStatuses, waitingForPossibilities, gamePhases, wonByPossibilities } = require("../../helpers/constants/Game");
 const { playerActions } = require("../../helpers/constants/Player");
 
-const gameSchema = new Schema({
+const WonSchema = new Schema({
+    by: {
+        type: String,
+        enum: wonByPossibilities,
+        required: true,
+    },
+    players: {
+        type: [PlayerSchema],
+        required: true,
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
+
+const GameSchema = new Schema({
     gameMaster: {
         type: Schema.Types.ObjectId,
         ref: "users",
@@ -51,10 +67,23 @@ const gameSchema = new Schema({
         default: "playing",
         required: true,
     },
-    winners: [PlayerSchema],
+    won: {
+        type: WonSchema,
+        required: false,
+    },
 }, {
     timestamps: true,
     versionKey: false,
+    toJSON: { virtuals: true },
+    id: false,
 });
 
-module.exports = gameSchema;
+GameSchema.virtual("history", {
+    ref: "gameHistory",
+    localField: "_id",
+    foreignField: "gameId",
+    justOne: false,
+    options: { sort: { createdAt: -1 } },
+});
+
+module.exports = GameSchema;

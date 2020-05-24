@@ -52,7 +52,6 @@ const eventSchema = new Schema({
         type: [Player],
         default: undefined,
     },
-    required: false,
 }, {
     _id: false,
     timestamps: false,
@@ -82,13 +81,16 @@ const gameHistorySchema = new Schema({
     },
     play: {
         type: playSchema,
+        required: false,
     },
     event: {
         type: eventSchema,
+        required: false,
     },
 }, {
     timestamps: true,
     versionKey: false,
+    collection: "gameHistory",
 });
 
 module.exports = gameHistorySchema;

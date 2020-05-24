@@ -22,20 +22,23 @@
 ## <a id="game-class"></a>🎲 Game
 
 | Field                | Type                      | Description                                                         |
-|----------------------|:-------------------------:|---------------------------------------------------------------------|
-| _id                  | ObjectId                  | Game's ID.                                                     |
-| gameMaster           | User                      | User who created the game and managing it. (_See: [Classes - User](#user-class)_)                                                     |
-| players              | [Player[]](#player-class) | Players of the game.                                                     |
-| turn                 | Number                    | Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).                                                    |
-| phase                | String                    | Each turn has two phases, `day` or `night`. Starting at `night`.                                                    |
-| tick                 | Number                    | Starting at `1`, tick increments each time a play is made.                                                    |
-| waiting              | Object                    |                                                |
-| &emsp;&emsp;for      | String                    | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                         |
-| &emsp;&emsp;to       | String                    | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)                                         |
-| status               | String                    | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                |
-| **winners***         | [Player[]](#player-class) | Winners of the game when status is `done`. (_See: [Classes - Player](#player-class)_)                                                |
-| createdAt            | Date                      | When the user created his account.                                                     |
-| updatedAt            | Date                      | When the user updated his account.                                                     |
+|----------------------|:-------------------------------------:|---------------------------------------------------------------------|
+| _id                  | ObjectId                              | Game's ID.                                                     |
+| gameMaster           | User                                  | User who created the game and managing it. (_See: [Classes - User](#user-class)_)                                                     |
+| players              | [Player[]](#player-class)             | Players of the game.                                                     |
+| turn                 | Number                                | Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).                                                    |
+| phase                | String                                | Each turn has two phases, `day` or `night`. Starting at `night`.                                                    |
+| tick                 | Number                                | Starting at `1`, tick increments each time a play is made.                                                    |
+| waiting              | Object                                |                                                |
+| &emsp;&emsp;for      | String                                | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                         |
+| &emsp;&emsp;to       | String                                | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)                                         |
+| status               | String                                | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                |
+| history              | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History](#game-history-class)_)                                                |
+| **won***             | Object                                | Winner(s) of the game when status is `done`.                                                |
+| &emsp;&emsp;by       | String                                | Can be either a group or a role. (_Possibilites: `wolves` or `villagers`_)                                                |
+| &emsp;&emsp;players  | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                |
+| createdAt            | Date                                  | When the user created his account.                                                     |
+| updatedAt            | Date                                  | When the user updated his account.                                                     |
 
 ## <a id="player-class"></a>🐺⚡🧙 ‍Player
 
@@ -76,7 +79,7 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 | turn                             | Number                    | Game's turn.                                                     |
 | phase                            | Number                    | Game's phase.                                                     |
 | tick                             | Number                    | Game's tick.                                                     |
-| play                             | [Play](#play-class)       | Game's play                                                      |
+| **play***                        | [Play](#play-class)       | Game's play.                                                      |
 
 ## <a id="play-class"></a>🕹 Play
 | Field                            | Type                      | Description                                                         |
@@ -84,6 +87,9 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 | source                           | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
 | action                           | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
 | **targets***                     | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
+| **votes***                       | Object[]                  | Votes of the play.                                                      |
+| &emsp;&emsp;votes.from           | [Player](#player-class)   | Vote's source.                                                      |
+| &emsp;&emsp;votes.for            | [Player](#player-class)   | Vote's target.                                                      |
 
 ## <a id="error-class"></a>⚠️ API Error
 
