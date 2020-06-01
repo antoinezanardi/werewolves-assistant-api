@@ -6,6 +6,8 @@ const { BasicStrategy } = require("passport-http");
 const User = require("../../db/models/User");
 const Config = require("../../../config");
 
+// TODO: Error response for bad auth in jwt check for example.
+
 passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, cb) => User.findOne({ email: email }, (err, user) => {
     if (err) {
         cb(err);

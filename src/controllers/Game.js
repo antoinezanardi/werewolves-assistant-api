@@ -3,11 +3,10 @@ const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
 const Player = require("./Player");
 const GameHistory = require("./GameHistory");
-const Role = require("./Role");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
-const { groupNames } = require("../helpers/constants/Role");
+const { groupNames, roles } = require("../helpers/constants/Role");
 
 exports.find = async(search, projection, options = {}) => {
     let games = await Game.find(search, projection, options).populate(populate);
@@ -40,7 +39,6 @@ exports.checkRolesCompatibility = players => {
 };
 
 exports.fillPlayersData = async players => {
-    const roles = await Role.find();
     for (const player of players) {
         const role = roles.find(role => role.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
@@ -108,8 +106,8 @@ exports.assignRoleToPlayers = (players, roles) => {
 exports.getVillagerRoles = async(players, wolfRoles) => {
     const villagerRoles = [];
     const villagerCount = players.length - wolfRoles.length;
-    const availablePowerfulVillagerRoles = await Role.find({ group: "villagers", name: { $not: /villager/ } });
-    const villagerRole = await Role.findOne({ name: "villager" });
+    const availablePowerfulVillagerRoles = await roles.filter(role => role.group === "villagers" && role.name !== "villager");
+    const villagerRole = await roles.find(role => role.name === "villager");
     for (let i = 0; i < villagerCount; i++) {
         if (!availablePowerfulVillagerRoles.length) {
             villagerRoles.push(JSON.parse(JSON.stringify(villagerRole)));
@@ -148,7 +146,7 @@ exports.getWolfCount = players => {
 exports.getWolfRoles = async players => {
     const wolfRoles = [];
     const wolfCount = this.getWolfCount(players);
-    const availableWolfRoles = await Role.find({ group: "wolves" });
+    const availableWolfRoles = roles.filter(role => role.group === "wolves");
     for (let i = 0; i < wolfCount; i++) {
         wolfRoles.push(this.pickRandomRole(availableWolfRoles));
     }

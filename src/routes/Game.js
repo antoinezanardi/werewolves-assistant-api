@@ -133,7 +133,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Object} [targets.potion]
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
-     * @apiParam (Request Body Parameters) {Array} [votes] Required when **action** is `elect-mayor`, `eat` or `vote`.
+     * @apiParam (Request Body Parameters) {Array} [votes] Required when **action** is `elect-mayor` or `vote`.
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
      * @apiUse GameResponse
@@ -152,8 +152,7 @@ module.exports = app => {
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("votes")
             .optional()
-            .isArray().withMessage("Must be an array")
-            .custom(value => value.length ? Promise.resolve() : Promise.reject()).withMessage("Array can't be empty"),
+            .isArray().withMessage("Must be an array"),
         body("votes.*.from")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("votes.*.for")

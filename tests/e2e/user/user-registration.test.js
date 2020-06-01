@@ -68,13 +68,14 @@ describe("Sign up and log in", () => {
                 done();
             });
     });
-    it("Log in successfully (POST /users/login)", done => {
+    it("Logs in successfully (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
             .end((err, res) => {
                 expect(res).to.have.status(200);
+                expect(res.body.token).to.be.a("string");
                 done();
             });
     });

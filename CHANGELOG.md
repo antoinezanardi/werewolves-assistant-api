@@ -13,6 +13,7 @@
 * Games can be created by user. User can't create a game if there is already one playing.
 * Games can be canceled at any moment by the game master.
 * Each time a play is done by anyone or any group, or an event occurs, an entry in game's history is saved.
+* `elect-mayor` action logic implemented.
 
 ### 🐛 Bug fixes
 
@@ -62,7 +63,8 @@
 ### 🧪 Tests
 
 * Starting `e2e` tests.
-* Starting `e2e` tests.
+* E2E tests for user registration.
+* E2E tests for game creation.
 
 ### 📦 Packages
 
