@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 const passport = require("passport");
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const User = require("../controllers/User");
 
 module.exports = app => {
@@ -28,7 +28,7 @@ module.exports = app => {
      */
 
     /**
-     * @api {GET} /users A] Get all users
+     * @api {GET} /users A] Get users
      * @apiName GetUsers
      * @apiGroup Users 👤
      *
@@ -36,6 +36,20 @@ module.exports = app => {
      * @apiUse UserResponse
      */
     app.get("/users", passport.authenticate("basic", { session: false }), User.getUsers);
+
+    /**
+     * @api {GET} /users/:id B] Get an user
+     * @apiName GetUser
+     * @apiGroup Users 👤
+     *
+     * @apiPermission Basic
+     * @apiParam (Route Parameters) {ObjectId} id User's ID.
+     * @apiUse UserResponse
+     */
+    app.get("/users/:id", passport.authenticate("basic", { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+    ], User.getUser);
 
     /**
      * @api {POST} /users B] Create new user

@@ -29,7 +29,7 @@ module.exports = app => {
      */
 
     /**
-     * @api {GET} /games A] Get all games
+     * @api {GET} /games A] Get games
      * @apiName GetGames
      * @apiGroup Games 🎲
      *

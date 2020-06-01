@@ -10,7 +10,7 @@ exports.checkTargetDependingOnAction = (target, action) => {
 exports.checkAndFillTargets = (targets, game, { canBeEmpty, expectedTargetLength, action }) => {
     if (!targets || !Array.isArray(targets)) {
         throw generateError("BAD_PLAY", `"targets" needs to be set and to be an array.`);
-    } else if (!canBeEmpty && !targets.length) {
+    } else if (!targets.length && !canBeEmpty) {
         throw generateError("BAD_PLAY", "`targets` can't be empty.");
     } else if (expectedTargetLength !== undefined && targets.length !== expectedTargetLength) {
         throw generateError("BAD_PLAY", `"targets" needs to contain exactly ${expectedTargetLength} items.`);
@@ -62,7 +62,7 @@ exports.checkPlayerMultipleVotes = (votes, players) => {
     }
 };
 
-exports.checkVoteTarget = (playerId, players, { action }) => {
+exports.checkVoteTarget = (playerId, players) => {
     const player = players.find(player => player._id.toString() === playerId);
     if (!player) {
         throw generateError("BAD_PLAY", `Player with id "${playerId}" is not in game and so can't be a vote's target.`);
@@ -71,7 +71,7 @@ exports.checkVoteTarget = (playerId, players, { action }) => {
     }
 };
 
-exports.checkPlayerAbilityToVote = (playerId, players, { action }) => {
+exports.checkPlayerAbilityToVote = (playerId, players) => {
     const player = players.find(player => player._id.toString() === playerId);
     if (!player) {
         throw generateError("BAD_PLAY", `Player with id "${playerId}" is not in game and so can't vote.`);
@@ -134,9 +134,10 @@ exports.witchPlays = async(play, game) => {
     console.log("witch plays");
 };
 
-exports.seerPlays = async(play, game) => {
+exports.seerPlays = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
     this.checkAndFillTargets(targets, game, { expectedTargetLength: 1, action: play.action });
+    gameHistoryEntry.targets = targets;
 };
 
 exports.villagersPlay = async(play, game) => {

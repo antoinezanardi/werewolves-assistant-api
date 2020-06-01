@@ -20,8 +20,10 @@
 
 ### 🛣️ Routes
 
+* Route `GET /users/:id` added for getting one specific user. Protected with basic authentication.
 * Route `GET /games` added for retrieving all games. Protected with basic authentication.
 * Route `GET /games/repartition` added for getting a random team composition. Protected with basic authentication.
+* Route `GET /games/:id` added for getting one specific game. Protected with basic authentication.
 * Route `POST /games` added for creating games. Protected with JWT.
 * Route `PATCH /games` added for updating games. Protected with JWT.
 * Route `GET /roles` added for getting all available roles. Protected with basic authentication.
@@ -57,16 +59,21 @@
 *  All play methods moved from `Game` controller to brand new `Player` controller.
 * `errors` field from `Error` class renamed to `data`.
 
+### 🧪 Tests
+
+* Starting `e2e` tests.
+* Starting `e2e` tests.
+
 ### 📦 Packages
 
 * `migrate-mongo` installed with version `7.2.1`.
-* `apidoc` updated to version `0.22.1`.
+* `apidoc` updated to version `0.23.0`.
 * `bcrypt` updated to version `4.0.1`.
 * `eslint` updated to version `7.1.0`.
 * `express-validator` updated to version `6.5.0`.
 * `mocha` updated to version `7.2.0`.
 * `mongo-dot-notation` updated to version `2.0.0`.
-* `mongoose` updated to version `5.9.15`.
+* `mongoose` updated to version `5.9.16`.
 * `nodemon` updated to version `2.0.4`.
 * `passport` updated to version `0.4.1`.
 
@@ -94,7 +101,7 @@
 
 ### 🧪 Tests
 
-* Test environment set up. You can run it with `npm run test`.
+* Test environment set up. You can run it with `npm test`.
 * Test for route `GET /` added. 
 * Test for route `GET /users` added. 
 

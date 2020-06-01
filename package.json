@@ -14,7 +14,7 @@
     "update_version": "./scripts/update-version.sh",
     "migrate": "npx migrate-mongo up -f ./config/migrate-mongo/index.js",
     "migrate_down": "npx migrate-mongo down -f ./config/migrate-mongo/index.js",
-    "test": "NODE_ENV=test ./node_modules/.bin/mocha ./tests/ --exit"
+    "test": "export NODE_ENV=test && npx mocha ./tests/e2e/index.js --exit"
   },
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
     "nodemon": "^2.0.4"
   },
   "dependencies": {
-    "apidoc": "^0.22.1",
+    "apidoc": "^0.23.0",
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
@@ -45,7 +45,7 @@
     "jsonwebtoken": "^8.5.1",
     "migrate-mongo": "^7.2.1",
     "mongo-dot-notation": "^2.0.0",
-    "mongoose": "^5.9.15",
+    "mongoose": "^5.9.16",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",

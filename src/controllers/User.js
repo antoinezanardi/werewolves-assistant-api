@@ -54,7 +54,7 @@ exports.postUser = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         await this.generateSaltAndHash(body);
-        const newUser = await this.create(body, { lean: true });
+        const newUser = await this.create(body, { toJSON: true });
         delete newUser.password;
         res.status(200).json(newUser);
     } catch (e) {
@@ -65,6 +65,16 @@ exports.postUser = async(req, res) => {
 exports.getUsers = async(req, res) => {
     try {
         const users = await this.find({}, "-password");
+        res.status(200).json(users);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.getUser = async(req, res) => {
+    try {
+        const { params } = checkRequestData(req);
+        const users = await this.findOne({ _id: params.id }, "-password");
         res.status(200).json(users);
     } catch (e) {
         sendError(res, e);
