@@ -278,11 +278,11 @@ exports.checkPlay = async play => {
     if (!game) {
         throw generateError("NOT_FOUND", `Game with id ${play.gameId} not found`);
     } else if (game.status !== "playing") {
-        throw generateError("BAD_PLAY", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
+        throw generateError("BAD_REQUEST", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
     } else if (game.waiting.for !== play.source) {
-        throw generateError("BAD_PLAY", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
+        throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
     } else if (game.waiting.to !== play.action) {
-        throw generateError("BAD_PLAY", `Game is waiting for "${game.waiting.for}" to "${game.waiting.to}", not "${play.action}"`);
+        throw generateError("BAD_PLAY_ACTION", `Game is waiting for "${game.waiting.for}" to "${game.waiting.to}", not "${play.action}"`);
     }
 };
 

@@ -9,18 +9,18 @@ exports.checkTargetDependingOnAction = (target, action) => {
 
 exports.checkAndFillTargets = (targets, game, { canBeEmpty, expectedTargetLength, action }) => {
     if (!targets || !Array.isArray(targets)) {
-        throw generateError("BAD_PLAY", `"targets" needs to be set and to be an array.`);
+        throw generateError("TARGETS_REQUIRED", `"targets" needs to be set and to be an array.`);
     } else if (!targets.length && !canBeEmpty) {
-        throw generateError("BAD_PLAY", "`targets` can't be empty.");
+        throw generateError("TARGETS_CANT_BE_EMPTY", "`targets` can't be empty.");
     } else if (expectedTargetLength !== undefined && targets.length !== expectedTargetLength) {
-        throw generateError("BAD_PLAY", `"targets" needs to contain exactly ${expectedTargetLength} items.`);
+        throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to contain exactly ${expectedTargetLength} items.`);
     }
     for (let i = 0; i < targets.length; i++) {
         targets[i] = game.players.find(player => player._id.toString() === targets[i]);
         if (!targets[i]) {
-            throw generateError("BAD_PLAY", `Target with id "${targets[i]._id}" is not targetable because the player is not in the game.`);
+            throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${targets[i]._id}" is not targetable because the player is not in the game.`);
         } else if (!targets[i].isAlive) {
-            throw generateError("BAD_PLAY", `Target with id "${targets[i]._id}" is not targetable because the player is dead.`);
+            throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${targets[i]._id}" is not targetable because the player is dead.`);
         }
         this.checkTargetDependingOnAction(targets[i], action);
     }
@@ -49,7 +49,7 @@ exports.getVotesResults = (votes, allowTie = false) => {
     const maxVotes = Math.max(...players.map(player => player.vote));
     const nominatedPlayers = players.filter(player => player.vote === maxVotes);
     if (nominatedPlayers.length > 1 && !allowTie) {
-        throw generateError("BAD_PLAY", "Tie in votes is not allowed for this action.");
+        throw generateError("TIE_IN_VOTES", "Tie in votes is not allowed for this action.");
     }
     return nominatedPlayers;
 };
@@ -57,7 +57,7 @@ exports.getVotesResults = (votes, allowTie = false) => {
 exports.checkPlayerMultipleVotes = (votes, players) => {
     for (const player of players) {
         if (votes.reduce((acc, vote) => vote.from === player._id.toString() ? ++acc : acc, 0) > 1) {
-            throw generateError("BAD_PLAY", `Player with id "${player._id}" isn't allowed to vote more than once.`);
+            throw generateError("PLAYER_CANT_VOTE_MULTIPLE_TIMES", `Player with id "${player._id}" isn't allowed to vote more than once.`);
         }
     }
 };
@@ -65,26 +65,26 @@ exports.checkPlayerMultipleVotes = (votes, players) => {
 exports.checkVoteTarget = (playerId, players) => {
     const player = players.find(player => player._id.toString() === playerId);
     if (!player) {
-        throw generateError("BAD_PLAY", `Player with id "${playerId}" is not in game and so can't be a vote's target.`);
+        throw generateError("PLAYER_CANT_BE_VOTE_TARGET", `Player with id "${playerId}" is not in game and so can't be a vote's target.`);
     } else if (!player.isAlive) {
-        throw generateError("BAD_PLAY", `Player with id "${playerId}" is dead and so can't be a vote's target.`);
+        throw generateError("PLAYER_CANT_BE_VOTE_TARGET", `Player with id "${playerId}" is dead and so can't be a vote's target.`);
     }
 };
 
 exports.checkPlayerAbilityToVote = (playerId, players) => {
     const player = players.find(player => player._id.toString() === playerId);
     if (!player) {
-        throw generateError("BAD_PLAY", `Player with id "${playerId}" is not in game and so can't vote.`);
+        throw generateError("PLAYER_CANT_VOTE", `Player with id "${playerId}" is not in game and so can't vote.`);
     } else if (!player.isAlive) {
-        throw generateError("BAD_PLAY", `Player with id "${playerId}" is dead and so can't vote.`);
+        throw generateError("PLAYER_CANT_VOTE", `Player with id "${playerId}" is dead and so can't vote.`);
     }
 };
 
 exports.checkVoteStructure = vote => {
     if (!vote.from || !vote.for) {
-        throw generateError("BAD_PLAY", "Bad vote structure.");
+        throw generateError("BAD_VOTE_STRUCTURE", "Bad vote structure.");
     } else if (vote.from === vote.for) {
-        throw generateError("BAD_PLAY", "Vote's source and target can't be the same.");
+        throw generateError("SAME_VOTE_SOURCE_AND_TARGET", "Vote's source and target can't be the same.");
     }
 };
 
@@ -99,9 +99,9 @@ exports.checkVotesSourceAndTarget = (votes, { players }, options) => {
 
 exports.checkAndFillVotes = (votes, game, options) => {
     if (!votes || !Array.isArray(votes)) {
-        throw generateError("BAD_PLAY", "`votes` need to be set");
+        throw generateError("VOTES_REQUIRED", "`votes` need to be set");
     } else if (!votes.length) {
-        throw generateError("BAD_PLAY", "`votes` can't be empty");
+        throw generateError("VOTES_CANT_BE_EMPTY", "`votes` can't be empty");
     }
     this.checkVotesSourceAndTarget(votes, game, options);
     for (let i = 0; i < votes.length; i++) {

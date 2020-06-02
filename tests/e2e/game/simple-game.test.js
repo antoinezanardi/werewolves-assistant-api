@@ -70,14 +70,25 @@ describe("Game of 6 players with basic roles", () => {
         expect(game.waiting).to.deep.equals({ for: "all", to: "elect-mayor" });
         done();
     });
-    it("Can't elect mayor if play's source is not 'mayor' (POST /games/:id/play)", done => {
+    it("Can't elect mayor if play's source is not 'all' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "seer", action: "look" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("Can't elect mayor if play's action is not 'elect-mayor' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "look" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
                 done();
             });
     });
@@ -88,7 +99,7 @@ describe("Game of 6 players with basic roles", () => {
             .send({ source: "all", action: "elect-mayor" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("VOTES_REQUIRED");
                 done();
             });
     });
@@ -99,7 +110,7 @@ describe("Game of 6 players with basic roles", () => {
             .send({ source: "all", action: "elect-mayor", votes: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("VOTES_CANT_BE_EMPTY");
                 done();
             });
     });
@@ -114,7 +125,7 @@ describe("Game of 6 players with basic roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("SAME_VOTE_SOURCE_AND_TARGET");
                 done();
             });
     });
@@ -129,7 +140,7 @@ describe("Game of 6 players with basic roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("PLAYER_CANT_VOTE");
                 done();
             });
     });
@@ -144,7 +155,7 @@ describe("Game of 6 players with basic roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("PLAYER_CANT_BE_VOTE_TARGET");
                 done();
             });
     });
@@ -159,7 +170,7 @@ describe("Game of 6 players with basic roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("PLAYER_CANT_VOTE_MULTIPLE_TIMES");
                 done();
             });
     });
@@ -174,7 +185,7 @@ describe("Game of 6 players with basic roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY");
+                expect(res.body.type).to.equals("TIE_IN_VOTES");
                 done();
             });
     });

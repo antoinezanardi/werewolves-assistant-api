@@ -58,18 +58,31 @@ If you have an error from the API, you'll get a generic structure. (_See: [Class
 
 Description for each case below:
 
-| Code | Type                              | HTTP Code |                 Description                                 |
-|:----:|:---------------------------------:|:---------:|-------------------------------------------------------------|
-| 1    | BAD_REQUEST                       | 400       | You provided incorrect params.                              |
-| 2    | UNAUTHORIZED                      | 401       | You're not authorized.                                      |
-| 3    | EMAIL_EXISTS                      | 400       | The email provided already exists.                          |
-| 4    | NOT_FOUND                         | 404       | The requested resource is not found.                        |
-| 5    | INTERNAL_SERVER_ERROR             | 500       | The server got an error, this is not your fault.            |
-| 6    | BAD_TOKEN                         | 400       | You provided a bad or malformed token.                      |
-| 7    | BAD_CREDENTIALS                   | 401       | The credentials provided don't match any in database.       |
-| 8    | PLAYERS_NAME_NOT_UNIQUE           | 400       | Players provided don't have unique `name`.                  |
-| 9    | NO_WOLF_IN_GAME_COMPOSITION       | 400       | There is no wolf in game composition.                  |
-| 10   | NO_VILLAGER_IN_GAME_COMPOSITION   | 400       | There is no villager in game composition.                  |
-| 11   | GAME_MASTER_HAS_ON_GOING_GAMES    | 400       | The game master has already on-going game(s).                  |
-| 12   | GAME_DOESNT_BELONG_TO_USER        | 401       | This game doesn't belong to user.                  |
-| 13   | BAD_PLAY                          | 400       | The play is not allowed in current game's state.                  |
+| Code | Type                              | HTTP Code |                 Description                                                     |
+|:----:|:---------------------------------:|:---------:|---------------------------------------------------------------------------------|
+| 1    | BAD_REQUEST                       |    400    | You provided incorrect params.                                                  |
+| 2    | UNAUTHORIZED                      |    401    | You're not authorized.                                                          |
+| 3    | EMAIL_EXISTS                      |    400    | The email provided already exists.                                              |
+| 4    | NOT_FOUND                         |    404    | The requested resource is not found.                                            |
+| 5    | INTERNAL_SERVER_ERROR             |    500    | The server got an error, this is not your fault.                                |
+| 6    | BAD_TOKEN                         |    400    | You provided a bad or malformed token.                                          |
+| 7    | BAD_CREDENTIALS                   |    401    | The credentials provided don't match any in database.                           |
+| 8    | PLAYERS_NAME_NOT_UNIQUE           |    400    | Players provided don't have unique `name`.                                      |
+| 9    | NO_WOLF_IN_GAME_COMPOSITION       |    400    | There is no wolf in game composition.                                           |
+| 10   | NO_VILLAGER_IN_GAME_COMPOSITION   |    400    | There is no villager in game composition.                                       |
+| 11   | GAME_MASTER_HAS_ON_GOING_GAMES    |    400    | Game master has already on-going game(s).                                       |
+| 12   | GAME_DOESNT_BELONG_TO_USER        |    401    | This game doesn't belong to user.                                               |
+| 13   | BAD_PLAY_SOURCE                   |    400    | Play's source provided is not the one expected.                                 |
+| 14   | BAD_PLAY_ACTION                   |    400    | Play's action provided is not the one expected.                                 |
+| 14   | VOTES_REQUIRED                    |    400    | Play needs votes to be set.                                                     |
+| 15   | VOTES_CANT_BE_EMPTY               |    400    | Play's votes can't be an empty array.                                           |
+| 16   | BAD_VOTE_STRUCTURE                |    400    | One of play's vote has a bad structure. (_See: [Classes - Play](#play-class)_)  |
+| 17   | SAME_VOTE_SOURCE_AND_TARGET       |    400    | Play's vote can't have the same source and target.                              |
+| 18   | PLAYER_CANT_VOTE                  |    400    | Player can't be source of a vote.                                               |
+| 19   | PLAYER_CANT_BE_VOTE_TARGET        |    400    | Player can't be target of a vote.                                               |
+| 20   | PLAYER_CANT_VOTE_MULTIPLE_TIMES   |    400    | Player can't vote more than once.                                               |
+| 21   | TIE_IN_VOTES                      |    400    | Tie in votes is not allowed for this action.                                   |
+| 22   | TARGETS_REQUIRED                  |    400    | Plays needs targets to be set.                                                  |
+| 23   | TARGETS_CANT_BE_EMPTY             |    400    | Play's targets can't be an empty array.                                         |
+| 24   | BAD_TARGETS_LENGTH                |    400    | Play's targets length doesn't match the one expected.                           |
+| 25   | PLAYER_NOT_TARGETABLE             |    400    | Player can't be a target.                                                       |
