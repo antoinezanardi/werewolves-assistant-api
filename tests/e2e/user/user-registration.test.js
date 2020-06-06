@@ -11,10 +11,10 @@ const { expect } = chai;
 const credentials = { email: "test@test.fr", password: "secret" };
 let user;
 
-describe("Sign up and log in", () => {
+describe("A - Sign up and log in", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
-    it("Doesn't allow bad email (POST /users)", done => {
+    it("📧 Doesn't allow bad email (POST /users)", done => {
         chai.request(app)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -25,7 +25,7 @@ describe("Sign up and log in", () => {
                 done();
             });
     });
-    it("Creates new user (POST /users)", done => {
+    it("👤 Creates new user (POST /users)", done => {
         chai.request(app)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -36,7 +36,7 @@ describe("Sign up and log in", () => {
                 done();
             });
     });
-    it("Doesn't allow duplicate email (POST /users)", done => {
+    it("📧 Doesn't allow duplicate email (POST /users)", done => {
         chai.request(app)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -47,7 +47,7 @@ describe("Sign up and log in", () => {
                 done();
             });
     });
-    it("Gets freshly created user (GET /users/:id)", done => {
+    it("👤 Gets freshly created user (GET /users/:id)", done => {
         chai.request(app)
             .get(`/users/${user._id}`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -57,7 +57,7 @@ describe("Sign up and log in", () => {
                 done();
             });
     });
-    it("Doesn't allow bad credentials (POST /users/login)", done => {
+    it("🔐 Doesn't allow bad credentials (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -68,7 +68,7 @@ describe("Sign up and log in", () => {
                 done();
             });
     });
-    it("Logs in successfully (POST /users/login)", done => {
+    it("🔑 Logs in successfully (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)

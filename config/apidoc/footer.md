@@ -81,8 +81,10 @@ Description for each case below:
 | 18   | PLAYER_CANT_VOTE                  |    400    | Player can't be source of a vote.                                               |
 | 19   | PLAYER_CANT_BE_VOTE_TARGET        |    400    | Player can't be target of a vote.                                               |
 | 20   | PLAYER_CANT_VOTE_MULTIPLE_TIMES   |    400    | Player can't vote more than once.                                               |
-| 21   | TIE_IN_VOTES                      |    400    | Tie in votes is not allowed for this action.                                   |
+| 21   | TIE_IN_VOTES                      |    400    | Tie in votes is not allowed for this action.                                    |
 | 22   | TARGETS_REQUIRED                  |    400    | Plays needs targets to be set.                                                  |
 | 23   | TARGETS_CANT_BE_EMPTY             |    400    | Play's targets can't be an empty array.                                         |
 | 24   | BAD_TARGETS_LENGTH                |    400    | Play's targets length doesn't match the one expected.                           |
-| 25   | PLAYER_NOT_TARGETABLE             |    400    | Player can't be a target.                                                       |
+| 25   | BAD_TARGET_STRUCTURE              |    400    | One of play's target has a bad structure. (_See: [Classes - Play](#play-class)_ |
+| 26   | PLAYER_NOT_TARGETABLE             |    400    | Player can't be a target.                                                       |
+| 27   | SEER_CANT_LOOK_AT_HERSELF         |    400    | Seer can't look at herself.                                                     |

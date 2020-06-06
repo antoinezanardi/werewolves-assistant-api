@@ -23,7 +23,7 @@ let token, game;
 describe("Game of 6 players with basic roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
-    it("Creates new user (POST /users)", done => {
+    it("👤 Creates new user (POST /users)", done => {
         chai.request(app)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -33,7 +33,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Logs in successfully (POST /users/login)", done => {
+    it("🔑 Logs in successfully (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -44,7 +44,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Creates game with JWT auth (POST /games)", done => {
+    it("🎲 Creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -55,7 +55,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
+    it("👥 All can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${mongoose.Types.ObjectId()}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -66,11 +66,11 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Checks if game is waiting for 'all' to 'elect-mayor' (POST /games/:id/play)", done => {
+    it("🎲 Checks if game is waiting for 'all' to 'elect-mayor' (POST /games/:id/play)", done => {
         expect(game.waiting).to.deep.equals({ for: "all", to: "elect-mayor" });
         done();
     });
-    it("Can't elect mayor if play's source is not 'all' (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if play's source is not 'all' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -81,7 +81,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if play's action is not 'elect-mayor' (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if play's action is not 'elect-mayor' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -92,7 +92,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if votes are not set (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if votes are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -103,7 +103,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if votes are empty (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if votes are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -114,7 +114,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if one vote has same target and source (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if one vote has same target and source (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -129,7 +129,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if one vote has an unknown source (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if one vote has an unknown source (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -144,7 +144,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if one vote has an unknown target (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if one vote has an unknown target (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -159,7 +159,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if player votes twice (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if player votes twice (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -174,7 +174,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Can't elect mayor if there is a tie in votes (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if there is a tie in votes (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -189,7 +189,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("All elect the mayor (POST /games/:id/play)", done => {
+    it("👥 All elect the mayor (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -207,8 +207,107 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("Checks if game is waiting for 'seer' to 'look' (POST /games/:id/play)", done => {
+    it("🎲 Checks if game is waiting for 'seer' to 'look' (POST /games/:id/play)", done => {
         expect(game.waiting).to.deep.equals({ for: "seer", to: "look" });
         done();
+    });
+    it("🔮 Seer can't look if play's source is not 'seer' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "look" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🔮 Seer can't look if play's action is not 'look' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "elect-mayor" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🔮 Seer can't look if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("🔮 Seer can't look if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("🔮 Seer can't look at multiple targets (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [
+                { _id: players[0]._id },
+                { _id: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🔮 Seer can't look at unknown target (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [
+                { _id: mongoose.Types.ObjectId() },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🔮 Seer can't look at herself (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [
+                { _id: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("SEER_CANT_LOOK_AT_HERSELF");
+                done();
+            });
+    });
+    it("🔮 Seer looks at the witch (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [
+                { _id: players[0]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                done();
+            });
     });
 });

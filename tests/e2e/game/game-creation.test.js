@@ -34,10 +34,10 @@ const playersWithoutVillagers = [
 ];
 let token, game;
 
-describe("Game creation", () => {
+describe("A - Game creation", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
-    it("Creates new user (POST /users)", done => {
+    it("👤 Creates new user (POST /users)", done => {
         chai.request(app)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -47,7 +47,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Logs in successfully (POST /users/login)", done => {
+    it("🔑 Logs in successfully (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -58,7 +58,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Can't create game without JWT auth (POST /games)", done => {
+    it("🔐 Can't create game without JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .send({ email: "foobar", password: "secret" })
@@ -67,7 +67,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Can't create game without wolves (POST /games)", done => {
+    it("🐺 Can't create game without wolves (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -78,7 +78,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Can't create game without villagers (POST /games)", done => {
+    it("👪 Can't create game without villagers (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -89,7 +89,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Can't create game with no unique player names (POST /games)", done => {
+    it("👪 Can't create game with no unique player names (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -100,7 +100,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Creates game with JWT auth (POST /games)", done => {
+    it("🎲 Creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -111,7 +111,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Can't create another game if one is already playing (POST /games)", done => {
+    it("🎲 Can't create another game if one is already playing (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -122,7 +122,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Cancels game (PATCH /games)", done => {
+    it("🎲 Cancels game (PATCH /games)", done => {
         chai.request(app)
             .patch(`/games/${game._id}`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -132,7 +132,7 @@ describe("Game creation", () => {
                 done();
             });
     });
-    it("Creates another game because all others are cancelled (POST /games)", done => {
+    it("🎲 Creates another game because all others are cancelled (POST /games)", done => {
         chai.request(app)
             .post(`/games`)
             .set({ "Authorization": `Bearer ${token}` })

@@ -3,7 +3,7 @@ const { generateError } = require("../helpers/functions/Error");
 
 exports.checkTargetDependingOnAction = (target, action) => {
     if (action === "look" && target.role.current === "seer") {
-        throw generateError("BAD_PLAY", "Seer can't see herself.");
+        throw generateError("SEER_CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
     }
 };
 
@@ -13,16 +13,20 @@ exports.checkAndFillTargets = (targets, game, { canBeEmpty, expectedTargetLength
     } else if (!targets.length && !canBeEmpty) {
         throw generateError("TARGETS_CANT_BE_EMPTY", "`targets` can't be empty.");
     } else if (expectedTargetLength !== undefined && targets.length !== expectedTargetLength) {
-        throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to contain exactly ${expectedTargetLength} items.`);
+        throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to have exactly a length of ${expectedTargetLength}.`);
     }
     for (let i = 0; i < targets.length; i++) {
-        targets[i] = game.players.find(player => player._id.toString() === targets[i]);
-        if (!targets[i]) {
+        if (targets[i]._id === undefined) {
+            throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure.`);
+        }
+        const target = game.players.find(player => player._id.toString() === targets[i]._id);
+        if (!target) {
             throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${targets[i]._id}" is not targetable because the player is not in the game.`);
-        } else if (!targets[i].isAlive) {
+        } else if (!target.isAlive) {
             throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${targets[i]._id}" is not targetable because the player is dead.`);
         }
-        this.checkTargetDependingOnAction(targets[i], action);
+        this.checkTargetDependingOnAction(target, action);
+        targets[i] = target;
     }
 };
 

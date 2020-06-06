@@ -99,8 +99,16 @@ exports.errorMetadata = {
         code: 24,
         HTTPCode: 400,
     },
-    PLAYER_NOT_TARGETABLE: {
+    BAD_TARGET_STRUCTURE: {
         code: 25,
+        HTTPCode: 400,
+    },
+    PLAYER_NOT_TARGETABLE: {
+        code: 26,
+        HTTPCode: 400,
+    },
+    SEER_CANT_LOOK_AT_HERSELF: {
+        code: 27,
         HTTPCode: 400,
     },
 };
