@@ -42,22 +42,22 @@
 
 ## <a id="player-class"></a>🐺⚡🧙 ‍Player
 
-| Field                      | Type     | Description                                                         |
-|----------------------------|:--------:|---------------------------------------------------------------------|
-| _id                        | ObjectId | Player's ID.                                                     |
-| name                       | String   | Player's name.                                                     |
-| role                       | Object   |                                                      |
-| &emsp;&emsp;original       | String   | Player's Original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
-| &emsp;&emsp;current        | String   | Player's current role. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
-| &emsp;&emsp;group          | String   | Player's current group. (_Possibilities: [Codes - Player Groups](#player-groups)_)                                                    |
-| attributes                 | Array    | An attribute is an effect or a status on a player.                                                     |
-| &emsp;&emsp;attribute      | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                    |
-| &emsp;&emsp;source         | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                    |
-| **&emsp;&emsp;remaining*** | String   | Remaining time for this attribute before disappear. Expressed in `phases` (_e.g: `2 phases`_), decreases after each phase. |
-| isAlive                    | Boolean  | If the player is currently alive or not.                                                     |
-| **murdered***              | Object   | Set if `isAlive` is `false`.                                                    |
-| &emsp;&emsp;by             | String   | Which role or group killed the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                   |
-| &emsp;&emsp;of             | String   | What action killed the player. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                 |
+| Field                            | Type     | Description                                                         |
+|----------------------------------|:--------:|---------------------------------------------------------------------|
+| _id                              | ObjectId | Player's ID.                                                     |
+| name                             | String   | Player's name.                                                     |
+| role                             | Object   |                                                      |
+| &emsp;&emsp;original             | String   | Player's Original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
+| &emsp;&emsp;current              | String   | Player's current role. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
+| &emsp;&emsp;group                | String   | Player's current group. (_Possibilities: [Codes - Player Groups](#player-groups)_)                                                    |
+| attributes                       | Array    | An attribute is an effect or a status on a player.                                                     |
+| &emsp;&emsp;attribute            | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                    |
+| &emsp;&emsp;source               | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                    |
+| **&emsp;&emsp;remainingPhases*** | Number   | Remaining time for this attribute before disappear. Decreases after each phase. |
+| isAlive                          | Boolean  | If the player is currently alive or not.                                                     |
+| **murdered***                    | Object   | Set if `isAlive` is `false`.                                                    |
+| &emsp;&emsp;by                   | String   | Which role or group killed the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                   |
+| &emsp;&emsp;of                   | String   | What action killed the player. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                 |
 
 ## <a id="role-class"></a>🃏 Role
 

@@ -307,6 +307,115 @@ describe("Game of 6 players with basic roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].attributes).to.deep.include({ attribute: "seen", source: "seer" });
+                expect(game.history[0].play.targets).to.exist;
+                done();
+            });
+    });
+    it("🎲 Checks if game is waiting for 'wolves' to 'eat' (POST /games/:id/play)", done => {
+        expect(game.waiting).to.deep.equals({ for: "wolves", to: "eat" });
+        done();
+    });
+    it("🐺 Wolves can't eat if play's source is not 'wolves' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🐺 Wolves can't eat if play's action is not 'eat' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "shoot" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🐺 Wolves can't eat if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("🐺 Wolves can't eat if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("🐺 Wolves can't eat multiple targets (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [
+                { _id: players[0]._id },
+                { _id: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🐺 Wolves can't eat an unknown target (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [
+                { _id: mongoose.Types.ObjectId() },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🐺 Wolves can't eat another wolf (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [
+                { _id: players[5]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("WOLVES_CANT_EAT_EACH_OTHER");
+                done();
+            });
+    });
+    it("🐺 Wolves eat the protector (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [
+                { _id: players[2]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].attributes).to.deep.include({ attribute: "eaten", source: "wolves" });
+                expect(game.history[0].play.targets).to.exist;
                 done();
             });
     });

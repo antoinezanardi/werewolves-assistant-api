@@ -4,6 +4,8 @@ const { generateError } = require("../helpers/functions/Error");
 exports.checkTargetDependingOnAction = (target, action) => {
     if (action === "look" && target.role.current === "seer") {
         throw generateError("SEER_CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
+    } else if (action === "eat" && target.role.group === "wolves") {
+        throw generateError("WOLVES_CANT_EAT_EACH_OTHER", `Wolves's target can't be a player with group "wolves".`);
     }
 };
 
@@ -31,7 +33,7 @@ exports.checkAndFillTargets = (targets, game, { canBeEmpty, expectedTargetLength
 };
 
 exports.addPlayerAttribute = (playerId, attribute, game) => {
-    const player = game.players.find(player => player._id.toString() === playerId);
+    const player = game.players.find(player => player._id.toString() === playerId.toString());
     const playerAttribute = playerAttributes.find(playerAttribute => playerAttribute.attribute === attribute);
     if (player.attributes) {
         player.attributes.push(playerAttribute);
@@ -118,8 +120,11 @@ exports.mayorPlays = async(play, game) => {
     console.log("mayor plays");
 };
 
-exports.wolvesPlay = async(play, game) => {
-    console.log("wolves play");
+exports.wolvesPlay = async(play, game, gameHistoryEntry) => {
+    const { targets } = play;
+    this.checkAndFillTargets(targets, game, { expectedTargetLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0]._id, "eaten", game);
+    gameHistoryEntry.targets = targets;
 };
 
 exports.hunterPlays = async(play, game) => {
@@ -141,6 +146,7 @@ exports.witchPlays = async(play, game) => {
 exports.seerPlays = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
     this.checkAndFillTargets(targets, game, { expectedTargetLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0]._id, "seen", game);
     gameHistoryEntry.targets = targets;
 };
 

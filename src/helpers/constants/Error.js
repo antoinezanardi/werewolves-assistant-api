@@ -111,4 +111,8 @@ exports.errorMetadata = {
         code: 27,
         HTTPCode: 400,
     },
+    WOLVES_CANT_EAT_EACH_OTHER: {
+        code: 28,
+        HTTPCode: 400,
+    },
 };

@@ -88,3 +88,4 @@ Description for each case below:
 | 25   | BAD_TARGET_STRUCTURE              |    400    | One of play's target has a bad structure. (_See: [Classes - Play](#play-class)_ |
 | 26   | PLAYER_NOT_TARGETABLE             |    400    | Player can't be a target.                                                       |
 | 27   | SEER_CANT_LOOK_AT_HERSELF         |    400    | Seer can't look at herself.                                                     |
+| 28   | WOLVES_CANT_EAT_EACH_OTHER        |    400    | Wolves's target can't be a player with group "wolves".                          |
