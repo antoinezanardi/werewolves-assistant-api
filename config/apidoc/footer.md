@@ -19,7 +19,7 @@
 | Role      | [Group](#player-groups) |                 Description                                |
 |:---------:|:-----------------------:|------------------------------------------------------------|
 | wolf      | wolves                  | Each night, his group eats a villager chosen by the majority.                               |
-| witch     | villagers               | She has one life potion which prevents from murder of any kind and a death potion which instantly kills. She can only use each one once in the game.                                      |
+| witch     | villagers               | She has one life potion which prevents from being eaten by wolves and a death potion which instantly kills. She can only use each one once in the game.                                      |
 | seer      | villagers               | Each night, she sees the role of the player she wants.                          |
 | protector | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                         |
 | hunter    | villagers               | If he dies, he shoots a victim to take his revenge. He can't kill himself.            |
@@ -89,3 +89,7 @@ Description for each case below:
 | 26   | PLAYER_NOT_TARGETABLE             |    400    | Player can't be a target.                                                       |
 | 27   | SEER_CANT_LOOK_AT_HERSELF         |    400    | Seer can't look at herself.                                                     |
 | 28   | WOLVES_CANT_EAT_EACH_OTHER        |    400    | Wolves's target can't be a player with group "wolves".                          |
+| 29   | BAD_LIFE_POTION_USE               |    400    | Witch can only use life potion on a target eaten by wolves.                     |
+| 30   | ONLY_ONE_LIFE_POTION              |    400    | Witch can only use one life potion per game.                                    |
+| 31   | ONLY_ONE_DEATH_POTION             |    400    | Witch can only use one death potion per game.                                   |
+| 32   | NON_UNIQUE_TARGETS                |    400    | Multiple targets are pointing the same player.                                  |

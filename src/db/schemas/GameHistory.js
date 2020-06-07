@@ -15,7 +15,21 @@ const playSchema = new Schema({
         required: true,
     },
     targets: {
-        type: [Player],
+        type: [{
+            player: {
+                type: Player,
+                required: true,
+            },
+            potion: {
+                life: {
+                    type: Boolean,
+                },
+                death: {
+                    type: Boolean,
+                },
+            },
+        }],
+        _id: false,
         default: undefined,
     },
     votes: {

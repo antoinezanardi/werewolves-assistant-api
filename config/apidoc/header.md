@@ -82,14 +82,18 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 | **play***                        | [Play](#play-class)       | Game's play.                                                      |
 
 ## <a id="play-class"></a>🕹 Play
-| Field                            | Type                      | Description                                                         |
-|----------------------------------|:-------------------------:|---------------------------------------------------------------------|
-| source                           | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
-| action                           | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
-| **targets***                     | [Player[]](#player-class) | Player(s) affected by the play.                                                      |
-| **votes***                       | Object[]                  | Votes of the play.                                                      |
-| &emsp;&emsp;votes.from           | [Player](#player-class)   | Vote's source.                                                      |
-| &emsp;&emsp;votes.for            | [Player](#player-class)   | Vote's target.                                                      |
+| Field                                  | Type                      | Description                                                         |
+|----------------------------------------|:-------------------------:|---------------------------------------------------------------------|
+| source                                 | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
+| action                                 | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
+| **targets***                           | Object[]                  | Players affected by the play.                                                      |
+| &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                      |
+| **&emsp;&emsp;potion***                | Object                    | Only available for the `witch`.                                                      |
+| **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from wolves.                                                      |
+| **&emsp;&emsp;&emsp;&emsp;death***     | Boolean                   | Only available for the `witch`. If set to `true`, target is killed.                                                      |
+| **votes***                             | Object[]                  | Votes of the play.                                                      |
+| &emsp;&emsp;from                       | [Player](#player-class)   | Vote's source.                                                      |
+| &emsp;&emsp;for                        | [Player](#player-class)   | Vote's target.                                                      |
 
 ## <a id="error-class"></a>⚠️ API Error
 

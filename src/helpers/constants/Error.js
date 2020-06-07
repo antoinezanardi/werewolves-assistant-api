@@ -115,4 +115,20 @@ exports.errorMetadata = {
         code: 28,
         HTTPCode: 400,
     },
+    BAD_LIFE_POTION_USE: {
+        code: 29,
+        HTTPCode: 400,
+    },
+    ONLY_ONE_LIFE_POTION: {
+        code: 30,
+        HTTPCode: 400,
+    },
+    ONLY_ONE_DEATH_POTION: {
+        code: 31,
+        HTTPCode: 400,
+    },
+    NON_UNIQUE_TARGETS: {
+        code: 32,
+        HTTPCode: 400,
+    },
 };

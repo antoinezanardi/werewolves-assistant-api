@@ -20,7 +20,7 @@ const players = [
 ];
 let token, game;
 
-describe("Game of 6 players with basic roles", () => {
+describe("B - Game of 6 players with basic roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -66,7 +66,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("🎲 Checks if game is waiting for 'all' to 'elect-mayor' (POST /games/:id/play)", done => {
+    it("🎲 Game is waiting for 'all' to 'elect-mayor' (POST /games/:id/play)", done => {
         expect(game.waiting).to.deep.equals({ for: "all", to: "elect-mayor" });
         done();
     });
@@ -207,7 +207,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("🎲 Checks if game is waiting for 'seer' to 'look' (POST /games/:id/play)", done => {
+    it("🎲 Game is waiting for 'seer' to 'look' (POST /games/:id/play)", done => {
         expect(game.waiting).to.deep.equals({ for: "seer", to: "look" });
         done();
     });
@@ -261,8 +261,8 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [
-                { _id: players[0]._id },
-                { _id: players[1]._id },
+                { player: players[0]._id },
+                { player: players[1]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -275,7 +275,7 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [
-                { _id: mongoose.Types.ObjectId() },
+                { player: mongoose.Types.ObjectId() },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -289,7 +289,7 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [
-                { _id: players[1]._id },
+                { player: players[1]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -303,7 +303,7 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [
-                { _id: players[0]._id },
+                { player: players[0]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -313,7 +313,7 @@ describe("Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("🎲 Checks if game is waiting for 'wolves' to 'eat' (POST /games/:id/play)", done => {
+    it("🎲 Game is waiting for 'wolves' to 'eat' (POST /games/:id/play)", done => {
         expect(game.waiting).to.deep.equals({ for: "wolves", to: "eat" });
         done();
     });
@@ -367,8 +367,8 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "wolves", action: "eat", targets: [
-                { _id: players[0]._id },
-                { _id: players[1]._id },
+                { player: players[0]._id },
+                { player: players[1]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -381,7 +381,7 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "wolves", action: "eat", targets: [
-                { _id: mongoose.Types.ObjectId() },
+                { player: mongoose.Types.ObjectId() },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -395,7 +395,7 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "wolves", action: "eat", targets: [
-                { _id: players[5]._id },
+                { player: players[5]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -409,13 +409,135 @@ describe("Game of 6 players with basic roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
             .send({ source: "wolves", action: "eat", targets: [
-                { _id: players[2]._id },
+                { player: players[2]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[2].attributes).to.deep.include({ attribute: "eaten", source: "wolves" });
                 expect(game.history[0].play.targets).to.exist;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'witch' to 'use-potion' (POST /games/:id/play)", done => {
+        expect(game.waiting).to.deep.equals({ for: "witch", to: "use-potion" });
+        done();
+    });
+    it("🧹️Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "use-potion" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🧹️Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🧹 Witch can't use potion if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("🧹 Witch can't use potion if one target doesn't have `potion` field (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[0]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGET_STRUCTURE");
+                done();
+            });
+    });
+    it("🧹 Witch can't use potion if one target have both `potion.life` and `potion.death` fields set to `true` (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[0]._id, potion: { life: true, death: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGET_STRUCTURE");
+                done();
+            });
+    });
+    it("🧹 Witch can't use potion on unknown target (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: mongoose.Types.ObjectId(), potion: { life: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🧹 Witch can't use life potion on player not eaten by wolves (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[0]._id, potion: { life: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_LIFE_POTION_USE");
+                done();
+            });
+    });
+    it("🧹 Witch can't use life potion and death potion on same target (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[2]._id, potion: { life: true } },
+                { player: players[2]._id, potion: { death: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NON_UNIQUE_TARGETS");
+                done();
+            });
+    });
+    it("🧹 Witch can't use death potion twice (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[0]._id, potion: { death: true } },
+                { player: players[1]._id, potion: { death: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ONLY_ONE_DEATH_POTION");
                 done();
             });
     });

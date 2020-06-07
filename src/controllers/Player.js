@@ -1,35 +1,75 @@
+const { hasAttribute } = require("../helpers/functions/Player");
 const { playerAttributes } = require("../helpers/constants/Player");
 const { generateError } = require("../helpers/functions/Error");
 
-exports.checkTargetDependingOnAction = (target, action) => {
-    if (action === "look" && target.role.current === "seer") {
-        throw generateError("SEER_CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
-    } else if (action === "eat" && target.role.group === "wolves") {
-        throw generateError("WOLVES_CANT_EAT_EACH_OTHER", `Wolves's target can't be a player with group "wolves".`);
+exports.checkAllTargetsDependingOnAction = (targets, action) => {
+    if (action === "use-potion") {
+        if (targets.filter(({ potion }) => potion.life).length > 1) {
+            throw generateError("ONLY_ONE_LIFE_POTION", "Witch can only use one life potion per game.");
+        } else if (targets.filter(({ potion }) => potion.death).length > 1) {
+            throw generateError("ONLY_ONE_DEATH_POTION", "Witch can only use one death potion per game.");
+        }
     }
 };
 
-exports.checkAndFillTargets = (targets, game, { canBeEmpty, expectedTargetLength, action }) => {
+exports.checkUniqueTargets = targets => {
+    const uniqueTargets = [...new Set(targets.map(({ player }) => player._id))];
+    if (uniqueTargets.length !== targets.length) {
+        throw generateError("NON_UNIQUE_TARGETS", "Multiple targets are pointing the same player.");
+    }
+};
+
+exports.checkTargetDependingOnAction = (target, action) => {
+    if (action === "look" && target.player.role.current === "seer") {
+        throw generateError("SEER_CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
+    } else if (action === "eat" && target.player.role.group === "wolves") {
+        throw generateError("WOLVES_CANT_EAT_EACH_OTHER", `Wolves's target can't be a player with group "wolves".`);
+    } else if (action === "use-potion" && target.potion.life && !hasAttribute(target.player, "eaten")) {
+        throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by wolves.`);
+    }
+};
+
+exports.checkAndFillPlayerTarget = (target, game) => {
+    const player = game.players.find(player => player._id.toString() === target.player);
+    if (!player) {
+        throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${target.player}" is not targetable because the player is not in the game.`);
+    } else if (!player.isAlive) {
+        throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${target.player}" is not targetable because the player is dead.`);
+    }
+    target.player = player;
+};
+
+exports.checkTargetStructure = (target, action) => {
+    if (target.player === undefined) {
+        throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "player" is missing.`);
+    } else if (action === "use-potion") {
+        if (target.potion === undefined || target.potion.life === undefined && target.potion.death === undefined) {
+            throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "potion" with either "potion.life" or "potion.death" are missing.`);
+        } else if (target.potion.life && target.potion.death) {
+            throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Witch can't use life and death potions on the same target.`);
+        }
+    }
+};
+
+exports.checkTargetsOptions = (targets, { canBeEmpty, hasMultipleSameTargets, expectedLength }) => {
     if (!targets || !Array.isArray(targets)) {
         throw generateError("TARGETS_REQUIRED", `"targets" needs to be set and to be an array.`);
     } else if (!targets.length && !canBeEmpty) {
         throw generateError("TARGETS_CANT_BE_EMPTY", "`targets` can't be empty.");
-    } else if (expectedTargetLength !== undefined && targets.length !== expectedTargetLength) {
-        throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to have exactly a length of ${expectedTargetLength}.`);
+    } else if (expectedLength !== undefined && targets.length !== expectedLength) {
+        throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to have exactly a length of ${expectedLength}.`);
     }
+};
+
+exports.checkAndFillTargets = (targets, game, options) => {
+    this.checkTargetsOptions(targets, options);
     for (let i = 0; i < targets.length; i++) {
-        if (targets[i]._id === undefined) {
-            throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure.`);
-        }
-        const target = game.players.find(player => player._id.toString() === targets[i]._id);
-        if (!target) {
-            throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${targets[i]._id}" is not targetable because the player is not in the game.`);
-        } else if (!target.isAlive) {
-            throw generateError("PLAYER_NOT_TARGETABLE", `Target with id "${targets[i]._id}" is not targetable because the player is dead.`);
-        }
-        this.checkTargetDependingOnAction(target, action);
-        targets[i] = target;
+        this.checkTargetStructure(targets[i], options.action);
+        this.checkAndFillPlayerTarget(targets[i], game);
+        this.checkTargetDependingOnAction(targets[i], options.action);
     }
+    this.checkUniqueTargets(targets);
+    this.checkAllTargetsDependingOnAction(targets, options.action);
 };
 
 exports.addPlayerAttribute = (playerId, attribute, game) => {
@@ -122,8 +162,8 @@ exports.mayorPlays = async(play, game) => {
 
 exports.wolvesPlay = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
-    this.checkAndFillTargets(targets, game, { expectedTargetLength: 1, action: play.action });
-    this.addPlayerAttribute(targets[0]._id, "eaten", game);
+    this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0].player._id, "eaten", game);
     gameHistoryEntry.targets = targets;
 };
 
@@ -139,14 +179,15 @@ exports.protectorPlays = async(play, game) => {
     console.log("protector plays");
 };
 
-exports.witchPlays = async(play, game) => {
-    console.log("witch plays");
+exports.witchPlays = async(play, game, gameHistoryEntry) => {
+    const { targets } = play;
+    this.checkAndFillTargets(targets, game, { canBeEmpty: true, action: play.action });
 };
 
 exports.seerPlays = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
-    this.checkAndFillTargets(targets, game, { expectedTargetLength: 1, action: play.action });
-    this.addPlayerAttribute(targets[0]._id, "seen", game);
+    this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0].player._id, "seen", game);
     gameHistoryEntry.targets = targets;
 };
 
