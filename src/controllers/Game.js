@@ -255,7 +255,6 @@ exports.getNextGameAction = game => game.phase === "night" ? this.getNextGameNig
 
 exports.generatePlayMethods = () => ({
     all: Player.allPlay,
-    villagers: Player.villagersPlay,
     seer: Player.seerPlays,
     witch: Player.witchPlays,
     protector: Player.protectorPlays,

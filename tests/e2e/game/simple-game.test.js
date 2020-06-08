@@ -423,7 +423,7 @@ describe("B - Game of 6 players with basic roles", () => {
         expect(game.waiting).to.deep.equals({ for: "witch", to: "use-potion" });
         done();
     });
-    it("🧹️Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
+    it("🧹 Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -434,7 +434,7 @@ describe("B - Game of 6 players with basic roles", () => {
                 done();
             });
     });
-    it("🧹️Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
+    it("🧹 Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -540,5 +540,26 @@ describe("B - Game of 6 players with basic roles", () => {
                 expect(res.body.type).to.equals("ONLY_ONE_DEATH_POTION");
                 done();
             });
+    });
+    it("🧹 Witch use life potion on protector (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[2]._id, potion: { life: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].attributes).to.deep.include({ attribute: "drank-life-potion", source: "witch" });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].potion.life).to.equals(true);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'protector' to 'protect' (POST /games/:id/play)", done => {
+        expect(game.waiting).to.deep.equals({ for: "protector", to: "protect" });
+        done();
     });
 });

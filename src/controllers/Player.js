@@ -1,12 +1,15 @@
+const GameHistory = require("./GameHistory");
 const { hasAttribute } = require("../helpers/functions/Player");
 const { playerAttributes } = require("../helpers/constants/Player");
 const { generateError } = require("../helpers/functions/Error");
 
-exports.checkAllTargetsDependingOnAction = (targets, action) => {
+exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
     if (action === "use-potion") {
-        if (targets.filter(({ potion }) => potion.life).length > 1) {
+        const savedTarget = targets.filter(({ potion }) => potion.life);
+        const murderedTarget = targets.filter(({ potion }) => potion.death);
+        if (savedTarget.length > 1 || savedTarget.length && await GameHistory.isLifePotionUsed(game._id)) {
             throw generateError("ONLY_ONE_LIFE_POTION", "Witch can only use one life potion per game.");
-        } else if (targets.filter(({ potion }) => potion.death).length > 1) {
+        } else if (murderedTarget.length > 1 || murderedTarget.length && await GameHistory.isDeathPotionUsed(game._id)) {
             throw generateError("ONLY_ONE_DEATH_POTION", "Witch can only use one death potion per game.");
         }
     }
@@ -61,7 +64,7 @@ exports.checkTargetsOptions = (targets, { canBeEmpty, hasMultipleSameTargets, ex
     }
 };
 
-exports.checkAndFillTargets = (targets, game, options) => {
+exports.checkAndFillTargets = async(targets, game, options) => {
     this.checkTargetsOptions(targets, options);
     for (let i = 0; i < targets.length; i++) {
         this.checkTargetStructure(targets[i], options.action);
@@ -69,7 +72,7 @@ exports.checkAndFillTargets = (targets, game, options) => {
         this.checkTargetDependingOnAction(targets[i], options.action);
     }
     this.checkUniqueTargets(targets);
-    this.checkAllTargetsDependingOnAction(targets, options.action);
+    await this.checkAllTargetsDependingOnAction(targets, game, options.action);
 };
 
 exports.addPlayerAttribute = (playerId, attribute, game) => {
@@ -162,7 +165,7 @@ exports.mayorPlays = async(play, game) => {
 
 exports.wolvesPlay = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
-    this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "eaten", game);
     gameHistoryEntry.targets = targets;
 };
@@ -181,18 +184,22 @@ exports.protectorPlays = async(play, game) => {
 
 exports.witchPlays = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
-    this.checkAndFillTargets(targets, game, { canBeEmpty: true, action: play.action });
+    await this.checkAndFillTargets(targets, game, { canBeEmpty: true, action: play.action });
+    for (const target of targets) {
+        if (target.potion.life) {
+            this.addPlayerAttribute(target.player._id, "drank-life-potion", game);
+        } else if (target.potion.death) {
+            this.addPlayerAttribute(target.player._id, "drank-death-potion", game);
+        }
+    }
+    gameHistoryEntry.targets = targets;
 };
 
 exports.seerPlays = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
-    this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "seen", game);
     gameHistoryEntry.targets = targets;
-};
-
-exports.villagersPlay = async(play, game) => {
-    console.log("villagers play");
 };
 
 exports.allElectMayor = async(play, game, gameHistoryEntry) => {

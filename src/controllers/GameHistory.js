@@ -13,3 +13,7 @@ exports.create = async(data, options = {}) => {
     const gameHistoryEntry = await GameHistory.create(data, options);
     return toJSON ? gameHistoryEntry.toJSON() : gameHistoryEntry;
 };
+
+exports.isLifePotionUsed = async gameId => await this.findOne({ gameId, play: { targets: { potion: { life: true } } } });
+
+exports.isDeathPotionUsed = async gameId => await this.findOne({ gameId, play: { targets: { potion: { death: true } } } });

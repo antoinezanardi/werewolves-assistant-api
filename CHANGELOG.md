@@ -70,7 +70,7 @@
 
 * `migrate-mongo` installed with version `7.2.1`.
 * `apidoc` updated to version `0.23.0`.
-* `bcrypt` updated to version `4.0.1`.
+* `bcrypt` updated to version `5.0.0`.
 * `eslint` updated to version `7.2.0`.
 * `express-validator` updated to version `6.5.0`.
 * `mocha` updated to version `7.2.0`.
