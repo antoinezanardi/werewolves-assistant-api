@@ -56,7 +56,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
+    it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${mongoose.Types.ObjectId()}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -66,6 +66,10 @@ describe("B - Full game of 6 players with all roles", () => {
                 expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
+    });
+    it("🌙 Night falls", done => {
+        expect(game.phase).to.equals("night");
+        done();
     });
     it("🎲 Game is waiting for 'all' to 'elect-mayor'", done => {
         expect(game.waiting).to.deep.equals({ for: "all", to: "elect-mayor" });
