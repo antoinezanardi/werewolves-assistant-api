@@ -17,3 +17,8 @@ exports.create = async(data, options = {}) => {
 exports.isLifePotionUsed = async gameId => await this.findOne({ gameId, play: { targets: { potion: { life: true } } } });
 
 exports.isDeathPotionUsed = async gameId => await this.findOne({ gameId, play: { targets: { potion: { death: true } } } });
+
+exports.getLastProtectedPlayer = async gameId => {
+    const lastProtectorPlay = await this.findOne({ gameId, play: { action: "protect" } }, null, { sort: { createdAt: -1 } });
+    return lastProtectorPlay ? lastProtectorPlay.play.targets[0].player : null;
+};

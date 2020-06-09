@@ -211,19 +211,7 @@ exports.patchGame = async(req, res) => {
     }
 };
 
-exports.nextGameTick = (game, newPhase = false) => {
-    game.tick++;
-    if (newPhase) {
-        if (game.phase === "night") {
-            game.phase = "day";
-        } else {
-            game.phase = "night";
-            game.turn++;
-        }
-    }
-};
-
-exports.getNextGameDayAction = () => ({ for: "villagers", to: "vote" });
+exports.getNextGameDayAction = () => ({ for: "all", to: "vote" });
 
 exports.isSourceAvailableInPlayers = (players, source) => {
     if (source === "all" || source === "mayor") {
@@ -248,10 +236,29 @@ exports.getNextGameNightAction = game => {
             return { for: nextGameNightAction.source, to: nextGameNightAction.action };
         }
     }
-    throw generateError("INTERNAL_SERVER_ERROR", "Unable to predict next night action.");
+    return null;
 };
 
-exports.getNextGameAction = game => game.phase === "night" ? this.getNextGameNightAction(game) : this.getNextGameDayAction(game);
+exports.getNextGameAction = game => {
+    if (game.phase === "night") {
+        const nextGameNightAction = this.getNextGameNightAction(game);
+        if (!nextGameNightAction) {
+            game.phase = "day";
+            return this.getNextGameDayAction(game);
+        } else {
+            return nextGameNightAction;
+        }
+    } else if (game.phase === "day") {
+        const nextGameDayAction = this.getNextGameDayAction(game);
+        if (!nextGameDayAction) {
+            game.phase = "night";
+            game.turn++;
+            return this.getNextGameNightAction(game);
+        } else {
+            return nextGameDayAction;
+        }
+    }
+};
 
 exports.generatePlayMethods = () => ({
     all: Player.allPlay,
@@ -292,10 +299,8 @@ exports.play = async play => {
     const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game, gameHistoryEntry);
     await GameHistory.create(gameHistoryEntry);
-    if (game.waiting.for === play.source && game.waiting.to === play.action) {
-        game.waiting = this.getNextGameAction(game);
-    }
-    this.nextGameTick(game);
+    game.waiting = this.getNextGameAction(game);
+    game.tick++;
     return await this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 

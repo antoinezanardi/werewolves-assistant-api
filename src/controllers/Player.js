@@ -22,13 +22,18 @@ exports.checkUniqueTargets = targets => {
     }
 };
 
-exports.checkTargetDependingOnAction = (target, action) => {
+exports.checkTargetDependingOnAction = async(target, game, action) => {
     if (action === "look" && target.player.role.current === "seer") {
         throw generateError("SEER_CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
     } else if (action === "eat" && target.player.role.group === "wolves") {
         throw generateError("WOLVES_CANT_EAT_EACH_OTHER", `Wolves's target can't be a player with group "wolves".`);
     } else if (action === "use-potion" && target.potion.life && !hasAttribute(target.player, "eaten")) {
         throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by wolves.`);
+    } else if (action === "protect") {
+        const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
+        if (lastProtectedTarget && lastProtectedTarget._id === target.player._id) {
+            throw generateError("CANT_PROTECT_TWICE", `Protector can't protect the same player twice in a row.`);
+        }
     }
 };
 
@@ -54,10 +59,10 @@ exports.checkTargetStructure = (target, action) => {
     }
 };
 
-exports.checkTargetsOptions = (targets, { canBeEmpty, hasMultipleSameTargets, expectedLength }) => {
-    if (!targets || !Array.isArray(targets)) {
+exports.checkTargetsOptions = (targets, { canBeUnset, canBeEmpty, expectedLength }) => {
+    if (!canBeUnset && (!targets || !Array.isArray(targets))) {
         throw generateError("TARGETS_REQUIRED", `"targets" needs to be set and to be an array.`);
-    } else if (!targets.length && !canBeEmpty) {
+    } else if (!canBeEmpty && !targets.length) {
         throw generateError("TARGETS_CANT_BE_EMPTY", "`targets` can't be empty.");
     } else if (expectedLength !== undefined && targets.length !== expectedLength) {
         throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to have exactly a length of ${expectedLength}.`);
@@ -69,7 +74,7 @@ exports.checkAndFillTargets = async(targets, game, options) => {
     for (let i = 0; i < targets.length; i++) {
         this.checkTargetStructure(targets[i], options.action);
         this.checkAndFillPlayerTarget(targets[i], game);
-        this.checkTargetDependingOnAction(targets[i], options.action);
+        await this.checkTargetDependingOnAction(targets[i], game, options.action);
     }
     this.checkUniqueTargets(targets);
     await this.checkAllTargetsDependingOnAction(targets, game, options.action);
@@ -174,17 +179,23 @@ exports.hunterPlays = async(play, game) => {
     console.log("hunter plays");
 };
 
-exports.ravenPlays = async(play, game) => {
-    console.log("protector plays");
+exports.ravenPlays = async(play, game, gameHistoryEntry) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0].player._id, "raven-marked", game);
+    gameHistoryEntry.targets = targets;
 };
 
-exports.protectorPlays = async(play, game) => {
-    console.log("protector plays");
+exports.protectorPlays = async(play, game, gameHistoryEntry) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0].player._id, "protected", game);
+    gameHistoryEntry.targets = targets;
 };
 
 exports.witchPlays = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { canBeEmpty: true, action: play.action });
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, action: play.action });
     for (const target of targets) {
         if (target.potion.life) {
             this.addPlayerAttribute(target.player._id, "drank-life-potion", game);

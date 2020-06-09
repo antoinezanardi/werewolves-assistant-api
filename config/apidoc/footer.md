@@ -93,3 +93,4 @@ Description for each case below:
 | 30   | ONLY_ONE_LIFE_POTION              |    400    | Witch can only use one life potion per game.                                    |
 | 31   | ONLY_ONE_DEATH_POTION             |    400    | Witch can only use one death potion per game.                                   |
 | 32   | NON_UNIQUE_TARGETS                |    400    | Multiple targets are pointing the same player.                                  |
+| 33   | CANT_PROTECT_TWICE                |    400    | Protector can't protect the same player twice in a row.                         |

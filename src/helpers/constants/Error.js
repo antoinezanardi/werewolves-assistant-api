@@ -131,4 +131,8 @@ exports.errorMetadata = {
         code: 32,
         HTTPCode: 400,
     },
+    CANT_PROTECT_TWICE: {
+        code: 33,
+        HTTPCode: 400,
+    },
 };

@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.2.0 (2020-05-??)
+## 0.2.0 (2020-06-??)
 
 ### 🚀 New features
 
