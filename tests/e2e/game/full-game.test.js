@@ -164,7 +164,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if player votes twice (POST /games/:id/play)", done => {
+    it("👥 All can't elect mayor if one player votes twice (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -722,4 +722,143 @@ describe("B - Full game of 6 players with all roles", () => {
         expect(game.waiting).to.deep.equals({ for: "all", to: "vote" });
         done();
     });
+    it("👥 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "vote" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("👥 All can't vote if play's action is not 'vote' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "look" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("👥 All can't vote if votes are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("VOTES_REQUIRED");
+                done();
+            });
+    });
+    it("👥 All can't vote if votes are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("VOTES_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("👥 All can't vote if one vote has same target and source (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [
+                { from: players[0]._id, for: players[1]._id },
+                { from: players[1]._id, for: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("SAME_VOTE_SOURCE_AND_TARGET");
+                done();
+            });
+    });
+    it("👥 All can't vote if one vote has an unknown source (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [
+                { from: mongoose.Types.ObjectId(), for: players[1]._id },
+                { from: players[0]._id, for: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_CANT_VOTE");
+                done();
+            });
+    });
+    it("👥 All can't vote if one vote has an unknown target (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [
+                { from: players[0]._id, for: mongoose.Types.ObjectId() },
+                { from: players[1]._id, for: players[0]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_CANT_BE_VOTE_TARGET");
+                done();
+            });
+    });
+    it("👥 All can't vote if one player votes twice (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [
+                { from: players[0]._id, for: players[1]._id },
+                { from: players[0]._id, for: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_CANT_VOTE_MULTIPLE_TIMES");
+                done();
+            });
+    });
+    it("👥 Tie in votes between villager and wolf (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [
+                { from: players[0]._id, for: players[1]._id },
+                { from: players[1]._id, for: players[5]._id },
+                { from: players[2]._id, for: players[5]._id },
+                { from: players[3]._id, for: players[1]._id },
+                { from: players[4]._id, for: players[5]._id },
+                { from: players[5]._id, for: players[6]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[6].attributes).to.not.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.history[0].play.votes).to.exist;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'mayor' to 'settle-votes'", done => {
+        expect(game.waiting).to.deep.equals({ for: "mayor", to: "settle-votes" });
+        done();
+    });
 });
+
+// const players = [
+//     { name: "0Dig", role: "witch" },
+//     { name: "1oug", role: "seer" },
+//     { name: "2Dag", role: "protector" },
+//     { name: "3Dug", role: "raven" },
+//     { name: "4Dyg", role: "hunter" },
+//     { name: "5Deg", role: "wolf" },
+//     { name: "6Dog", role: "villager" },
+// ];

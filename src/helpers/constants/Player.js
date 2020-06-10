@@ -9,3 +9,10 @@ exports.playerAttributes = [
 ];
 
 exports.playerActions = ["eat", "use-potion", "look", "protect", "shoot", "mark", "elect-mayor", "delegate", "settle-votes", "vote"];
+
+exports.murderedPossibilities = [
+    { by: "witch", of: "use-potion" },
+    { by: "hunter", of: "shoot" },
+    { by: "mayor", of: "settle-votes" },
+    { by: "all", of: "vote" },
+];

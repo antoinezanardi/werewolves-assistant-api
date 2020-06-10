@@ -1,5 +1,5 @@
 const { Schema } = require("mongoose");
-const { playerAttributes, playerActions } = require("../../helpers/constants/Player");
+const { playerAttributes, playerActions, murderedPossibilities } = require("../../helpers/constants/Player");
 const { groupNames, roleNames } = require("../../helpers/constants/Role");
 const { waitingForPossibilities } = require("../../helpers/constants/Game");
 
@@ -94,6 +94,7 @@ const PlayerSchema = new Schema({
     },
     murdered: {
         type: MurderedSchema,
+        enum: murderedPossibilities,
         required: false,
     },
 }, {
