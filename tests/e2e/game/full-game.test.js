@@ -1263,9 +1263,56 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'all' to 'elect-mayor'", done => {
-        expect(game.waiting).to.deep.equals({ for: "all", to: "elect-mayor" });
+    it("🎲 Game is waiting for 'witch' to 'use-potion'", done => {
+        expect(game.waiting).to.deep.equals({ for: "witch", to: "use-potion" });
         done();
+    });
+    it("🧹 Witch can't use death potion twice (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [
+                { player: players[3]._id, potion: { death: true } },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ONLY_ONE_DEATH_POTION");
+                done();
+            });
+    });
+    it("🧹 Witch skips (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'raven' to 'mark'", done => {
+        expect(game.waiting).to.deep.equals({ for: "raven", to: "mark" });
+        done();
+    });
+    it("🐦 Raven marks the hunter (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "raven", action: "mark", targets: [
+                { player: players[4]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[4].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[4]._id);
+                done();
+            });
     });
 });
 

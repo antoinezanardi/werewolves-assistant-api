@@ -253,14 +253,22 @@ exports.isSourceAvailableInPlayers = (players, source) => {
 
 exports.getNextGameNightAction = (game, endOfDay = false) => {
     const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
-    for (let i = 0; i < actionsOrder.length; i++) {
-        if (endOfDay && this.isSourceAvailableInPlayers(game.players, actionsOrder[i].source)) {
-            const nextGameNightAction = actionsOrder[i];
-            return { for: nextGameNightAction.source, to: nextGameNightAction.action };
-        } else if (!endOfDay && actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
-            i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
-            const nextGameNightAction = actionsOrder[i + 1];
-            return { for: nextGameNightAction.source, to: nextGameNightAction.action };
+    if (endOfDay) {
+        for (let i = 0; i < actionsOrder.length; i++) {
+            if (this.isSourceAvailableInPlayers(game.players, actionsOrder[i].source)) {
+                const nextGameNightAction = actionsOrder[i];
+                return { for: nextGameNightAction.source, to: nextGameNightAction.action };
+            }
+        }
+    } else {
+        let actionFound = false;
+        for (let i = 0; i < actionsOrder.length; i++) {
+            if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to) {
+                actionFound = true;
+            } else if (actionFound && this.isSourceAvailableInPlayers(game.players, actionsOrder[i].source)) {
+                const nextGameNightAction = actionsOrder[i];
+                return { for: nextGameNightAction.source, to: nextGameNightAction.action };
+            }
         }
     }
     return null;

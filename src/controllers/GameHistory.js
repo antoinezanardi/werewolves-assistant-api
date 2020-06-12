@@ -28,6 +28,12 @@ exports.checkAndFillDataBeforeCreate = async data => {
     if (!game) {
         throw generateError("NOT_FOUND", `Game with ID ${data.gameId} not found for game history entry creation.`);
     }
+    if (!data.play.votes || !data.play.votes.length) {
+        delete data.play.votes;
+    }
+    if (!data.play.targets || !data.play.targets.length) {
+        delete data.play.targets;
+    }
     this.fillPlayers(data, game.players);
 };
 
