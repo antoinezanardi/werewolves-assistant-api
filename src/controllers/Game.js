@@ -226,6 +226,7 @@ exports.purgeAttributesAfterSunRising = game => {
 exports.getNextGameDayAction = async game => {
     const playerAttributeMethods = [
         { attribute: "eaten", trigger: Player.eaten },
+        { attribute: "drank-death-potion", trigger: Player.drankDeathPotion },
     ];
     for (const { attribute, trigger } of playerAttributeMethods) {
         if (Player.getPlayersWithAttribute(attribute, game).length) {
@@ -250,12 +251,15 @@ exports.isSourceAvailableInPlayers = (players, source) => {
     return false;
 };
 
-exports.getNextGameNightAction = (game, nightStarts = false) => {
+exports.getNextGameNightAction = (game, endOfDay = false) => {
     const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
     for (let i = 0; i < actionsOrder.length; i++) {
-        if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to && i + 1 !== actionsOrder.length ||
-            nightStarts && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
-            const nextGameNightAction = nightStarts ? actionsOrder[0] : actionsOrder[i + 1];
+        if (endOfDay && this.isSourceAvailableInPlayers(game.players, actionsOrder[i].source)) {
+            const nextGameNightAction = actionsOrder[i];
+            return { for: nextGameNightAction.source, to: nextGameNightAction.action };
+        } else if (!endOfDay && actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
+            i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
+            const nextGameNightAction = actionsOrder[i + 1];
             return { for: nextGameNightAction.source, to: nextGameNightAction.action };
         }
     }

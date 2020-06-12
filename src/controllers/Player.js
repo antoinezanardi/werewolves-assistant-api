@@ -67,15 +67,24 @@ exports.checkTargetStructure = (target, action) => {
 exports.checkTargetsOptions = (targets, { canBeUnset, canBeEmpty, expectedLength }) => {
     if (!canBeUnset && (!targets || !Array.isArray(targets))) {
         throw generateError("TARGETS_REQUIRED", `"targets" needs to be set and to be an array.`);
-    } else if (!canBeEmpty && !targets.length) {
+    } else if (!targets) {
+        return;
+    }
+    if (!canBeEmpty && !targets.length) {
         throw generateError("TARGETS_CANT_BE_EMPTY", "`targets` can't be empty.");
-    } else if (expectedLength !== undefined && targets.length !== expectedLength) {
+    } else if (!targets.length) {
+        return;
+    }
+    if (expectedLength !== undefined && targets.length !== expectedLength) {
         throw generateError("BAD_TARGETS_LENGTH", `"targets" needs to have exactly a length of ${expectedLength}.`);
     }
 };
 
 exports.checkAndFillTargets = async(targets, game, options) => {
     this.checkTargetsOptions(targets, options);
+    if (!targets || !targets.length) {
+        return;
+    }
     for (let i = 0; i < targets.length; i++) {
         this.checkTargetStructure(targets[i], options.action);
         this.checkAndFillPlayerTarget(targets[i], game);
@@ -87,7 +96,7 @@ exports.checkAndFillTargets = async(targets, game, options) => {
 
 exports.killPlayer = (playerId, { action }, game) => {
     const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
-    if (player && (action === "eat" && canBeEaten(player) || action !== "eat")) {
+    if (player && (action === "eat" && canBeEaten(player) || action !== "eat" && !hasAttribute(player, "protected"))) {
         player.isAlive = false;
         const murdered = murderedPossibilities.find(({ of }) => of === action);
         if (murdered) {
@@ -229,7 +238,9 @@ exports.hunterPlays = async(play, game) => {
 exports.ravenPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, action: play.action });
-    this.addPlayerAttribute(targets[0].player._id, "raven-marked", game);
+    if (targets && targets.length) {
+        this.addPlayerAttribute(targets[0].player._id, "raven-marked", game);
+    }
 };
 
 exports.protectorPlays = async(play, game) => {
@@ -294,4 +305,10 @@ exports.removeAttributeFromAllPlayers = (attributeName, game) => {
     for (const { _id } of game.players) {
         this.removePlayerAttribute(_id, attributeName, game);
     }
+};
+
+exports.drankDeathPotion = game => {
+    const poisonedPlayer = this.getPlayersWithAttribute("drank-death-potion", game)[0];
+    this.killPlayer(poisonedPlayer._id, { action: "use-potion" }, game);
+    this.removePlayerAttribute(poisonedPlayer._id, "drank-death-potion", game);
 };
