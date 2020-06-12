@@ -146,7 +146,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_CANT_VOTE");
+                expect(res.body.type).to.equals("CANT_VOTE");
                 done();
             });
     });
@@ -161,7 +161,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_CANT_BE_VOTE_TARGET");
+                expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
                 done();
             });
     });
@@ -176,7 +176,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_CANT_VOTE_MULTIPLE_TIMES");
+                expect(res.body.type).to.equals("CANT_VOTE_MULTIPLE_TIMES");
                 done();
             });
     });
@@ -289,7 +289,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
                 done();
             });
     });
@@ -303,7 +303,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("SEER_CANT_LOOK_AT_HERSELF");
+                expect(res.body.type).to.equals("CANT_LOOK_AT_HERSELF");
                 done();
             });
     });
@@ -396,7 +396,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
                 done();
             });
     });
@@ -410,7 +410,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("WOLVES_CANT_EAT_EACH_OTHER");
+                expect(res.body.type).to.equals("CANT_EAT_EACH_OTHER");
                 done();
             });
     });
@@ -494,7 +494,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
                 done();
             });
     });
@@ -632,7 +632,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
                 done();
             });
     });
@@ -703,7 +703,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
                 done();
             });
     });
@@ -807,7 +807,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_CANT_VOTE");
+                expect(res.body.type).to.equals("CANT_VOTE");
                 done();
             });
     });
@@ -822,7 +822,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_CANT_BE_VOTE_TARGET");
+                expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
                 done();
             });
     });
@@ -837,7 +837,7 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_CANT_VOTE_MULTIPLE_TIMES");
+                expect(res.body.type).to.equals("CANT_VOTE_MULTIPLE_TIMES");
                 done();
             });
     });
@@ -912,7 +912,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes at multiple targets (POST /games/:id/play)", done => {
+    it("🎖 Mayor can't settle votes with multiple targets (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -927,7 +927,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes at unknown target (POST /games/:id/play)", done => {
+    it("🎖 Mayor can't settle votes with unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -936,9 +936,119 @@ describe("B - Full game of 6 players with all roles", () => {
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
                 done();
             });
+    });
+    it("🎖 Mayor can't settle votes with player who was not in previous tie in votes (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "settle-votes", targets: [
+                { player: players[0]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("CANT_BE_CHOSEN_AS_TIEBREAKER");
+                done();
+            });
+    });
+    it("🎖 Mayor settles votes by choosing villager (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "settle-votes", targets: [
+                { player: players[6]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].isAlive).to.equals(true);
+                expect(game.players[6].isAlive).to.equals(false);
+                expect(game.history[0].play.targets).to.exist;
+                done();
+            });
+    });
+    it("🌙 Night falls", done => {
+        expect(game.phase).to.equals("night");
+        expect(game.turn).to.equals(2);
+        done();
+    });
+    it("🎲 Game is waiting for 'seer' to 'look'", done => {
+        expect(game.waiting).to.deep.equals({ for: "seer", to: "look" });
+        done();
+    });
+    it("🔮 Seer can't look at dead target (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [
+                { player: players[6]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🔮 Seer looks at the protector (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [
+                { player: players[2]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].attributes).to.deep.include({ attribute: "seen", source: "seer", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'wolves' to 'eat'", done => {
+        expect(game.waiting).to.deep.equals({ for: "wolves", to: "eat" });
+        done();
+    });
+    it("🐺 Wolves can't eat a dead target (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [
+                { player: players[6]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🐺 Wolves eat the seer (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "wolves", action: "eat", targets: [
+                { player: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[1].attributes).to.deep.include({ attribute: "eaten", source: "wolves", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'witch' to 'use-potion'", done => {
+        expect(game.waiting).to.deep.equals({ for: "witch", to: "use-potion" });
+        done();
     });
 });
 

@@ -211,6 +211,11 @@ exports.patchGame = async(req, res) => {
     }
 };
 
+exports.isDayOver = async game => {
+    const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
+    return !!(lastVotePlay && lastVotePlay.turn === game.turn);
+};
+
 exports.purgeAttributesAfterSunRising = game => {
     const purgedAttributes = ["protected", "seen", "drank-life-potion"];
     for (const purgedAttribute of purgedAttributes) {
@@ -218,17 +223,17 @@ exports.purgeAttributesAfterSunRising = game => {
     }
 };
 
-exports.getNextGameDayAction = game => {
+exports.getNextGameDayAction = async game => {
     const playerAttributeMethods = [
         { attribute: "eaten", trigger: Player.eaten },
     ];
     for (const { attribute, trigger } of playerAttributeMethods) {
-        if (Player.getPlayersWithAttribute(attribute, game)) {
+        if (Player.getPlayersWithAttribute(attribute, game).length) {
             trigger(game);
         }
     }
     this.purgeAttributesAfterSunRising(game);
-    return { for: "all", to: "vote" };
+    return await this.isDayOver(game) ? null : { for: "all", to: "vote" };
 };
 
 exports.isSourceAvailableInPlayers = (players, source) => {
@@ -245,19 +250,19 @@ exports.isSourceAvailableInPlayers = (players, source) => {
     return false;
 };
 
-exports.getNextGameNightAction = game => {
+exports.getNextGameNightAction = (game, nightStarts = false) => {
     const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
     for (let i = 0; i < actionsOrder.length; i++) {
-        if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to &&
-            i + 1 !== actionsOrder.length && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
-            const nextGameNightAction = actionsOrder[i + 1];
+        if (actionsOrder[i].source === game.waiting.for && actionsOrder[i].action === game.waiting.to && i + 1 !== actionsOrder.length ||
+            nightStarts && this.isSourceAvailableInPlayers(game.players, actionsOrder[i + 1].source)) {
+            const nextGameNightAction = nightStarts ? actionsOrder[0] : actionsOrder[i + 1];
             return { for: nextGameNightAction.source, to: nextGameNightAction.action };
         }
     }
     return null;
 };
 
-exports.getNextGameAction = game => {
+exports.getNextGameAction = async game => {
     if (game.phase === "night") {
         const nextGameNightAction = this.getNextGameNightAction(game);
         if (!nextGameNightAction) {
@@ -267,11 +272,11 @@ exports.getNextGameAction = game => {
             return nextGameNightAction;
         }
     } else if (game.phase === "day") {
-        const nextGameDayAction = this.getNextGameDayAction(game);
+        const nextGameDayAction = await this.getNextGameDayAction(game);
         if (!nextGameDayAction) {
             game.phase = "night";
             game.turn++;
-            return this.getNextGameNightAction(game);
+            return this.getNextGameNightAction(game, true);
         } else {
             return nextGameDayAction;
         }
@@ -318,7 +323,7 @@ exports.play = async play => {
     await playMethods[play.source](play, game, gameHistoryEntry);
     await GameHistory.create(gameHistoryEntry);
     if (game.waiting.for === play.source && game.waiting.to === play.action) {
-        game.waiting = this.getNextGameAction(game);
+        game.waiting = await this.getNextGameAction(game);
     }
     game.tick++;
     return await this.findOneAndUpdate({ _id: play.gameId }, game);

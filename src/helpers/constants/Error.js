@@ -71,15 +71,15 @@ exports.errorMetadata = {
         code: 17,
         HTTPCode: 400,
     },
-    PLAYER_CANT_VOTE: {
+    CANT_VOTE: {
         code: 18,
         HTTPCode: 400,
     },
-    PLAYER_CANT_BE_VOTE_TARGET: {
+    CANT_BE_VOTE_TARGET: {
         code: 19,
         HTTPCode: 400,
     },
-    PLAYER_CANT_VOTE_MULTIPLE_TIMES: {
+    CANT_VOTE_MULTIPLE_TIMES: {
         code: 20,
         HTTPCode: 400,
     },
@@ -103,15 +103,15 @@ exports.errorMetadata = {
         code: 25,
         HTTPCode: 400,
     },
-    PLAYER_NOT_TARGETABLE: {
+    NOT_TARGETABLE: {
         code: 26,
         HTTPCode: 400,
     },
-    SEER_CANT_LOOK_AT_HERSELF: {
+    CANT_LOOK_AT_HERSELF: {
         code: 27,
         HTTPCode: 400,
     },
-    WOLVES_CANT_EAT_EACH_OTHER: {
+    CANT_EAT_EACH_OTHER: {
         code: 28,
         HTTPCode: 400,
     },
@@ -133,6 +133,10 @@ exports.errorMetadata = {
     },
     CANT_PROTECT_TWICE: {
         code: 33,
+        HTTPCode: 400,
+    },
+    CANT_BE_CHOSEN_AS_TIEBREAKER: {
+        code: 34,
         HTTPCode: 400,
     },
 };

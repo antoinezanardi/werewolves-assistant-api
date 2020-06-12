@@ -78,19 +78,20 @@ Description for each case below:
 | 15   | VOTES_CANT_BE_EMPTY               |    400    | Play's votes can't be an empty array.                                           |
 | 16   | BAD_VOTE_STRUCTURE                |    400    | One of play's vote has a bad structure. (_See: [Classes - Play](#play-class)_)  |
 | 17   | SAME_VOTE_SOURCE_AND_TARGET       |    400    | Play's vote can't have the same source and target.                              |
-| 18   | PLAYER_CANT_VOTE                  |    400    | Player can't be source of a vote.                                               |
-| 19   | PLAYER_CANT_BE_VOTE_TARGET        |    400    | Player can't be target of a vote.                                               |
-| 20   | PLAYER_CANT_VOTE_MULTIPLE_TIMES   |    400    | Player can't vote more than once.                                               |
+| 18   | CANT_VOTE                         |    400    | Player can't be source of a vote.                                               |
+| 19   | CANT_BE_VOTE_TARGET               |    400    | Player can't be target of a vote.                                               |
+| 20   | CANT_VOTE_MULTIPLE_TIMES          |    400    | Player can't vote more than once.                                               |
 | 21   | TIE_IN_VOTES                      |    400    | Tie in votes is not allowed for this action.                                    |
 | 22   | TARGETS_REQUIRED                  |    400    | Plays needs targets to be set.                                                  |
 | 23   | TARGETS_CANT_BE_EMPTY             |    400    | Play's targets can't be an empty array.                                         |
 | 24   | BAD_TARGETS_LENGTH                |    400    | Play's targets length doesn't match the one expected.                           |
 | 25   | BAD_TARGET_STRUCTURE              |    400    | One of play's target has a bad structure. (_See: [Classes - Play](#play-class)_ |
-| 26   | PLAYER_NOT_TARGETABLE             |    400    | Player can't be a target.                                                       |
-| 27   | SEER_CANT_LOOK_AT_HERSELF         |    400    | Seer can't look at herself.                                                     |
-| 28   | WOLVES_CANT_EAT_EACH_OTHER        |    400    | Wolves's target can't be a player with group "wolves".                          |
+| 26   | NOT_TARGETABLE                    |    400    | Player can't be a target.                                                       |
+| 27   | CANT_LOOK_AT_HERSELF              |    400    | Seer can't look at herself.                                                     |
+| 28   | CANT_EAT_EACH_OTHER               |    400    | Wolves's target can't be a player with group "wolves".                          |
 | 29   | BAD_LIFE_POTION_USE               |    400    | Witch can only use life potion on a target eaten by wolves.                     |
 | 30   | ONLY_ONE_LIFE_POTION              |    400    | Witch can only use one life potion per game.                                    |
 | 31   | ONLY_ONE_DEATH_POTION             |    400    | Witch can only use one death potion per game.                                   |
 | 32   | NON_UNIQUE_TARGETS                |    400    | Multiple targets are pointing the same player.                                  |
 | 33   | CANT_PROTECT_TWICE                |    400    | Protector can't protect the same player twice in a row.                         |
+| 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the mayor.                      |

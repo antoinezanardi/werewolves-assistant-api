@@ -47,8 +47,8 @@ exports.isLifePotionUsed = async gameId => await this.findOne({ gameId, play: { 
 exports.isDeathPotionUsed = async gameId => await this.findOne({ gameId, play: { targets: { potion: { death: true } } } });
 
 exports.getLastProtectedPlayer = async gameId => {
-    const lastProtectorPlay = await this.findOne({ gameId, play: { action: "protect" } }, null, { sort: { createdAt: -1 } });
+    const lastProtectorPlay = await this.findOne({ gameId, "play.action": "protect" }, null, { sort: { createdAt: -1 } });
     return lastProtectorPlay ? lastProtectorPlay.play.targets[0].player : null;
 };
 
-exports.getLastVotePlay = async gameId => await this.findOne({ gameId, play: { action: "vote" } }, null, { sort: { createdAt: -1 } });
+exports.getLastVotePlay = async gameId => await this.findOne({ gameId, "play.action": "vote" }, null, { sort: { createdAt: -1 } });

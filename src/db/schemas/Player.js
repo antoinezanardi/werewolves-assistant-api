@@ -39,17 +39,15 @@ const PlayerPowerSchema = new Schema({
 });
 
 const MurderedSchema = new Schema({
-    murdered: {
-        by: {
-            type: String,
-            enum: waitingForPossibilities,
-            required: true,
-        },
-        of: {
-            type: String,
-            enum: playerActions,
-            required: true,
-        },
+    by: {
+        type: String,
+        enum: waitingForPossibilities,
+        required: true,
+    },
+    of: {
+        type: String,
+        enum: playerActions,
+        required: true,
     },
 }, {
     _id: false,
