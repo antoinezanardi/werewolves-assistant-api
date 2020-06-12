@@ -1314,10 +1314,43 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
+    it("☀️ Sun is rising", done => {
+        expect(game.phase).to.equals("day");
+        expect(game.players[0].attributes).to.not.deep.include({ attribute: "eaten", source: "wolves", remainingPhases: 1 });
+        expect(game.players[0].isAlive).to.equals(false);
+        expect(game.players[0].murdered).to.deep.equals({ by: "wolves", of: "eat" });
+        done();
+    });
+    it("🎲 Game is waiting for 'mayor' to 'delegate'", done => {
+        expect(game.waiting).to.deep.equals({ for: "mayor", to: "delegate" });
+        done();
+    });
+    it("🎖 Mayor can't delegate if play's source is not 'mayor' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "villager", action: "delegate" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🎖 Mayor can't delegate if play's action is not 'delegate' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
 });
 
 // const players = [
-//     { name: "0Dig", role: "witch" },
+//     { name: "0Dig", role: "witch" }, X
 //     { name: "1Doug", role: "seer" }, X
 //     { name: "2Dag", role: "protector" }, X
 //     { name: "3Dug", role: "raven" },

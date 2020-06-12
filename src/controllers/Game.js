@@ -230,7 +230,12 @@ exports.getNextGameDayAction = async game => {
     ];
     for (const { attribute, trigger } of playerAttributeMethods) {
         if (Player.getPlayersWithAttribute(attribute, game).length) {
+            const originalWaiting = { ...game.waiting };
             trigger(game);
+            // Si chasseur eaten, comment il sait que protector poisoned si ca return avant le reste => Faire un waiting[]
+            if (originalWaiting.for !== game.waiting.for && originalWaiting.to !== game.waiting.to) {
+                return game.waiting;
+            }
         }
     }
     this.purgeAttributesAfterSunRising(game);

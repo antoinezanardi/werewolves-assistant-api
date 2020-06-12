@@ -12,6 +12,7 @@ exports.playerActions = ["eat", "use-potion", "look", "protect", "shoot", "mark"
 
 exports.murderedPossibilities = [
     { by: "witch", of: "use-potion" },
+    { by: "wolves", of: "eat" },
     { by: "hunter", of: "shoot" },
     { by: "mayor", of: "settle-votes" },
     { by: "all", of: "vote" },

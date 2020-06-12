@@ -101,6 +101,9 @@ exports.killPlayer = (playerId, { action }, game) => {
         const murdered = murderedPossibilities.find(({ of }) => of === action);
         if (murdered) {
             player.murdered = murdered;
+            if (hasAttribute(player, "mayor")) {
+                game.waiting = { for: "mayor", to: "delegate" };
+            }
         }
     }
 };
