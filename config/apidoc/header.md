@@ -86,7 +86,7 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 |----------------------------------------|:-------------------------:|---------------------------------------------------------------------|
 | source                                 | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
 | action                                 | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
-| **targets***                           | Object[]                  | Players affected by the play.                                                      |
+| **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, players are nominated from the vote.                                                     |
 | &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                      |
 | **&emsp;&emsp;potion***                | Object                    | Only available for the `witch`.                                                      |
 | **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from wolves.                                                      |

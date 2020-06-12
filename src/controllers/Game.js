@@ -211,7 +211,25 @@ exports.patchGame = async(req, res) => {
     }
 };
 
-exports.getNextGameDayAction = () => ({ for: "all", to: "vote" });
+exports.purgeAttributesAfterSunRising = game => {
+    const purgedAttributes = ["protected", "seen", "drank-life-potion"];
+    for (const purgedAttribute of purgedAttributes) {
+        Player.removeAttributeFromAllPlayers(purgedAttribute, game);
+    }
+};
+
+exports.getNextGameDayAction = game => {
+    const playerAttributeMethods = [
+        { attribute: "eaten", trigger: Player.eaten },
+    ];
+    for (const { attribute, trigger } of playerAttributeMethods) {
+        if (Player.getPlayersWithAttribute(attribute, game)) {
+            trigger(game);
+        }
+    }
+    this.purgeAttributesAfterSunRising(game);
+    return { for: "all", to: "vote" };
+};
 
 exports.isSourceAvailableInPlayers = (players, source) => {
     if (source === "all" || source === "mayor") {

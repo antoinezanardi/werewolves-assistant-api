@@ -1,5 +1,5 @@
 const GameHistory = require("./GameHistory");
-const { hasAttribute } = require("../helpers/functions/Player");
+const { canBeEaten, hasAttribute } = require("../helpers/functions/Player");
 const { playerAttributes, murderedPossibilities } = require("../helpers/constants/Player");
 const { generateError } = require("../helpers/functions/Error");
 
@@ -33,6 +33,11 @@ exports.checkTargetDependingOnAction = async(target, game, action) => {
         const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
         if (lastProtectedTarget && lastProtectedTarget._id === target.player._id) {
             throw generateError("CANT_PROTECT_TWICE", `Protector can't protect the same player twice in a row.`);
+        }
+    } else if (action === "settle-votes") {
+        const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
+        if (lastVotePlay) {
+
         }
     }
 };
@@ -82,7 +87,7 @@ exports.checkAndFillTargets = async(targets, game, options) => {
 
 exports.killPlayer = (playerId, { action }, game) => {
     const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
-    if (player) {
+    if (player && action === "eat" && canBeEaten(player)) {
         player.isAlive = false;
         const murdered = murderedPossibilities.find(({ of }) => of === action);
         if (murdered) {
@@ -112,24 +117,25 @@ exports.removePlayerAttribute = (playerId, attributeName, game) => {
 
 exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => player.attributes && player.attributes.find(({ attribute }) => attribute === attributeName));
 
-exports.incrementPlayerVoteCount = (players, playerId, inc = 1) => {
-    const player = players.find(player => player._id === playerId.toString());
-    if (player) {
-        player.vote += inc;
+exports.incrementPlayerVoteCount = (votedPlayers, playerId, game, inc = 1) => {
+    const votedPlayer = votedPlayers.find(player => player._id.toString() === playerId.toString());
+    if (votedPlayer) {
+        votedPlayer.vote += inc;
     } else {
-        players.push({ _id: playerId.toString(), vote: inc });
+        const player = game.players.find(player => player._id.toString() === playerId.toString());
+        votedPlayers.push({ ...player, vote: inc });
     }
 };
 
-exports.getVotesResults = (votes, game, { action, allowTie = false }) => {
+exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
     const votedPlayers = [];
     for (const vote of votes) {
-        this.incrementPlayerVoteCount(votedPlayers, vote.for._id);
+        this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game);
     }
     if (action === "vote") {
         const ravenMarkedPlayers = this.getPlayersWithAttribute("raven-marked", game);
         if (ravenMarkedPlayers.length) {
-            this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers[0]._id, 2);
+            this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers[0]._id, game, 2);
             this.removePlayerAttribute(ravenMarkedPlayers[0]._id, "raven-marked", game);
         }
     }
@@ -197,36 +203,42 @@ exports.checkAndFillVotes = (votes, game, options) => {
     }
 };
 
-exports.mayorPlays = async(play, game) => {
-    console.log("mayor plays");
+exports.mayorSettlesVotes = async(play, game, gameHistoryEntry) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    gameHistoryEntry.targets = targets;
 };
 
-exports.wolvesPlay = async(play, game, gameHistoryEntry) => {
+exports.mayorPlays = async(play, game, gameHistoryEntry) => {
+    const mayorActions = {
+        "settle-votes": this.mayorSettlesVotes,
+    };
+    await mayorActions[play.action](play, game, gameHistoryEntry);
+};
+
+exports.wolvesPlay = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "eaten", game);
-    gameHistoryEntry.targets = targets;
 };
 
 exports.hunterPlays = async(play, game) => {
     console.log("hunter plays");
 };
 
-exports.ravenPlays = async(play, game, gameHistoryEntry) => {
+exports.ravenPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "raven-marked", game);
-    gameHistoryEntry.targets = targets;
 };
 
-exports.protectorPlays = async(play, game, gameHistoryEntry) => {
+exports.protectorPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "protected", game);
-    gameHistoryEntry.targets = targets;
 };
 
-exports.witchPlays = async(play, game, gameHistoryEntry) => {
+exports.witchPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, action: play.action });
     for (const target of targets) {
@@ -236,34 +248,32 @@ exports.witchPlays = async(play, game, gameHistoryEntry) => {
             this.addPlayerAttribute(target.player._id, "drank-death-potion", game);
         }
     }
-    gameHistoryEntry.targets = targets;
 };
 
-exports.seerPlays = async(play, game, gameHistoryEntry) => {
+exports.seerPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "seen", game);
-    gameHistoryEntry.targets = targets;
 };
 
 exports.allVote = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     this.checkAndFillVotes(votes, game, { action });
-    const nominatedPlayers = this.getVotesResults(votes, game, { action, allowTie: true });
+    const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     if (nominatedPlayers.length > 1) {
         game.waiting = { for: "mayor", to: "settle-votes" };
     } else {
         this.killPlayer(nominatedPlayers[0]._id, play, game);
     }
-    gameHistoryEntry.votes = votes;
+    gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
 exports.allElectMayor = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     this.checkAndFillVotes(votes, game, { action });
-    const nominatedPlayers = this.getVotesResults(votes, game, { action });
+    const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
     this.addPlayerAttribute(nominatedPlayers[0]._id, "mayor", game);
-    gameHistoryEntry.votes = votes;
+    gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
 exports.allPlay = async(play, game, gameHistoryEntry) => {
@@ -272,4 +282,16 @@ exports.allPlay = async(play, game, gameHistoryEntry) => {
         "vote": this.allVote,
     };
     await allActions[play.action](play, game, gameHistoryEntry);
+};
+
+exports.eaten = game => {
+    const eatenPlayer = this.getPlayersWithAttribute("eaten", game)[0];
+    this.killPlayer(eatenPlayer._id, { action: "eat" }, game);
+    this.removePlayerAttribute(eatenPlayer._id, "eaten", game);
+};
+
+exports.removeAttributeFromAllPlayers = (attributeName, game) => {
+    for (const { _id } of game.players) {
+        this.removePlayerAttribute(_id, attributeName, game);
+    }
 };

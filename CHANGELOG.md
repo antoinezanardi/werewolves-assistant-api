@@ -69,6 +69,7 @@
 ### 📦 Packages
 
 * `migrate-mongo` installed with version `7.2.1`.
+* `validator` installed with version `13.1.1`.
 * `apidoc` updated to version `0.23.0`.
 * `bcrypt` updated to version `5.0.0`.
 * `eslint` updated to version `7.2.0`.

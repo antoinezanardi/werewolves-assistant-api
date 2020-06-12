@@ -21,6 +21,7 @@ const players = [
 ];
 let token, game;
 
+// eslint-disable-next-line max-lines-per-function
 describe("B - Full game of 6 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -194,7 +195,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All elect the mayor (POST /games/:id/play)", done => {
+    it("👥 All elect the witch as the mayor (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -209,6 +210,10 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ attribute: "mayor", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
+                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
                 done();
             });
     });
@@ -315,6 +320,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ attribute: "seen", source: "seer", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
                 done();
             });
     });
@@ -421,6 +427,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[2].attributes).to.deep.include({ attribute: "eaten", source: "wolves", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
                 done();
             });
     });
@@ -548,6 +555,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[2].attributes).to.deep.include({ attribute: "drank-life-potion", source: "witch", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
                 expect(game.history[0].play.targets[0].potion.life).to.equals(true);
                 done();
             });
@@ -641,6 +649,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[5].attributes).to.deep.include({ attribute: "protected", source: "protector", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[5]._id);
                 done();
             });
     });
@@ -711,11 +720,17 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[6].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[6]._id);
                 done();
             });
     });
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
+        expect(game.players[2].attributes).to.not.deep.include({ attribute: "drank-life-potion", source: "witch", remainingPhases: 1 });
+        expect(game.players[2].attributes).to.not.deep.include({ attribute: "eaten", source: "wolves", remainingPhases: 1 });
+        expect(game.players[5].attributes).to.not.deep.include({ attribute: "protected", source: "protector", remainingPhases: 1 });
+        expect(game.players[0].attributes).to.not.deep.include({ attribute: "seen", source: "seer", remainingPhases: 1 });
+        expect(game.players[2].isAlive).to.equals(true);
         done();
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
@@ -737,7 +752,7 @@ describe("B - Full game of 6 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "look" })
+            .send({ source: "all", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_PLAY_ACTION");
@@ -826,7 +841,7 @@ describe("B - Full game of 6 players with all roles", () => {
                 done();
             });
     });
-    it("👥 Tie in votes between villager and wolf (POST /games/:id/play)", done => {
+    it("👥 Tie in votes between villager and wolf [Reason: villager is raven-marked 🐦]  (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -843,6 +858,8 @@ describe("B - Full game of 6 players with all roles", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[6].attributes).to.not.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.players[5].isAlive).to.equals(true);
+                expect(game.players[6].isAlive).to.equals(true);
                 expect(game.history[0].play.votes).to.exist;
                 done();
             });
@@ -850,6 +867,78 @@ describe("B - Full game of 6 players with all roles", () => {
     it("🎲 Game is waiting for 'mayor' to 'settle-votes'", done => {
         expect(game.waiting).to.deep.equals({ for: "mayor", to: "settle-votes" });
         done();
+    });
+    it("🎖 Mayor can't settle votes if play's source is not 'mayor' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "villager", action: "settle-votes" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🎖 Mayor can't settle votes if play's action is not 'settle-votes' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🎖 Mayor can't settle votes if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "settle-votes" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("🎖 Mayor can't settle votes if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "settle-votes", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("🎖 Mayor can't settle votes at multiple targets (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "settle-votes", targets: [
+                { player: players[0]._id },
+                { player: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🎖 Mayor can't settle votes at unknown target (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "settle-votes", targets: [
+                { player: mongoose.Types.ObjectId() },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_NOT_TARGETABLE");
+                done();
+            });
     });
 });
 
