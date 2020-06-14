@@ -74,7 +74,7 @@
 * `bcrypt` updated to version `5.0.0`.
 * `eslint` updated to version `7.2.0`.
 * `express-validator` updated to version `6.5.0`.
-* `mocha` updated to version `7.2.0`.
+* `mocha` updated to version `8.0.1`.
 * `mongo-dot-notation` updated to version `2.0.0`.
 * `mongoose` updated to version `5.9.18`.
 * `nodemon` updated to version `2.0.4`.

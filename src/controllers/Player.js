@@ -215,6 +215,12 @@ exports.checkAndFillVotes = (votes, game, options) => {
     }
 };
 
+exports.mayorDelegates = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    this.killPlayer(targets[0].player._id, play, game);
+};
+
 exports.mayorSettlesVotes = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
@@ -224,6 +230,7 @@ exports.mayorSettlesVotes = async(play, game) => {
 exports.mayorPlays = async(play, game, gameHistoryEntry) => {
     const mayorActions = {
         "settle-votes": this.mayorSettlesVotes,
+        "delegate": this.mayorDelegates,
     };
     await mayorActions[play.action](play, game, gameHistoryEntry);
 };
