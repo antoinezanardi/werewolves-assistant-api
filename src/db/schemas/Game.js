@@ -19,6 +19,23 @@ const WonSchema = new Schema({
     versionKey: false,
 });
 
+const WaitingSchema = new Schema({
+    for: {
+        type: String,
+        enum: waitingForPossibilities,
+        required: true,
+    },
+    to: {
+        type: String,
+        enum: playerActions,
+        required: true,
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: undefined,
+});
+
 const GameSchema = new Schema({
     gameMaster: {
         type: Schema.Types.ObjectId,
@@ -48,18 +65,9 @@ const GameSchema = new Schema({
         required: true,
     },
     waiting: {
-        for: {
-            type: String,
-            enum: waitingForPossibilities,
-            default: "all",
-            required: true,
-        },
-        to: {
-            type: String,
-            enum: playerActions,
-            default: "elect-mayor",
-            required: true,
-        },
+        type: [WaitingSchema],
+        _id: false,
+        default: undefined,
     },
     status: {
         type: String,

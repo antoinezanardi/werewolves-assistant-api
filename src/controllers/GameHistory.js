@@ -2,6 +2,7 @@ const { isMongoId } = require("validator");
 const Game = require("./Game");
 const GameHistory = require("../db/models/GameHistory");
 const { generateError } = require("../helpers/functions/Error");
+const { turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 
 exports.find = async(search, projection, options = {}) => await GameHistory.find(search, projection, options);
 
@@ -51,6 +52,11 @@ exports.create = async(data, options = {}) => {
 exports.isLifePotionUsed = async gameId => await this.findOne({ gameId, "play.targets.potion.life": true });
 
 exports.isDeathPotionUsed = async gameId => await this.findOne({ gameId, "play.targets.potion.death": true });
+
+exports.getLastNightPlay = async gameId => {
+    const nightPlayActions = [...turnPreNightActionsOrder, ...turnNightActionsOrder].map(({ action }) => action);
+    return await this.findOne({ gameId, "play.action": { $in: nightPlayActions } }, null, { sort: { createdAt: -1 } });
+};
 
 exports.getLastProtectedPlayer = async gameId => {
     const lastProtectorPlay = await this.findOne({ gameId, "play.action": "protect" }, null, { sort: { createdAt: -1 } });

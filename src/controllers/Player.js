@@ -102,16 +102,19 @@ exports.killPlayer = (playerId, { action }, game) => {
         if (murdered) {
             player.murdered = murdered;
             if (hasAttribute(player, "mayor")) {
-                game.waiting = { for: "mayor", to: "delegate" };
+                game.waiting.push({ for: "mayor", to: "delegate" });
             }
         }
     }
 };
 
-exports.addPlayerAttribute = (playerId, attribute, game) => {
+exports.addPlayerAttribute = (playerId, attribute, game, forcedSource) => {
     const player = game.players.find(player => player._id.toString() === playerId.toString());
     const playerAttribute = playerAttributes.find(playerAttribute => playerAttribute.attribute === attribute);
-    if (player) {
+    if (player && playerAttribute) {
+        if (forcedSource) {
+            playerAttribute.source = forcedSource;
+        }
         if (player.attributes) {
             player.attributes.push(playerAttribute);
         } else {
@@ -218,7 +221,8 @@ exports.checkAndFillVotes = (votes, game, options) => {
 exports.mayorDelegates = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
-    this.killPlayer(targets[0].player._id, play, game);
+    this.removeAttributeFromAllPlayers("mayor", game);
+    this.addPlayerAttribute(targets[0].player._id, "mayor", game, "mayor");
 };
 
 exports.mayorSettlesVotes = async(play, game) => {
@@ -282,7 +286,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     if (nominatedPlayers.length > 1) {
-        game.waiting = { for: "mayor", to: "settle-votes" };
+        game.waiting.push({ for: "mayor", to: "settle-votes" });
     } else {
         this.killPlayer(nominatedPlayers[0]._id, play, game);
     }

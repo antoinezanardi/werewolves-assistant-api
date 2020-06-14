@@ -29,7 +29,7 @@
 | turn                 | Number                                | Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).                                                    |
 | phase                | String                                | Each turn has two phases, `day` or `night`. Starting at `night`.                                                    |
 | tick                 | Number                                | Starting at `1`, tick increments each time a play is made.                                                    |
-| waiting              | Object                                |                                                |
+| waiting              | Object[]                              | Queue of upcoming actions.                                               |
 | &emsp;&emsp;for      | String                                | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                         |
 | &emsp;&emsp;to       | String                                | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)                                         |
 | status               | String                                | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                |

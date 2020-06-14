@@ -16,7 +16,7 @@ module.exports = app => {
      * @apiSuccess {Number} turn=1 Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {Number} tick=1 Starting at `1`, tick increments each time a play is made.
-     * @apiSuccess {Object} waiting
+     * @apiSuccess {Object[]} waiting
      * @apiSuccess {String} waiting.for Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)
      * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)
