@@ -1,5 +1,8 @@
 # 🐺 Werewolves Assistant API
 
+[![Build Status](https://travis-ci.org/antoinezanardi/werewolves-assistant-api.svg?branch=master)](https://travis-ci.org/antoinezanardi/werewolves-assistant-api)
+[![GitHub license](https://img.shields.io/github/license/antoinezanardi/werewolves-assistant-api.svg)](https://github.com/antoinezanardi/https://img.shields.io/github/license/werewolves-assistant-api.svg/blob/master/LICENSE)
+
 ## 🐺 Description
 Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.
 
@@ -20,7 +23,7 @@ Documentation is available for both environments:
 * **Production**: `https://werewolves-assistant-api.antoinezanardi.fr/apidoc`
 
 ## 🔨 Installation
-1. Install dependencies with `npm install` (add `--production` if you install the project on remote server)
+1. Install dependencies with `npm install` (add `--production` if you install the project on a remote server)
 2. Copy `.env.example` and paste it as `.env`
 3. Replace environment values in the fresh new `.env` file if necessary
     * **DB_NAME**: Name of the MongoDB database.

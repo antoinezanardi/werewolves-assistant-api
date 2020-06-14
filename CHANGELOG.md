@@ -1,6 +1,93 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.1.0 (2019-12-??)
+## 0.2.0 (2020-06-14)
+
+### 🚀 New features
+
+* `.editorconfig` file added for code style constancy.
+* Travis badge added in the `README.md` file.
+* License badge added in the `README.md` file.
+* Provides a random game repartition for a set of players.
+* Check for unique names when players are provided during game random composition or creation.
+* Check for roles compatibility before game creation.
+* Games can be created by user. User can't create a game if there is already one playing.
+* Games can be canceled at any moment by the game master.
+* Each time a play is done by anyone or any group, or an event occurs, an entry in game's history is saved.
+* Gameplay for `all`, `mayor`, `seer`, `witch`, `raven`, `hunter`, `protector` and `wolves` implemented !
+* Games can be reset when their status are `playing`.
+
+### 🐛 Bug fixes
+
+* Check if `errorType` provided to `Error constructor` is known to prevent unhandled exception. Otherwise, default `INTERNAL_SERVER_ERROR` is sent. 
+
+### 🛣️ Routes
+
+* Route `GET /users/:id` added for getting one specific user. Protected with basic authentication.
+* Route `GET /games` added for retrieving all games. Protected with basic authentication.
+* Route `GET /games/repartition` added for getting a random team composition. Protected with basic authentication.
+* Route `GET /games/:id` added for getting one specific game. Protected with basic authentication.
+* Route `POST /games` added for creating games. Protected with JWT.
+* Route `POST /games/:id/play` added for processing into a `playing` game by making a play. Protected with JWT.
+* Route `PATCH /games/:id` added for updating games. Protected with JWT.
+* Route `PATCH /games/:id/reset` added for resetting games. Protected with JWT.
+
+### 💾 Database
+
+* Game schema for collection `games` defined with minimal configuration.
+* Game history schema for collection `gameHistory` defined with minimal configuration.
+* Player schema for collection `games` defined with minimal configuration.
+* Role schema for collection `roles` defined with minimal configuration.
+* First roles added in `roles` collection.
+
+### 📚 Documentation
+
+* API documentation improved.
+* `User Class` documented.
+* `Role Class` documented.
+* `Game Class` documented.
+* `Player Class` documented.
+* `GameHistory Class` documented.
+* `Play Class` documented.
+* `Player Roles` documented.
+* `Player Groups` documented.
+* `Player Actions` documented.
+* `Player Attributes` documented.
+* `Game Statuses` documented.
+
+### ♻️ Refactoring
+
+* Moved all database related folders and files in `src/db`.
+* Divided `helpers` files into `functions` and `constants` folders.
+* `checkRouteParameters` helper function renamed into `checkRequestData`.
+*  All play methods moved from `Game` controller to brand new `Player` controller.
+* `errors` field from `Error` class renamed to `data`.
+
+### 🧪 Tests
+
+* Starting `e2e` tests.
+* E2E tests for user registration.
+* E2E tests for game creation.
+* E2E tests for full game of 7 players with villagers winning.
+* E2E tests for tiny game of 4 players with wolves winning.
+* E2E tests for game reset.
+
+### 📦 Packages
+
+* `migrate-mongo` installed with version `7.2.1`.
+* `validator` installed with version `13.1.1`.
+* `apidoc` updated to version `0.23.0`.
+* `bcrypt` updated to version `5.0.0`.
+* `eslint` updated to version `7.2.0`.
+* `express-validator` updated to version `6.5.0`.
+* `mocha` updated to version `7.2.0`.
+* `mongo-dot-notation` updated to version `2.0.0`.
+* `mongoose` updated to version `5.9.18`.
+* `nodemon` updated to version `2.0.4`.
+* `passport` updated to version `0.4.1`.
+
+---
+
+## 0.1.0 (2019-12-03)
 
 ### 🚀 New features
 
@@ -22,7 +109,7 @@
 
 ### 🧪 Tests
 
-* Test environment set up. You can run it with `npm run test`.
+* Test environment set up. You can run it with `npm test`.
 * Test for route `GET /` added. 
 * Test for route `GET /users` added. 
 
