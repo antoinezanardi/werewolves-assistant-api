@@ -5,6 +5,7 @@ const Player = require("./Player");
 const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
+const { isVillagerSideAlive, isWolfSideAlive } = require("../helpers/functions/Game");
 const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames, roles } = require("../helpers/constants/Role");
 
@@ -38,7 +39,7 @@ exports.checkRolesCompatibility = players => {
     }
 };
 
-exports.fillPlayersData = async players => {
+exports.fillPlayersData = players => {
     for (const player of players) {
         const role = roles.find(role => role.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
@@ -54,7 +55,7 @@ exports.checkUniqueNameInPlayers = players => {
 
 exports.checkAndFillDataBeforeCreate = async data => {
     this.checkUniqueNameInPlayers(data.players);
-    await this.fillPlayersData(data.players);
+    this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
     data.waiting = [{ for: "all", to: "elect-mayor" }];
@@ -212,6 +213,23 @@ exports.patchGame = async(req, res) => {
     }
 };
 
+exports.checkGameWinners = game => {
+    if (!isVillagerSideAlive(game) || !isWolfSideAlive(game)) {
+        if (!isVillagerSideAlive(game)) {
+            game.won = {
+                by: "wolves",
+                players: game.players.filter(player => player.role.group === "wolves"),
+            };
+        } else if (!isWolfSideAlive(game)) {
+            game.won = {
+                by: "villagers",
+                players: game.players.filter(player => player.role.group === "villagers"),
+            };
+        }
+        game.status = "done";
+    }
+};
+
 exports.dequeueWaiting = game => {
     if (game.waiting && game.waiting.length) {
         game.waiting.shift();
@@ -324,7 +342,7 @@ exports.checkPlay = async play => {
     if (!game) {
         throw generateError("NOT_FOUND", `Game with id ${play.gameId} not found`);
     } else if (game.status !== "playing") {
-        throw generateError("BAD_REQUEST", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
+        throw generateError("NO_MORE_PLAY_ALLOWED", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
     } else if (game.waiting[0].for !== play.source) {
         throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
     } else if (game.waiting[0].to !== play.action) {
@@ -344,6 +362,7 @@ exports.play = async play => {
         await this.fillWaitingQueue(game);
     }
     game.tick++;
+    this.checkGameWinners(game);
     return await this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
@@ -352,6 +371,37 @@ exports.postPlay = async(req, res) => {
         const { params, body } = checkRequestData(req);
         await this.checkGameBelongsToUser(params.id, req.user._id);
         const game = await this.play({ ...body, gameId: params.id });
+        res.status(200).json(game);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.checkGameBeforeReset = async gameId => {
+    const game = await this.findOne({ _id: gameId });
+    if (!game) {
+        throw generateError("NOT_FOUND", `Game with id "${gameId}" not found.`);
+    } else if (game.status === "canceled" || game.status === "done") {
+        throw generateError("CANT_BE_RESET", `Game with id "${gameId}" can't be reset because its status is "${game.status}".`);
+    }
+};
+
+exports.resetGame = async(req, res) => {
+    try {
+        const { params } = checkRequestData(req);
+        await this.checkGameBelongsToUser(params.id, req.user._id);
+        await this.checkGameBeforeReset(params.id);
+        await GameHistory.deleteMany({ gameId: params.id });
+        let game = await this.findOne({ _id: params.id });
+        const players = game.players.map(player => ({ name: player.name, role: player.role.original }));
+        await this.fillPlayersData(players);
+        game = await this.findOneAndUpdate({ _id: params.id }, {
+            players,
+            turn: 1,
+            phase: "night",
+            tick: 1,
+            waiting: [{ for: "all", to: "elect-mayor" }],
+        });
         res.status(200).json(game);
     } catch (e) {
         sendError(res, e);

@@ -101,6 +101,9 @@ exports.killPlayer = (playerId, { action }, game) => {
         const murdered = murderedPossibilities.find(({ of }) => of === action);
         if (murdered) {
             player.murdered = murdered;
+            if (player.role.current === "hunter") {
+                game.waiting.push({ for: "hunter", to: "shoot" });
+            }
             if (hasAttribute(player, "mayor")) {
                 game.waiting.push({ for: "mayor", to: "delegate" });
             }
@@ -246,7 +249,9 @@ exports.wolvesPlay = async(play, game) => {
 };
 
 exports.hunterPlays = async(play, game) => {
-    console.log("hunter plays");
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    this.killPlayer(targets[0].player._id, play, game);
 };
 
 exports.ravenPlays = async(play, game) => {

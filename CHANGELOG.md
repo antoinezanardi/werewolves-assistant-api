@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.2.0 (2020-06-??)
+## 0.2.0 (2020-06-14)
 
 ### 🚀 New features
 
@@ -13,7 +13,8 @@
 * Games can be created by user. User can't create a game if there is already one playing.
 * Games can be canceled at any moment by the game master.
 * Each time a play is done by anyone or any group, or an event occurs, an entry in game's history is saved.
-* `elect-mayor` action logic implemented.
+* Gameplay for `all`, `mayor`, `seer`, `witch`, `raven`, `hunter`, `protector` and `wolves` implemented !
+* Games can be reset when their status are `playing`.
 
 ### 🐛 Bug fixes
 
@@ -26,8 +27,9 @@
 * Route `GET /games/repartition` added for getting a random team composition. Protected with basic authentication.
 * Route `GET /games/:id` added for getting one specific game. Protected with basic authentication.
 * Route `POST /games` added for creating games. Protected with JWT.
-* Route `PATCH /games` added for updating games. Protected with JWT.
-* Route `GET /roles` added for getting all available roles. Protected with basic authentication.
+* Route `POST /games/:id/play` added for processing into a `playing` game by making a play. Protected with JWT.
+* Route `PATCH /games/:id` added for updating games. Protected with JWT.
+* Route `PATCH /games/:id/reset` added for resetting games. Protected with JWT.
 
 ### 💾 Database
 
@@ -65,6 +67,9 @@
 * Starting `e2e` tests.
 * E2E tests for user registration.
 * E2E tests for game creation.
+* E2E tests for full game of 7 players with villagers winning.
+* E2E tests for tiny game of 4 players with wolves winning.
+* E2E tests for game reset.
 
 ### 📦 Packages
 

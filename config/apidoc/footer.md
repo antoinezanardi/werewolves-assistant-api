@@ -95,3 +95,5 @@ Description for each case below:
 | 32   | NON_UNIQUE_TARGETS                |    400    | Multiple targets are pointing the same player.                                  |
 | 33   | CANT_PROTECT_TWICE                |    400    | Protector can't protect the same player twice in a row.                         |
 | 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the mayor.                      |
+| 35   | NO_MORE_PLAY_ALLOWED              |    400    | No more play are allowed because game's status is "done" or "canceled".         |
+| 36   | CANT_BE_RESET                     |    400    | Game can't be reset because game's status is "done" or "canceled".              |

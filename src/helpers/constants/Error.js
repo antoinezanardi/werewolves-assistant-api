@@ -139,4 +139,12 @@ exports.errorMetadata = {
         code: 34,
         HTTPCode: 400,
     },
+    NO_MORE_PLAY_ALLOWED: {
+        code: 35,
+        HTTPCode: 400,
+    },
+    CANT_BE_RESET: {
+        code: 36,
+        HTTPCode: 400,
+    },
 };

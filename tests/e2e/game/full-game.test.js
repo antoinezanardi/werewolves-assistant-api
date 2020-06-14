@@ -22,7 +22,7 @@ const players = [
 let token, game;
 
 // eslint-disable-next-line max-lines-per-function
-describe("B - Full game of 6 players with all roles", () => {
+describe("B - Full game of 7 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -1442,6 +1442,132 @@ describe("B - Full game of 6 players with all roles", () => {
                 game = res.body;
                 expect(game.players[4].isAlive).to.equals(false);
                 expect(game.players[4].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'hunter' to 'shoot' and 'mayor' to 'delegate'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "hunter", to: "shoot" });
+        expect(game.waiting[1]).to.deep.equals({ for: "mayor", to: "delegate" });
+        done();
+    });
+    it("🔫 Hunter can't shoot if play's source is not 'hunter' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "raven", action: "shoot" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🔫 Hunter can't shoot if play's action is not 'shoot' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "use-potion" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🔫 Hunter can't shoot if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("🔫 Hunter can't shoot if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("🔫 Hunter can't shoot at multiple targets (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [
+                { player: players[0]._id },
+                { player: players[1]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🔫 Hunter can't shoot at an unknown target (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [
+                { player: mongoose.Types.ObjectId() },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🔫 Hunter can't shoot at a dead target (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [
+                { player: players[0]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🔫 Hunter shoots at the wolf (POST /games/:id/play)", done => {
+        const { players } = game;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [
+                { player: players[5]._id },
+            ] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].isAlive).to.equals(false);
+                expect(game.players[5].murdered).to.deep.equals({ by: "hunter", of: "shoot" });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[5]._id);
+                done();
+            });
+    });
+    it("🎲 Game is WON by 'villagers'!!", done => {
+        expect(game.status).to.equals("done");
+        expect(game.won.by).to.equals("villagers");
+        expect(game.waiting[0]).to.deep.equals({ for: "mayor", to: "delegate" });
+        done();
+    });
+    it("🔐 Can't make a play if game's done (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ source: "mayor", action: "delegate" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NO_MORE_PLAY_ALLOWED");
                 done();
             });
     });

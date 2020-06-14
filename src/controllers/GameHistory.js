@@ -49,6 +49,8 @@ exports.create = async(data, options = {}) => {
     return toJSON ? gameHistoryEntry.toJSON() : gameHistoryEntry;
 };
 
+exports.deleteMany = search => GameHistory.deleteMany(search);
+
 exports.isLifePotionUsed = async gameId => await this.findOne({ gameId, "play.targets.potion.life": true });
 
 exports.isDeathPotionUsed = async gameId => await this.findOne({ gameId, "play.targets.potion.death": true });
