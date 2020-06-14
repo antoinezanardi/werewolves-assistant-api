@@ -3,8 +3,10 @@ const bcrypt = require("bcrypt");
 const { Strategy: LocalStrategy } = require("passport-local");
 const { Strategy: JWTStrategy, ExtractJwt: ExtractJWT } = require("passport-jwt");
 const { BasicStrategy } = require("passport-http");
-const User = require("../models/User");
-const Config = require("../../config");
+const User = require("../../db/models/User");
+const Config = require("../../../config");
+
+// TODO: Error response for bad auth in jwt check for example.
 
 passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, cb) => User.findOne({ email: email }, (err, user) => {
     if (err) {
@@ -38,11 +40,7 @@ passport.use(new JWTStrategy({
         if (err) {
             return cb(err);
         } else if (user) {
-            if (user.active) {
-                return cb(null, user);
-            } else {
-                return cb(null);
-            }
+            return cb(null, user);
         } else {
             return cb(null);
         }

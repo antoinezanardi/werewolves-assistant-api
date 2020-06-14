@@ -1,9 +1,9 @@
 {
-  "name": "Werewolves Assistant API",
-  "version": "0.1.0",
+  "name": "\uD83D\uDC3A Werewolves Assistant API",
+  "version": "0.2.0",
   "description": "Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.",
   "header": {
-    "title": "Models",
+    "title": "Classes",
     "filename": "./config/apidoc/header.md"
   },
   "footer": {
@@ -12,7 +12,7 @@
   },
   "template": {
     "forceLanguage": "en",
-    "withCompare": false,
-    "withGenerator": false
+    "withCompare": true,
+    "withGenerator": true
   }
 }

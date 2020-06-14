@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Config = require("../../config");
+const Config = require("../../../config");
 
 exports.connect = () => new Promise((resolve, reject) => {
     const mongooseOptions = {

@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 const passport = require("passport");
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const User = require("../controllers/User");
 
 module.exports = app => {
@@ -28,9 +28,33 @@ module.exports = app => {
      */
 
     /**
-     * @api {POST} /users Create new user
+     * @api {GET} /users A] Get users
+     * @apiName GetUsers
+     * @apiGroup Users 👤
+     *
+     * @apiPermission Basic
+     * @apiUse UserResponse
+     */
+    app.get("/users", passport.authenticate("basic", { session: false }), User.getUsers);
+
+    /**
+     * @api {GET} /users/:id B] Get an user
+     * @apiName GetUser
+     * @apiGroup Users 👤
+     *
+     * @apiPermission Basic
+     * @apiParam (Route Parameters) {ObjectId} id User's ID.
+     * @apiUse UserResponse
+     */
+    app.get("/users/:id", passport.authenticate("basic", { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+    ], User.getUser);
+
+    /**
+     * @api {POST} /users B] Create new user
      * @apiName CreateUser
-     * @apiGroup User
+     * @apiGroup Users 👤
      *
      * @apiUse UserRequestBody
      * @apiPermission Basic
@@ -46,9 +70,9 @@ module.exports = app => {
     ], User.postUser);
 
     /**
-     * @api {POST} /users/login Login
+     * @api {POST} /users/login C] Login
      * @apiName LoginUser
-     * @apiGroup User
+     * @apiGroup Users 👤
      *
      * @apiUse UserRequestBody
      * @apiPermission Basic
@@ -62,14 +86,4 @@ module.exports = app => {
             .isString().withMessage("Must be a string")
             .isLength({ min: 5 }).withMessage("Must be at least 5 characters long"),
     ], User.login);
-
-    /**
-     * @api {GET} /users Get all users
-     * @apiName GetUsers
-     * @apiGroup User
-     *
-     * @apiPermission Basic
-     * @apiUse UserResponse
-     */
-    app.get("/users", passport.authenticate("basic", { session: false }), User.getUsers);
 };

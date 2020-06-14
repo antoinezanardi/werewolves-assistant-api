@@ -5,6 +5,7 @@ node_js:
     - '10'
 install:
     - npm install
+    - npm run lint
     - npm run test
 addons:
     ssh_known_hosts: vps514431.ovh.net

@@ -4,15 +4,15 @@ module.exports = app => {
     fs.readdirSync(__dirname).forEach(file => {
         if (file === "index.js") {
             /**
-             * @api {GET} / Get API info
+             * @api {GET} / A] Get API info
              * @apiName GetAPIInfo
-             * @apiGroup API
+             * @apiGroup API 🔌
              *
              * @apiSuccess {String} name API's name
              * @apiSuccess {String} version API's version
              */
             app.route("/").get((req, res) => {
-                res.status(200).json({ name: "Werewolves Assistant API", version: "0.1.0" });
+                res.status(200).json({ name: "Werewolves Assistant API", version: "0.2.0" });
             });
             return;
         }
