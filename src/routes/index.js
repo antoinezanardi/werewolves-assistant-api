@@ -12,7 +12,7 @@ module.exports = app => {
              * @apiSuccess {String} version API's version
              */
             app.route("/").get((req, res) => {
-                res.status(200).json({ name: "Werewolves Assistant API", version: "0.2.0" });
+                res.status(200).json({ name: "Werewolves Assistant API", version: "0.3.0" });
             });
             return;
         }

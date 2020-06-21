@@ -13,6 +13,11 @@ const Config = {
     db: {
         name: process.env.DB_NAME || "werewolves-assistant",
     },
+    sentry: {
+        enabled: process.env.SENTRY_ENABLED === "true",
+        projectID: process.env.SENTRY_PROJECT_ID,
+        key: process.env.SENTRY_KEY,
+    },
 };
 
 if (Config.app.nodeEnv === "test") {
