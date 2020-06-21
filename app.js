@@ -10,8 +10,11 @@ const Config = require("./config");
 const { sendError, generateError } = require("./src/helpers/functions/Error");
 const { connect: connectDatabase } = require("./src/helpers/functions/Mongoose");
 
+if (Config.sentry.enabled) {
+    const Sentry = require("@sentry/node");
+    Sentry.init({ dsn: `https://${Config.sentry.key}@sentry.io/${Config.sentry.projectID}` });
+}
 connectDatabase();
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({ origin: "*" }));

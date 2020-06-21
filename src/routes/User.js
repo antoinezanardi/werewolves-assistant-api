@@ -52,7 +52,7 @@ module.exports = app => {
     ], User.getUser);
 
     /**
-     * @api {POST} /users B] Create new user
+     * @api {POST} /users C] Create new user
      * @apiName CreateUser
      * @apiGroup Users 👤
      *
@@ -70,7 +70,7 @@ module.exports = app => {
     ], User.postUser);
 
     /**
-     * @api {POST} /users/login C] Login
+     * @api {POST} /users/login D] Login
      * @apiName LoginUser
      * @apiGroup Users 👤
      *

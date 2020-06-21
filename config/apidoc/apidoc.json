@@ -1,6 +1,6 @@
 {
   "name": "\uD83D\uDC3A Werewolves Assistant API",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.",
   "header": {
     "title": "Classes",

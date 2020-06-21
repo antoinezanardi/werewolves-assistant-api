@@ -1,5 +1,23 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.3.0 (2020-06-21)
+
+### 🚀 New features
+
+* Sentry implemented for catching errors for better bug monitoring.
+
+### 📚 Documentation
+
+* Documentation fixed for route `GET /users/:id`.
+
+### 📦 Packages
+
+* `@sentry/node` installed with version `5.17.0`.
+* `eslint` updated to version `7.3.0`.
+* `express-validator` updated to version `6.6.0`.
+* `mongoose` updated to version `5.9.19`.
+---
+
 ## 0.2.0 (2020-06-14)
 
 ### 🚀 New features
