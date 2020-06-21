@@ -31,6 +31,9 @@ Documentation is available for both environments:
     * **BASIC_PASSWORD**: Password for basic authentication.
     * **PORT**: Which port the API must run (default is 4202).
     * **JWT_SECRET**: Encryption key used for JSON Web Token.
+    * **SENTRY_ENABLED**: Enable if errors are caught and sent to Sentry.
+    * **SENTRY_PROJECT_ID**: Sentry project's ID.
+    * **SENTRY_KEY**: Sentry secret key.
 
 ## 🔌 Let's go
 To start the API **on development mode**, simply run `npm start`.
