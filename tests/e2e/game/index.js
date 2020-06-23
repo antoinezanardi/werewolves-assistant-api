@@ -5,4 +5,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./full-game.test");
     require("./tiny-game.test");
     require("./reset-game.test");
+    require("./game-repartition.test");
 });

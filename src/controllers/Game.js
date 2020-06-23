@@ -88,8 +88,12 @@ exports.findOneAndUpdate = async(search, data, options = {}) => {
 
 exports.getGames = async(req, res) => {
     try {
-        checkRequestData(req);
-        const games = await this.find({});
+        const search = {};
+        const { query } = checkRequestData(req);
+        if (req.user.strategy === "JWT") {
+            search.gameMaster = req.user._id;
+        }
+        const games = await this.find({ ...search, ...query });
         res.status(200).json(games);
     } catch (e) {
         sendError(res, e);
@@ -171,6 +175,9 @@ exports.getGameRepartition = async(req, res) => {
 exports.getGame = async(req, res) => {
     try {
         const { params } = checkRequestData(req);
+        if (req.user.strategy === "JWT") {
+            await this.checkGameBelongsToUser(params.id, req.user._id);
+        }
         const game = await this.findOne({ _id: params.id });
         if (!game) {
             throw generateError("NOT_FOUND", `Game not found with id "${params.id}"`);

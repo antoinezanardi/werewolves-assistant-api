@@ -9,15 +9,15 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
-let user;
+let user, token, user2;
 
+// eslint-disable-next-line max-lines-per-function
 describe("A - Sign up and log in", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("📧 Doesn't allow bad email (POST /users)", done => {
         chai.request(app)
             .post("/users")
-            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send({ email: "foobar", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -28,7 +28,6 @@ describe("A - Sign up and log in", () => {
     it("👤 Creates new user (POST /users)", done => {
         chai.request(app)
             .post("/users")
-            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -39,7 +38,6 @@ describe("A - Sign up and log in", () => {
     it("📧 Doesn't allow duplicate email (POST /users)", done => {
         chai.request(app)
             .post("/users")
-            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -47,7 +45,7 @@ describe("A - Sign up and log in", () => {
                 done();
             });
     });
-    it("👤 Gets freshly created user (GET /users/:id)", done => {
+    it("👤 Gets freshly created user with Basic auth (GET /users/:id)", done => {
         chai.request(app)
             .get(`/users/${user._id}`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
@@ -60,7 +58,6 @@ describe("A - Sign up and log in", () => {
     it("🔐 Doesn't allow bad credentials (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
-            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send({ email: "foo@bar.com", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
@@ -71,11 +68,49 @@ describe("A - Sign up and log in", () => {
     it("🔑 Logs in successfully (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
-            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body.token).to.be.a("string");
+                token = res.body.token;
+                done();
+            });
+    });
+    it("👤 Gets freshly created user with JWT auth (GET /users/:id)", done => {
+        chai.request(app)
+            .get(`/users/${user._id}`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body.email).to.equals(credentials.email);
+                done();
+            });
+    });
+    it("🔐 Doesn't allow to get user without auth (GET /users/:id)", done => {
+        chai.request(app)
+            .get(`/users/${user._id}`)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                done();
+            });
+    });
+    it("👤 Creates a second user (POST /users)", done => {
+        chai.request(app)
+            .post("/users")
+            .send({ email: `${credentials.email}bis`, password: credentials.password })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                user2 = res.body;
+                done();
+            });
+    });
+    it("🔐 Doesn't allow to get user without the right token (GET /users/:id)", done => {
+        chai.request(app)
+            .get(`/users/${user2._id}`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body.type).to.equals("UNAUTHORIZED");
                 done();
             });
     });
