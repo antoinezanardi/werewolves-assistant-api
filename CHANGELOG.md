@@ -1,5 +1,36 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.4.0 (2020-06-24)
+
+### 🚀 New features
+
+* Games can be retrieved by status with route `GET /games`. Useful for knowing if a player has ongoing game for instance.
+* MIT license added.
+
+### 🛣️ Routes
+
+* Route `POST /users` is no more protected with basic authentication.
+* Route `POST /users/login` is no more protected with basic authentication.
+* Route `GET /users/:id` can now be accessed with both JWT and basic authentication.
+* Route `GET /games/repartition` can now be accessed with JWT authentication.
+* Route `GET /games` can now be accessed with JWT authentication.
+* Route `GET /games/:id` can now be accessed with JWT authentication.
+
+### 📚 Documentation
+
+* Authentications allowed for routes are more described.
+* `README.md` file improved with link to `Werewolves Assistant Web` and **MIT license** badge.
+* Fixed the description for the action `vote` and `delegate`.
+
+### 📦 Packages
+
+* `query-string` installed with version `6.13.1`.
+* `@sentry/node` updated to version `5.18.0`.
+* `eslint` updated to version `7.3.1`.
+* `mongoose` updated to version `5.9.20`.
+
+---
+
 ## 0.3.0 (2020-06-21)
 
 ### 🚀 New features
@@ -16,6 +47,7 @@
 * `eslint` updated to version `7.3.0`.
 * `express-validator` updated to version `6.6.0`.
 * `mongoose` updated to version `5.9.19`.
+
 ---
 
 ## 0.2.0 (2020-06-14)

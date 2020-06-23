@@ -40,7 +40,7 @@ passport.use(new JWTStrategy({
         if (err) {
             return cb(err);
         } else if (user) {
-            return cb(null, user);
+            return cb(null, { ...user.toJSON(), strategy: "JWT" });
         } else {
             return cb(null);
         }

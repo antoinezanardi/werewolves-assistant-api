@@ -37,8 +37,8 @@
 | shoot        | hunter                            | villagers               | When hunter dies - Kill someone chosen by hunter, can't be himself.                              |
 | mark         | raven                             | villagers               | Each night - Mark someone. The next day, the target will have 2 votes against himself. The mark goes away after the judgement.                             |
 | elect-mayor  | -                                 | all                     | Before the first phase (`night`) - Anyone can be elected as a mayor.                               |
-| vote         | -                                 | all                     | Before the first phase (`night`) - Anyone can be elected as a mayor.                               |
-| delegate     | mayor (_**attribute**, not role_) | -                       | When mayor dies - Anyone alive can be mayor next.                               |
+| vote         | -                                 | all                     | Each day - All alive players vote for someone to kill.                               |
+| delegate     | mayor (_**attribute**, not role_) | -                       | When mayor dies - The dying mayor chooses the next one in among the living.                               |
 | settle-votes | mayor (_**attribute**, not role_) | -                       | When there is a tie in the votes during the `day` - Choose which one will be executed.                               |
 
 ## <a id="player-attributes"></a>🎖️ Player Attributes
