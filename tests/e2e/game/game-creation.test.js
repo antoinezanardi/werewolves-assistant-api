@@ -1,6 +1,7 @@
 const { describe, it, before, after } = require("mocha");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
+const { stringify } = require("query-string");
 const app = require("../../../app");
 const Config = require("../../../config");
 const { resetDatabase } = require("../../../src/helpers/functions/Test");
@@ -9,6 +10,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
+const credentials2 = { email: "test@test.frbis", password: "secret" };
 const players = [
     { name: "Dig", role: "witch" },
     { name: "Doug", role: "seer" },
@@ -32,7 +34,7 @@ const playersWithoutVillagers = [
     { name: "Dyg", role: "wolf" },
     { name: "Deg", role: "wolf" },
 ];
-let token, game;
+let token, token2, game, game2, queryStrings;
 
 // eslint-disable-next-line max-lines-per-function
 describe("A - Game creation", () => {
@@ -59,10 +61,30 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("👤 Creates another user (POST /users)", done => {
+        chai.request(app)
+            .post("/users")
+            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
+            .send(credentials2)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                done();
+            });
+    });
+    it("🔑 Logs in successfully for second user (POST /users/login)", done => {
+        chai.request(app)
+            .post(`/users/login`)
+            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
+            .send(credentials2)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                token2 = res.body.token;
+                done();
+            });
+    });
     it("🔐 Can't create game without JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
-            .send({ email: "foobar", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 done();
@@ -101,7 +123,7 @@ describe("A - Game creation", () => {
                 done();
             });
     });
-    it("🎲 Creates game with JWT auth (POST /games)", done => {
+    it("🎲 User1 creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
@@ -116,6 +138,18 @@ describe("A - Game creation", () => {
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-mayor" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);
+                done();
+            });
+    });
+    it("🎲 User2 creates game with JWT auth (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ "Authorization": `Bearer ${token2}` })
+            .send({ players })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game2 = res.body;
+                expect(game2.status).to.equals("playing");
                 done();
             });
     });
@@ -169,7 +203,102 @@ describe("A - Game creation", () => {
             .set({ "Authorization": `Bearer ${token}` })
             .send({ players })
             .end((err, res) => {
+                game = res.body;
                 expect(res).to.have.status(200);
+                done();
+            });
+    });
+    it("🔐 Can't get games without authentication (GET /games)", done => {
+        chai.request(app)
+            .get(`/games`)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                done();
+            });
+    });
+    it("🎲 User1 gets his games with JWT auth (GET /games)", done => {
+        chai.request(app)
+            .get("/games")
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ players })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const games = res.body;
+                expect(Array.isArray(games)).to.equals(true);
+                expect(games.length).to.equals(2);
+                done();
+            });
+    });
+    queryStrings = stringify({ status: "playing" });
+    it(`🎲 User1 gets his games with playing status with JWT auth (GET /games?${queryStrings})`, done => {
+        chai.request(app)
+            .get(`/games?${queryStrings}`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .send({ players })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const games = res.body;
+                expect(Array.isArray(games)).to.equals(true);
+                expect(games.length).to.equals(1);
+                done();
+            });
+    });
+    queryStrings = stringify({ status: "canceled" });
+    it(`🎲 User2 gets his games with canceled status with JWT auth (GET /games?${queryStrings})`, done => {
+        chai.request(app)
+            .get(`/games?${queryStrings}`)
+            .set({ "Authorization": `Bearer ${token2}` })
+            .send({ players })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const games = res.body;
+                expect(Array.isArray(games)).to.equals(true);
+                expect(games.length).to.equals(0);
+                done();
+            });
+    });
+    it(`🎲 Gets all games with basic auth (GET /games)`, done => {
+        chai.request(app)
+            .get(`/games`)
+            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
+            .send({ players })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const games = res.body;
+                expect(Array.isArray(games)).to.equals(true);
+                expect(games.length).to.equals(3);
+                done();
+            });
+    });
+    it(`🎲 Gets a game with basic auth (GET /games)`, done => {
+        chai.request(app)
+            .get(`/games/${game._id}`)
+            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game._id).to.equals(game._id);
+                done();
+            });
+    });
+    it(`🎲 User1 gets his last game with JWT auth (GET /games/:id)`, done => {
+        chai.request(app)
+            .get(`/games/${game._id}`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game._id).to.equals(game._id);
+                done();
+            });
+    });
+    it(`🎲 User1 can't get a game created by user2 with JWT auth (GET /games/:id)`, done => {
+        chai.request(app)
+            .get(`/games/${game2._id}`)
+            .set({ "Authorization": `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });

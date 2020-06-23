@@ -1,9 +1,9 @@
 /* eslint-disable max-lines-per-function */
 const passport = require("passport");
-const { param, body } = require("express-validator");
+const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
 const { roleNames } = require("../helpers/constants/Role");
-const { patchableGameStatuses, waitingForPossibilities } = require("../helpers/constants/Game");
+const { patchableGameStatuses, waitingForPossibilities, gameStatuses } = require("../helpers/constants/Game");
 const { playerActions } = require("../helpers/constants/Player");
 
 module.exports = app => {
@@ -32,26 +32,35 @@ module.exports = app => {
      * @api {GET} /games A] Get games
      * @apiName GetGames
      * @apiGroup Games 🎲
-     *
+     * @apiDescription Get games filtered by query string parameters if specified.
+     * - `JWT auth`: Only games created by the user attached to t   oken can be retrieved from this route.
+     * - `Basic auth`: All games can be retrieved.
+     * @apiParam (Query String Parameters) {String} [status] Filter by game's status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_
+     * @apiPermission JWT
      * @apiPermission Basic
      * @apiUse GameResponse
      */
-    app.get("/games", passport.authenticate("basic", { session: false }), Game.getGames);
+    app.get("/games", passport.authenticate(["basic", "jwt"], { session: false }), [
+        query("status")
+            .optional()
+            .isIn(gameStatuses).withMessage(`Must be equal to one of the following values: ${gameStatuses}`),
+    ], Game.getGames);
 
     /**
      * @api {GET} /games/repartition B] Get a game repartition
-     * @apiDescription Randomly affects role to players for a game
+     * @apiDescription Randomly affects role to players for a game.
      * @apiName GetGameRepartition
      * @apiGroup Games 🎲
      *
      * @apiParam (Request Body Parameters) {Array} players Must contain between 4 and 20 players.
      * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
      * @apiPermission Basic
+     * @apiPermission JWT
      * @apiSuccess {Array} players
      * @apiSuccess {String} players.name Player's name.
      * @apiSuccess {String} players.role Player's role.
      */
-    app.get("/games/repartition", passport.authenticate("basic", { session: false }), [
+    app.get("/games/repartition", passport.authenticate(["basic", "jwt"], { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
             .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
@@ -69,9 +78,10 @@ module.exports = app => {
      *
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiPermission Basic
+     * @apiPermission JWT
      * @apiUse GameResponse
      */
-    app.get("/games/:id", passport.authenticate("basic", { session: false }), [
+    app.get("/games/:id", passport.authenticate(["basic", "jwt"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.getGame);
@@ -81,7 +91,7 @@ module.exports = app => {
      * @apiName CreateGame
      * @apiGroup Games 🎲
      *
-     * @apiPermission BearerToken
+     * @apiPermission JWT
      * @apiParam (Request Body Parameters) {Array} players Must contain between 4 and 20 players.
      * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
@@ -106,7 +116,7 @@ module.exports = app => {
      * @apiName UpdateGame
      * @apiGroup Games 🎲
      *
-     * @apiPermission BearerToken
+     * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiUse GameResponse
      */
@@ -120,7 +130,7 @@ module.exports = app => {
      * @apiName UpdateGame
      * @apiGroup Games 🎲
      *
-     * @apiPermission BearerToken
+     * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String="canceled"} [status] Game master can cancel a game only if its status is set to `playing`.
      * @apiUse GameResponse
@@ -138,7 +148,7 @@ module.exports = app => {
      * @apiName MakeAPlayInGame
      * @apiGroup Games 🎲
      *
-     * @apiPermission BearerToken
+     * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String} source Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_).
      * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_).

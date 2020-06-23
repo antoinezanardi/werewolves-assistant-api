@@ -6,11 +6,11 @@ const User = require("../controllers/User");
 module.exports = app => {
 
     /**
-     * @apiDefine BearerToken Bearer Authorization with User Token
+     * @apiDefine JWT Bearer Authorization with JSON Web Token.
      */
 
     /**
-     * @apiDefine Basic Basic authentication with username and password
+     * @apiDefine Basic Basic authentication with username and password.
      */
 
     /**
@@ -42,11 +42,14 @@ module.exports = app => {
      * @apiName GetUser
      * @apiGroup Users 👤
      *
+     * @apiPermission JWT
      * @apiPermission Basic
      * @apiParam (Route Parameters) {ObjectId} id User's ID.
+     * - `JWT Auth`: Only user attached to token can be retrieved from this route.
+     * - `Basic Auth`: Any user can be retrieved.
      * @apiUse UserResponse
      */
-    app.get("/users/:id", passport.authenticate("basic", { session: false }), [
+    app.get("/users/:id", passport.authenticate(["jwt", "basic"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], User.getUser);
@@ -57,10 +60,9 @@ module.exports = app => {
      * @apiGroup Users 👤
      *
      * @apiUse UserRequestBody
-     * @apiPermission Basic
      * @apiUse UserResponse
      */
-    app.post("/users", passport.authenticate("basic", { session: false }), [
+    app.post("/users", [
         body("email")
             .isEmail().withMessage("Must be a valid email")
             .trim(),
@@ -75,10 +77,9 @@ module.exports = app => {
      * @apiGroup Users 👤
      *
      * @apiUse UserRequestBody
-     * @apiPermission Basic
      * @apiSuccess {String} token JSON Web Token to keep for further route authentication.
      */
-    app.post("/users/login", passport.authenticate("basic", { session: false }), [
+    app.post("/users/login", [
         body("email")
             .isEmail().withMessage("Must be a valid email")
             .trim(),

@@ -4,6 +4,7 @@ const passport = require("passport");
 const bcrypt = require("bcrypt");
 const User = require("../db/models/User");
 const { generateError, sendError } = require("../helpers/functions/Error");
+const { checkJWTUserRights } = require("../helpers/functions/User");
 const { checkRequestData } = require("../helpers/functions/Express");
 const Config = require("../../config");
 
@@ -74,8 +75,9 @@ exports.getUsers = async(req, res) => {
 exports.getUser = async(req, res) => {
     try {
         const { params } = checkRequestData(req);
-        const users = await this.findOne({ _id: params.id }, "-password");
-        res.status(200).json(users);
+        checkJWTUserRights(req, params.id);
+        const user = await this.findOne({ _id: params.id }, "-password");
+        res.status(200).json(user);
     } catch (e) {
         sendError(res, e);
     }

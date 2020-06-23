@@ -6,16 +6,14 @@
 ## 🐺 Description
 Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.
 
+This is the project's API used by [Werewolves Assistant Web](https://github.com/antoinezanardi/werewolves-assistant-web), a **VueJS** client.  
+
 ## 🌻 Live
 Two environments are set up:
-* **Sandbox**: `https://sandbox.werewolves-assistant-api.antoinezanardi.fr`
-* **Production**: `https://werewolves-assistant-api.antoinezanardi.fr`
+* **Sandbox**: https://sandbox.werewolves-assistant-api.antoinezanardi.fr
+* **Production**: https://werewolves-assistant-api.antoinezanardi.fr
 
-For your tests, please use de **Sandbox URL**.
-
-Basic authentication credentials for **Sandbox environment** are:
-* **username**: `root`
-* **password**: `secret`
+For your tests, please use the **Sandbox URL**.
 
 ## 📚 API Documentation
 Documentation is available for both environments:
