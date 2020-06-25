@@ -1,7 +1,7 @@
 const { describe, it, before, after } = require("mocha");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const { stringify } = require("query-string");
+const { stringify } = require("qs");
 const app = require("../../../app");
 const Config = require("../../../config");
 const { resetDatabase } = require("../../../src/helpers/functions/Test");
@@ -135,7 +135,7 @@ describe("A - Game creation", () => {
                 expect(game.turn).to.equals(1);
                 expect(game.phase).to.equals("night");
                 expect(game.tick).to.equals(1);
-                expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-mayor" });
+                expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);
                 done();
@@ -180,7 +180,7 @@ describe("A - Game creation", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor" })
+            .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NO_MORE_PLAY_ALLOWED");

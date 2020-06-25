@@ -6,7 +6,7 @@ exports.gameStatuses = ["playing", "done", "canceled"];
 
 exports.patchableGameStatuses = ["canceled"];
 
-exports.waitingForPossibilities = [...roleNames, ...groupNames, "mayor", "all"];
+exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"];
 
 exports.wonByPossibilities = ["wolves", "villagers"];
 
@@ -16,7 +16,7 @@ exports.populate = [
 ];
 
 exports.turnPreNightActionsOrder = [
-    { source: "all", action: "elect-mayor" },
+    { source: "all", action: "elect-sheriff" },
 ];
 
 exports.turnNightActionsOrder = [

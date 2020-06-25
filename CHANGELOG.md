@@ -1,5 +1,18 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.4.1 (2020-06-25)
+
+### ♻️ Refactoring
+
+* Route `GET /games/repartition` needs data passed by query strings and not body to work regarding REST best practises.
+* `mayor` renamed to `sheriff` regarding [the official Wikipedia page of The Werewolves of Millers Hollow](https://en.wikipedia.org/wiki/The_Werewolves_of_Millers_Hollow).
+
+### 📦 Packages
+
+* `query-string` removed for `qs` with version `6.9.4`.
+
+---
+
 ## 0.4.0 (2020-06-24)
 
 ### 🚀 New features
@@ -63,7 +76,7 @@
 * Games can be created by user. User can't create a game if there is already one playing.
 * Games can be canceled at any moment by the game master.
 * Each time a play is done by anyone or any group, or an event occurs, an entry in game's history is saved.
-* Gameplay for `all`, `mayor`, `seer`, `witch`, `raven`, `hunter`, `protector` and `wolves` implemented !
+* Gameplay for `all`, `sheriff`, `seer`, `witch`, `raven`, `hunter`, `protector` and `wolves` implemented !
 * Games can be reset when their status are `playing`.
 
 ### 🐛 Bug fixes

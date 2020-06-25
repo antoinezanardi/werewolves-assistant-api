@@ -58,7 +58,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
-    data.waiting = [{ for: "all", to: "elect-mayor" }];
+    data.waiting = [{ for: "all", to: "elect-sheriff" }];
 };
 
 exports.create = async(data, options = {}) => {
@@ -161,12 +161,12 @@ exports.getWolfRoles = async players => {
 
 exports.getGameRepartition = async(req, res) => {
     try {
-        const { body } = checkRequestData(req);
-        this.checkUniqueNameInPlayers(body.players);
-        const wolfRoles = await this.getWolfRoles(body.players);
-        const villagerRoles = await this.getVillagerRoles(body.players, wolfRoles);
-        this.assignRoleToPlayers(body.players, [...villagerRoles, ...wolfRoles]);
-        res.status(200).json(body.players);
+        const { query } = checkRequestData(req);
+        this.checkUniqueNameInPlayers(query.players);
+        const wolfRoles = await this.getWolfRoles(query.players);
+        const villagerRoles = await this.getVillagerRoles(query.players, wolfRoles);
+        this.assignRoleToPlayers(query.players, [...villagerRoles, ...wolfRoles]);
+        res.status(200).json(query.players);
     } catch (e) {
         sendError(res, e);
     }
@@ -272,7 +272,7 @@ exports.fillWaitingQueueWithDayActions = async game => {
 };
 
 exports.isSourceAvailableInPlayers = (players, source) => {
-    if (source === "all" || source === "mayor") {
+    if (source === "all" || source === "sheriff") {
         return true;
     }
     const sourceType = groupNames.includes(source) ? "group" : "role";
@@ -333,7 +333,7 @@ exports.generatePlayMethods = () => ({
     raven: Player.ravenPlays,
     hunter: Player.hunterPlays,
     wolves: Player.wolvesPlay,
-    mayor: Player.mayorPlays,
+    sheriff: Player.sheriffPlays,
 });
 
 exports.generateGameHistoryEntry = (game, play) => ({
@@ -407,7 +407,7 @@ exports.resetGame = async(req, res) => {
             turn: 1,
             phase: "night",
             tick: 1,
-            waiting: [{ for: "all", to: "elect-mayor" }],
+            waiting: [{ for: "all", to: "elect-sheriff" }],
         });
         res.status(200).json(game);
     } catch (e) {

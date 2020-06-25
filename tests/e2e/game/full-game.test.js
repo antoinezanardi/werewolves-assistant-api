@@ -61,7 +61,7 @@ describe("B - Full game of 7 players with all roles", () => {
         chai.request(app)
             .post(`/games/${mongoose.Types.ObjectId()}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor" })
+            .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
@@ -72,11 +72,11 @@ describe("B - Full game of 7 players with all roles", () => {
         expect(game.phase).to.equals("night");
         done();
     });
-    it("🎲 Game is waiting for 'all' to 'elect-mayor'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-mayor" });
+    it("🎲 Game is waiting for 'all' to 'elect-sheriff'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
         done();
     });
-    it("👥 All can't elect mayor if play's source is not 'all' (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if play's source is not 'all' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -87,7 +87,7 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if play's action is not 'elect-mayor' (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if play's action is not 'elect-sheriff' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -98,34 +98,35 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if votes are not set (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if votes are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor" })
+            .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
+                console.log(res.body);
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("VOTES_REQUIRED");
                 done();
             });
     });
-    it("👥 All can't elect mayor if votes are empty (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if votes are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [] })
+            .send({ source: "all", action: "elect-sheriff", votes: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("VOTES_CANT_BE_EMPTY");
                 done();
             });
     });
-    it("👥 All can't elect mayor if one vote has same target and source (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if one vote has same target and source (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[1]._id },
                 { from: players[1]._id, for: players[1]._id },
             ] })
@@ -135,12 +136,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if one vote has an unknown source (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if one vote has an unknown source (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: mongoose.Types.ObjectId(), for: players[1]._id },
                 { from: players[0]._id, for: players[1]._id },
             ] })
@@ -150,12 +151,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if one vote has an unknown target (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if one vote has an unknown target (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: mongoose.Types.ObjectId() },
                 { from: players[1]._id, for: players[0]._id },
             ] })
@@ -165,12 +166,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if one player votes twice (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if one player votes twice (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[1]._id },
                 { from: players[0]._id, for: players[1]._id },
             ] })
@@ -180,12 +181,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All can't elect mayor if there is a tie in votes (POST /games/:id/play)", done => {
+    it("👥 All can't elect sheriff if there is a tie in votes (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[1]._id },
                 { from: players[1]._id, for: players[0]._id },
             ] })
@@ -195,12 +196,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👥 All elect the witch as the mayor (POST /games/:id/play)", done => {
+    it("👥 All elect the witch as the sheriff (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[1]._id },
                 { from: players[1]._id, for: players[0]._id },
                 { from: players[2]._id, for: players[0]._id },
@@ -208,7 +209,7 @@ describe("B - Full game of 7 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ attribute: "mayor", source: "all" });
+                expect(game.players[0].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
                 expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
@@ -236,7 +237,7 @@ describe("B - Full game of 7 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "elect-mayor" })
+            .send({ source: "seer", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_PLAY_ACTION");
@@ -864,11 +865,11 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'mayor' to 'settle-votes'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "mayor", to: "settle-votes" });
+    it("🎲 Game is waiting for 'sheriff' to 'settle-votes'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "settle-votes" });
         done();
     });
-    it("🎖 Mayor can't settle votes if play's source is not 'mayor' (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes if play's source is not 'sheriff' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -879,45 +880,45 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes if play's action is not 'settle-votes' (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes if play's action is not 'settle-votes' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "eat" })
+            .send({ source: "sheriff", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_PLAY_ACTION");
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes if targets are not set (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "settle-votes" })
+            .send({ source: "sheriff", action: "settle-votes" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TARGETS_REQUIRED");
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes if targets are empty (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "settle-votes", targets: [] })
+            .send({ source: "sheriff", action: "settle-votes", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes with multiple targets (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes with multiple targets (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "settle-votes", targets: [
+            .send({ source: "sheriff", action: "settle-votes", targets: [
                 { player: players[0]._id },
                 { player: players[1]._id },
             ] })
@@ -927,11 +928,11 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes with unknown target (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes with unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "settle-votes", targets: [
+            .send({ source: "sheriff", action: "settle-votes", targets: [
                 { player: mongoose.Types.ObjectId() },
             ] })
             .end((err, res) => {
@@ -940,12 +941,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't settle votes with player who was not in previous tie in votes (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't settle votes with player who was not in previous tie in votes (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "settle-votes", targets: [
+            .send({ source: "sheriff", action: "settle-votes", targets: [
                 { player: players[0]._id },
             ] })
             .end((err, res) => {
@@ -954,12 +955,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor settles votes by choosing villager (POST /games/:id/play)", done => {
+    it("🎖 Sheriff settles votes by choosing villager (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "settle-votes", targets: [
+            .send({ source: "sheriff", action: "settle-votes", targets: [
                 { player: players[6]._id },
             ] })
             .end((err, res) => {
@@ -967,7 +968,7 @@ describe("B - Full game of 7 players with all roles", () => {
                 game = res.body;
                 expect(game.players[5].isAlive).to.equals(true);
                 expect(game.players[6].isAlive).to.equals(false);
-                expect(game.players[6].murdered).to.deep.equals({ by: "mayor", of: "settle-votes" });
+                expect(game.players[6].murdered).to.deep.equals({ by: "sheriff", of: "settle-votes" });
                 expect(game.history[0].play.targets).to.exist;
                 done();
             });
@@ -1321,11 +1322,11 @@ describe("B - Full game of 7 players with all roles", () => {
         expect(game.players[0].murdered).to.deep.equals({ by: "wolves", of: "eat" });
         done();
     });
-    it("🎲 Game is waiting for 'mayor' to 'delegate'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "mayor", to: "delegate" });
+    it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
         done();
     });
-    it("🎖 Mayor can't delegate if play's source is not 'mayor' (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate if play's source is not 'sheriff' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
@@ -1336,45 +1337,45 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't delegate if play's action is not 'delegate' (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate if play's action is not 'delegate' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "eat" })
+            .send({ source: "sheriff", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_PLAY_ACTION");
                 done();
             });
     });
-    it("🎖 Mayor can't delegate if targets are not set (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate" })
+            .send({ source: "sheriff", action: "delegate" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TARGETS_REQUIRED");
                 done();
             });
     });
-    it("🎖 Mayor can't delegate if targets are empty (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate", targets: [] })
+            .send({ source: "sheriff", action: "delegate", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
                 done();
             });
     });
-    it("🎖 Mayor can't delegate to multiple targets (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate to multiple targets (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate", targets: [
+            .send({ source: "sheriff", action: "delegate", targets: [
                 { player: players[0]._id },
                 { player: players[1]._id },
             ] })
@@ -1384,11 +1385,11 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't delegate to unknown target (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate to unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate", targets: [
+            .send({ source: "sheriff", action: "delegate", targets: [
                 { player: mongoose.Types.ObjectId() },
             ] })
             .end((err, res) => {
@@ -1397,12 +1398,12 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor can't delegate to a dead target (POST /games/:id/play)", done => {
+    it("🎖 Sheriff can't delegate to a dead target (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate", targets: [
+            .send({ source: "sheriff", action: "delegate", targets: [
                 { player: players[0]._id },
             ] })
             .end((err, res) => {
@@ -1411,19 +1412,19 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎖 Mayor delegates to the hunter (POST /games/:id/play)", done => {
+    it("🎖 Sheriff delegates to the hunter (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate", targets: [
+            .send({ source: "sheriff", action: "delegate", targets: [
                 { player: players[4]._id },
             ] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.not.deep.include({ attribute: "mayor", source: "all" });
-                expect(game.players[4].attributes).to.deep.include({ attribute: "mayor", source: "mayor" });
+                expect(game.players[0].attributes).to.not.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.players[4].attributes).to.deep.include({ attribute: "sheriff", source: "sheriff" });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[4]._id);
                 done();
@@ -1445,9 +1446,9 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'hunter' to 'shoot' and 'mayor' to 'delegate'", done => {
+    it("🎲 Game is waiting for 'hunter' to 'shoot' and 'sheriff' to 'delegate'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "hunter", to: "shoot" });
-        expect(game.waiting[1]).to.deep.equals({ for: "mayor", to: "delegate" });
+        expect(game.waiting[1]).to.deep.equals({ for: "sheriff", to: "delegate" });
         done();
     });
     it("🔫 Hunter can't shoot if play's source is not 'hunter' (POST /games/:id/play)", done => {
@@ -1557,14 +1558,14 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎲 Game is WON by 'villagers'!!", done => {
         expect(game.status).to.equals("done");
         expect(game.won.by).to.equals("villagers");
-        expect(game.waiting[0]).to.deep.equals({ for: "mayor", to: "delegate" });
+        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
         done();
     });
     it("🔐 Can't make a play if game's done (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "mayor", action: "delegate" })
+            .send({ source: "sheriff", action: "delegate" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NO_MORE_PLAY_ALLOWED");

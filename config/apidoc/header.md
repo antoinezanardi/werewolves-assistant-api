@@ -30,7 +30,7 @@
 | phase                | String                                | Each turn has two phases, `day` or `night`. Starting at `night`.                                                    |
 | tick                 | Number                                | Starting at `1`, tick increments each time a play is made.                                                    |
 | waiting              | Object[]                              | Queue of upcoming actions.                                               |
-| &emsp;&emsp;for      | String                                | Can be either a group, a role or the mayor. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                         |
+| &emsp;&emsp;for      | String                                | Can be either a group, a role or the sheriff. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)                                         |
 | &emsp;&emsp;to       | String                                | What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)                                         |
 | status               | String                                | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                |
 | history              | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History](#game-history-class)_)                                                |
@@ -52,11 +52,11 @@
 | &emsp;&emsp;group                | String   | Player's current group. (_Possibilities: [Codes - Player Groups](#player-groups)_)                                                    |
 | attributes                       | Array    | An attribute is an effect or a status on a player.                                                     |
 | &emsp;&emsp;attribute            | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                    |
-| &emsp;&emsp;source               | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                    |
+| &emsp;&emsp;source               | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `sheriff`_)                                                    |
 | **&emsp;&emsp;remainingPhases*** | Number   | Remaining time for this attribute before disappear. Decreases after each phase. |
 | isAlive                          | Boolean  | If the player is currently alive or not.                                                     |
 | **murdered***                    | Object   | Set if `isAlive` is `false`.                                                    |
-| &emsp;&emsp;by                   | String   | Which role or group killed the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `mayor`_)                                                   |
+| &emsp;&emsp;by                   | String   | Which role or group killed the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `sheriff`_)                                                   |
 | &emsp;&emsp;of                   | String   | What action killed the player. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                 |
 
 ## <a id="role-class"></a>🃏 Role
@@ -84,7 +84,7 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 ## <a id="play-class"></a>🕹 Play
 | Field                                  | Type                      | Description                                                         |
 |----------------------------------------|:-------------------------:|---------------------------------------------------------------------|
-| source                                 | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `mayor`_)                                                      |
+| source                                 | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)                                                      |
 | action                                 | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                      |
 | **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, players are nominated from the vote.                                                     |
 | &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                      |

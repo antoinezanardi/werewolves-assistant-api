@@ -37,7 +37,7 @@ exports.checkTargetDependingOnAction = async(target, game, action) => {
     } else if (action === "settle-votes") {
         const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
         if (lastVotePlay && !lastVotePlay.play.targets.find(({ player }) => player._id.toString() === target.player._id.toString())) {
-            throw generateError("CANT_BE_CHOSEN_AS_TIEBREAKER", `Player with id "${target.player._id}" is not part of the tiebreaker choice for the mayor.`);
+            throw generateError("CANT_BE_CHOSEN_AS_TIEBREAKER", `Player with id "${target.player._id}" is not part of the tiebreaker choice for the sheriff.`);
         }
     }
 };
@@ -104,8 +104,8 @@ exports.killPlayer = (playerId, { action }, game) => {
             if (player.role.current === "hunter") {
                 game.waiting.push({ for: "hunter", to: "shoot" });
             }
-            if (hasAttribute(player, "mayor")) {
-                game.waiting.push({ for: "mayor", to: "delegate" });
+            if (hasAttribute(player, "sheriff")) {
+                game.waiting.push({ for: "sheriff", to: "delegate" });
             }
         }
     }
@@ -221,25 +221,25 @@ exports.checkAndFillVotes = (votes, game, options) => {
     }
 };
 
-exports.mayorDelegates = async(play, game) => {
+exports.sheriffDelegates = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
-    this.removeAttributeFromAllPlayers("mayor", game);
-    this.addPlayerAttribute(targets[0].player._id, "mayor", game, "mayor");
+    this.removeAttributeFromAllPlayers("sheriff", game);
+    this.addPlayerAttribute(targets[0].player._id, "sheriff", game, "sheriff");
 };
 
-exports.mayorSettlesVotes = async(play, game) => {
+exports.sheriffSettlesVotes = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.killPlayer(targets[0].player._id, play, game);
 };
 
-exports.mayorPlays = async(play, game, gameHistoryEntry) => {
-    const mayorActions = {
-        "settle-votes": this.mayorSettlesVotes,
-        "delegate": this.mayorDelegates,
+exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
+    const sheriffActions = {
+        "settle-votes": this.sheriffSettlesVotes,
+        "delegate": this.sheriffDelegates,
     };
-    await mayorActions[play.action](play, game, gameHistoryEntry);
+    await sheriffActions[play.action](play, game, gameHistoryEntry);
 };
 
 exports.wolvesPlay = async(play, game) => {
@@ -291,24 +291,24 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     if (nominatedPlayers.length > 1) {
-        game.waiting.push({ for: "mayor", to: "settle-votes" });
+        game.waiting.push({ for: "sheriff", to: "settle-votes" });
     } else {
         this.killPlayer(nominatedPlayers[0]._id, play, game);
     }
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
-exports.allElectMayor = async(play, game, gameHistoryEntry) => {
+exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
-    this.addPlayerAttribute(nominatedPlayers[0]._id, "mayor", game);
+    this.addPlayerAttribute(nominatedPlayers[0]._id, "sheriff", game);
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
 exports.allPlay = async(play, game, gameHistoryEntry) => {
     const allActions = {
-        "elect-mayor": this.allElectMayor,
+        "elect-sheriff": this.allElectSheriff,
         "vote": this.allVote,
     };
     await allActions[play.action](play, game, gameHistoryEntry);

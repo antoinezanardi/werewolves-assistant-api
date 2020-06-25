@@ -58,19 +58,19 @@ describe("C - Tiny game of 4 players with only wolves and one poor villager", ()
         chai.request(app)
             .post(`/games/${mongoose.Types.ObjectId()}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor" })
+            .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });
-    it("👥 All elect the villager as the mayor (POST /games/:id/play)", done => {
+    it("👥 All elect the villager as the sheriff (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[3]._id },
                 { from: players[1]._id, for: players[3]._id },
                 { from: players[2]._id, for: players[3]._id },

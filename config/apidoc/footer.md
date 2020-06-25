@@ -36,16 +36,16 @@
 | protect      | protector                         | villagers               | Each night - Prevents from death for the night. Can't protect the same player twice in a row.                              |
 | shoot        | hunter                            | villagers               | When hunter dies - Kill someone chosen by hunter, can't be himself.                              |
 | mark         | raven                             | villagers               | Each night - Mark someone. The next day, the target will have 2 votes against himself. The mark goes away after the judgement.                             |
-| elect-mayor  | -                                 | all                     | Before the first phase (`night`) - Anyone can be elected as a mayor.                               |
+| elect-sheriff | -                                 | all                     | Before the first phase (`night`) - Anyone can be elected as a sheriff.                               |
 | vote         | -                                 | all                     | Each day - All alive players vote for someone to kill.                               |
-| delegate     | mayor (_**attribute**, not role_) | -                       | When mayor dies - The dying mayor chooses the next one in among the living.                               |
-| settle-votes | mayor (_**attribute**, not role_) | -                       | When there is a tie in the votes during the `day` - Choose which one will be executed.                               |
+| delegate     | sheriff (_**attribute**, not role_) | -                       | When sheriff dies - The dying sheriff chooses the next one in among the living.                               |
+| settle-votes | sheriff (_**attribute**, not role_) | -                       | When there is a tie in the votes during the `day` - Choose which one will be executed.                               |
 
 ## <a id="player-attributes"></a>🎖️ Player Attributes
 
 | Attribute          |                Description                                |
 |:------------------:|------------------------------------|
-| mayor              | Elected by all alive players. When dying, this attribute is transferred to someone chosen by the player.                                |
+| sheriff              | Elected by all alive players. When dying, this attribute is transferred to someone chosen by the player.                                |
 | eaten              | Wolves decided to eat this player during the night. The player will die the next phase (`day`) if he has no protection.                               |
 | drank-life-potion  | The witch gave this potion during the night. It prevents from dying until the next phase (`day`).                                |
 | drank-death-potion | The witch gave this potion during the night. The player will die the next phase (`day`) if he has no protection.                               |
@@ -94,6 +94,6 @@ Description for each case below:
 | 31   | ONLY_ONE_DEATH_POTION             |    400    | Witch can only use one death potion per game.                                   |
 | 32   | NON_UNIQUE_TARGETS                |    400    | Multiple targets are pointing the same player.                                  |
 | 33   | CANT_PROTECT_TWICE                |    400    | Protector can't protect the same player twice in a row.                         |
-| 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the mayor.                      |
+| 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the sheriff.                      |
 | 35   | NO_MORE_PLAY_ALLOWED              |    400    | No more play are allowed because game's status is "done" or "canceled".         |
 | 36   | CANT_BE_RESET                     |    400    | Game can't be reset because game's status is "done" or "canceled".              |

@@ -1,5 +1,5 @@
 exports.playerAttributes = [
-    { attribute: "mayor", source: "all" },
+    { attribute: "sheriff", source: "all" },
     { attribute: "seen", source: "seer", remainingPhases: 1 },
     { attribute: "eaten", source: "wolves", remainingPhases: 1 },
     { attribute: "drank-life-potion", source: "witch", remainingPhases: 1 },
@@ -8,12 +8,12 @@ exports.playerAttributes = [
     { attribute: "raven-marked", source: "raven", remainingPhases: 1 },
 ];
 
-exports.playerActions = ["eat", "use-potion", "look", "protect", "shoot", "mark", "elect-mayor", "delegate", "settle-votes", "vote"];
+exports.playerActions = ["eat", "use-potion", "look", "protect", "shoot", "mark", "elect-sheriff", "delegate", "settle-votes", "vote"];
 
 exports.murderedPossibilities = [
     { by: "witch", of: "use-potion" },
     { by: "wolves", of: "eat" },
     { by: "hunter", of: "shoot" },
-    { by: "mayor", of: "settle-votes" },
+    { by: "sheriff", of: "settle-votes" },
     { by: "all", of: "vote" },
 ];
