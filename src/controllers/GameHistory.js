@@ -61,8 +61,8 @@ exports.getLastNightPlay = async gameId => {
 };
 
 exports.getLastProtectedPlayer = async gameId => {
-    const lastProtectorPlay = await this.findOne({ gameId, "play.action": "protect" }, null, { sort: { createdAt: -1 } });
-    return lastProtectorPlay ? lastProtectorPlay.play.targets[0].player : null;
+    const lastGuardPlay = await this.findOne({ gameId, "play.action": "protect" }, null, { sort: { createdAt: -1 } });
+    return lastGuardPlay ? lastGuardPlay.play.targets[0].player : null;
 };
 
 exports.getLastVotePlay = async gameId => await this.findOne({ gameId, "play.action": "vote" }, null, { sort: { createdAt: -1 } });

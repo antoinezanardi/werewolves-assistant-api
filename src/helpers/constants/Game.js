@@ -6,9 +6,9 @@ exports.gameStatuses = ["playing", "done", "canceled"];
 
 exports.patchableGameStatuses = ["canceled"];
 
-exports.waitingForPossibilities = [...roleNames, ...groupNames, "mayor", "all"];
+exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"];
 
-exports.wonByPossibilities = ["wolves", "villagers"];
+exports.wonByPossibilities = ["werewolves", "villagers"];
 
 exports.populate = [
     { path: "gameMaster", select: "-password" },
@@ -16,13 +16,13 @@ exports.populate = [
 ];
 
 exports.turnPreNightActionsOrder = [
-    { source: "all", action: "elect-mayor" },
+    { source: "all", action: "elect-sheriff" },
 ];
 
 exports.turnNightActionsOrder = [
     { source: "seer", action: "look" },
-    { source: "wolves", action: "eat" },
+    { source: "werewolves", action: "eat" },
     { source: "witch", action: "use-potion" },
-    { source: "protector", action: "protect" },
+    { source: "guard", action: "protect" },
     { source: "raven", action: "mark" },
 ];

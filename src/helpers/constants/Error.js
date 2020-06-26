@@ -31,7 +31,7 @@ exports.errorMetadata = {
         code: 8,
         HTTPCode: 400,
     },
-    NO_WOLF_IN_GAME_COMPOSITION: {
+    NO_WEREWOLF_IN_GAME_COMPOSITION: {
         code: 9,
         HTTPCode: 400,
     },

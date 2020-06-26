@@ -1,7 +1,7 @@
 const { describe, it, before, after } = require("mocha");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const { stringify } = require("query-string");
+const { stringify } = require("qs");
 const app = require("../../../app");
 const Config = require("../../../config");
 const { resetDatabase } = require("../../../src/helpers/functions/Test");
@@ -14,25 +14,25 @@ const credentials2 = { email: "test@test.frbis", password: "secret" };
 const players = [
     { name: "Dig", role: "witch" },
     { name: "Doug", role: "seer" },
-    { name: "Dag", role: "protector" },
+    { name: "Dag", role: "guard" },
     { name: "Dug", role: "raven" },
     { name: "Dyg", role: "hunter" },
-    { name: "Deg", role: "wolf" },
+    { name: "Deg", role: "werewolf" },
 ];
-const playersWithoutWolves = [
+const playersWithoutWerewolves = [
     { name: "Dig", role: "witch" },
     { name: "Doug", role: "seer" },
-    { name: "Dag", role: "protector" },
+    { name: "Dag", role: "guard" },
     { name: "Dug", role: "raven" },
     { name: "Dyg", role: "hunter" },
 ];
 const playersWithoutVillagers = [
-    { name: "Dig", role: "wolf" },
-    { name: "Doug", role: "wolf" },
-    { name: "Dag", role: "wolf" },
-    { name: "Dug", role: "wolf" },
-    { name: "Dyg", role: "wolf" },
-    { name: "Deg", role: "wolf" },
+    { name: "Dig", role: "werewolf" },
+    { name: "Doug", role: "werewolf" },
+    { name: "Dag", role: "werewolf" },
+    { name: "Dug", role: "werewolf" },
+    { name: "Dyg", role: "werewolf" },
+    { name: "Deg", role: "werewolf" },
 ];
 let token, token2, game, game2, queryStrings;
 
@@ -90,14 +90,14 @@ describe("A - Game creation", () => {
                 done();
             });
     });
-    it("🐺 Can't create game without wolves (POST /games)", done => {
+    it("🐺 Can't create game without werewolves (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ players: playersWithoutWolves })
+            .send({ players: playersWithoutWerewolves })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("NO_WOLF_IN_GAME_COMPOSITION");
+                expect(res.body.type).to.equals("NO_WEREWOLF_IN_GAME_COMPOSITION");
                 done();
             });
     });
@@ -116,7 +116,7 @@ describe("A - Game creation", () => {
         chai.request(app)
             .post("/games")
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ players: [...players, { name: "Dig", role: "wolf" }] })
+            .send({ players: [...players, { name: "Dig", role: "werewolf" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("PLAYERS_NAME_NOT_UNIQUE");
@@ -135,7 +135,7 @@ describe("A - Game creation", () => {
                 expect(game.turn).to.equals(1);
                 expect(game.phase).to.equals("night");
                 expect(game.tick).to.equals(1);
-                expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-mayor" });
+                expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);
                 done();
@@ -180,7 +180,7 @@ describe("A - Game creation", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor" })
+            .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NO_MORE_PLAY_ALLOWED");
