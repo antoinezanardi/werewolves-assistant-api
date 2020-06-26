@@ -25,14 +25,14 @@ exports.checkUniqueTargets = targets => {
 exports.checkTargetDependingOnAction = async(target, game, action) => {
     if (action === "look" && target.player.role.current === "seer") {
         throw generateError("CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
-    } else if (action === "eat" && target.player.role.group === "wolves") {
-        throw generateError("CANT_EAT_EACH_OTHER", `Wolves's target can't be a player with group "wolves".`);
+    } else if (action === "eat" && target.player.role.group === "werewolves") {
+        throw generateError("CANT_EAT_EACH_OTHER", `Werewolves's target can't be a player with group "werewolves".`);
     } else if (action === "use-potion" && target.potion.life && !hasAttribute(target.player, "eaten")) {
-        throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by wolves.`);
+        throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by werewolves.`);
     } else if (action === "protect") {
         const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
         if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString()) {
-            throw generateError("CANT_PROTECT_TWICE", `Protector can't protect the same player twice in a row.`);
+            throw generateError("CANT_PROTECT_TWICE", `Guard can't protect the same player twice in a row.`);
         }
     } else if (action === "settle-votes") {
         const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
@@ -242,7 +242,7 @@ exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
     await sheriffActions[play.action](play, game, gameHistoryEntry);
 };
 
-exports.wolvesPlay = async(play, game) => {
+exports.werewolvesPlay = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "eaten", game);
@@ -262,7 +262,7 @@ exports.ravenPlays = async(play, game) => {
     }
 };
 
-exports.protectorPlays = async(play, game) => {
+exports.guardPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
     this.addPlayerAttribute(targets[0].player._id, "protected", game);

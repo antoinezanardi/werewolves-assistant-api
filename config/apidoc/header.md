@@ -35,7 +35,7 @@
 | status               | String                                | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                |
 | history              | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History](#game-history-class)_)                                                |
 | **won***             | Object                                | Winner(s) of the game when status is `done`.                                                |
-| &emsp;&emsp;by       | String                                | Can be either a group or a role. (_Possibilites: `wolves` or `villagers`_)                                                |
+| &emsp;&emsp;by       | String                                | Can be either a group or a role. (_Possibilites: `werewolves` or `villagers`_)                                                |
 | &emsp;&emsp;players  | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                |
 | createdAt            | Date                                  | When the user created his account.                                                     |
 | updatedAt            | Date                                  | When the user updated his account.                                                     |
@@ -50,7 +50,7 @@
 | &emsp;&emsp;original             | String   | Player's Original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
 | &emsp;&emsp;current              | String   | Player's current role. (_See: [Codes - Player Roles](#player-roles)_)                                                    |
 | &emsp;&emsp;group                | String   | Player's current group. (_Possibilities: [Codes - Player Groups](#player-groups)_)                                                    |
-| attributes                       | Array    | An attribute is an effect or a status on a player.                                                     |
+| attributes                       | Object[] | An attribute is an effect or a status on a player.                                                     |
 | &emsp;&emsp;attribute            | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                    |
 | &emsp;&emsp;source               | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `sheriff`_)                                                    |
 | **&emsp;&emsp;remainingPhases*** | Number   | Remaining time for this attribute before disappear. Decreases after each phase. |
@@ -89,7 +89,7 @@ Each time a play is done by anyone or any group, an entry in game's history is s
 | **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, players are nominated from the vote.                                                     |
 | &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                      |
 | **&emsp;&emsp;potion***                | Object                    | Only available for the `witch`.                                                      |
-| **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from wolves.                                                      |
+| **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from werewolves.                                                      |
 | **&emsp;&emsp;&emsp;&emsp;death***     | Boolean                   | Only available for the `witch`. If set to `true`, target is killed.                                                      |
 | **votes***                             | Object[]                  | Votes of the play.                                                      |
 | &emsp;&emsp;from                       | [Player](#player-class)   | Vote's source.                                                      |

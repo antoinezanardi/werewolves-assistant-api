@@ -22,7 +22,7 @@ module.exports = app => {
      * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
      * @apiSuccess {Object} [won] Winners of the game when status is `done`.
-     * @apiSuccess {String={"wolves", "villagers"}} won.by Can be either a group or a role. (_Possibilities: `wolves` or `villagers`_)
+     * @apiSuccess {String={"werewolves", "villagers"}} won.by Can be either a group or a role. (_Possibilities: `werewolves` or `villagers`_)
      * @apiSuccess {Player[]} won.players List of player(s) who won. (_See: [Classes - Player](#player-class)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
@@ -56,7 +56,7 @@ module.exports = app => {
      * @apiParam (Query String Parameters) {String} players.name Player's name. Must be unique in the array.
      * @apiPermission Basic
      * @apiPermission JWT
-     * @apiSuccess {Array} players
+     * @apiSuccess {Object[]} players
      * @apiSuccess {String} players.name Player's name.
      * @apiSuccess {String} players.role Player's role.
      */
@@ -92,7 +92,7 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiPermission JWT
-     * @apiParam (Request Body Parameters) {Array} players Must contain between 4 and 20 players.
+     * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 20 players.
      * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiUse GameResponse
@@ -113,7 +113,7 @@ module.exports = app => {
 
     /**
      * @api {PATCH} /games/:id H] Reset a game
-     * @apiName UpdateGame
+     * @apiName ResetGame
      * @apiGroup Games 🎲
      *
      * @apiPermission JWT
@@ -152,12 +152,12 @@ module.exports = app => {
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String} source Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
      * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
-     * @apiParam (Request Body Parameters) {Array} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
+     * @apiParam (Request Body Parameters) {Object[]} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets.player Player's id.
      * @apiParam (Request Body Parameters) {Object} [targets.potion]
-     * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life from wolves meal.
+     * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life from werewolves meal.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
-     * @apiParam (Request Body Parameters) {Array} [votes] Required when **action** is `elect-sheriff` or `vote`.
+     * @apiParam (Request Body Parameters) {Object[]} [votes] Required when **action** is `elect-sheriff` or `vote`.
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
      * @apiUse GameResponse

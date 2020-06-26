@@ -1,56 +1,56 @@
 # Codes & Values
 
 ## <a id="game-statuses"></a>🎲 Game Statuses
-| Status            |                 Description                                |
-|:-----------------:|------------------------------------------------------------|
-| playing           | The game is currently playing. |
-| done              | The game is finished, no more actions are required to proceed. |
+| Status            |                                    Description                             |
+|:-----------------:|----------------------------------------------------------------------------|
+| playing           | The game is currently playing.                                             |
+| done              | The game is finished, no more actions are required to proceed.             |
 | canceled          | The game has been canceled by game master and cannot be played any longer. |
 
-## <a id="player-groups"></a>👥 Player Groups
-| Group     |                 Description                                |
-|:---------:|------------------------------------------------------------|
-| all       | All players alive.  |
-| wolves    | They teaming up are against `villagers` and need to kill them all to win the game.  |
-| villagers | They teaming up are against `wolves` and need to kill them all to win the game.  |
+## <a id="player-groups"></a>👪 Player Groups
+| Group                |                 Description                                                          |
+|:--------------------:|--------------------------------------------------------------------------------------|
+| 👪<br/>all           | All players alive.                                                                   |
+| 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game.   |
+| 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game.  |
 
 ## <a id="player-roles"></a>🃏 Player Roles
 
-| Role      | [Group](#player-groups) |                 Description                                |
-|:---------:|:-----------------------:|------------------------------------------------------------|
-| wolf      | wolves                  | Each night, his group eats a villager chosen by the majority.                               |
-| witch     | villagers               | She has one life potion which prevents from being eaten by wolves and a death potion which instantly kills. She can only use each one once in the game.                                      |
-| seer      | villagers               | Each night, she sees the role of the player she wants.                          |
-| protector | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                         |
-| hunter    | villagers               | If he dies, he shoots a victim to take his revenge. He can't kill himself.            |
-| raven     | villagers               | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                      |
-| villagers | villagers               | Has no powers, can only count on his speech.       |
+| Role               | [Group](#player-groups) |                 Description                                                                                                                                  |
+|:------------------:|:-----------------------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🐺<br/>werewolf    | werewolves              | Each night, his group eats a villager chosen by the majority.                                                                                                |
+| 🧑‍🌾<br/>villager    | villagers               | Has no powers, can only count on his speech.                                                                                                                 |
+| 🧙‍♀<br/>️‍witch      | villagers               | She has one life potion which prevents from being eaten by werewolves and a death potion which instantly kills. She can only use each one once in the game.  |
+| 🔮<br/>seer        | villagers               | Each night, she sees the role of the player she wants.                                                                                                       |
+| 🛡️<br/>guard       | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                                            |
+| 🔫<br/>hunter      | villagers               | If he dies, he shoots a victim to take his revenge. He can't kill himself.                                                                                   |
+| 🐦<br/>raven       | villagers               | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                 |
 
 ## <a id="player-actions"></a>🔪 Player Actions
 
-| Action       | [Role](#player-roles)             | [Group](#player-groups) |                 When - Use and Limits                                |
-|:------------:|:---------------------------------:|:-----------------------:|------------------------------------|
-| eat          | wolf                              | wolves                  | Each night - Kill a villager chosen by majority.                               |
-| use-potion   | witch                             | villagers               | Each night - Protect or kill. One use available for each life and death potion.                              |
-| look         | seer                              | villagers               | Each night - Reveal a role.                              |
-| protect      | protector                         | villagers               | Each night - Prevents from death for the night. Can't protect the same player twice in a row.                              |
-| shoot        | hunter                            | villagers               | When hunter dies - Kill someone chosen by hunter, can't be himself.                              |
-| mark         | raven                             | villagers               | Each night - Mark someone. The next day, the target will have 2 votes against himself. The mark goes away after the judgement.                             |
-| elect-sheriff | -                                 | all                     | Before the first phase (`night`) - Anyone can be elected as a sheriff.                               |
-| vote         | -                                 | all                     | Each day - All alive players vote for someone to kill.                               |
-| delegate     | sheriff (_**attribute**, not role_) | -                       | When sheriff dies - The dying sheriff chooses the next one in among the living.                               |
-| settle-votes | sheriff (_**attribute**, not role_) | -                       | When there is a tie in the votes during the `day` - Choose which one will be executed.                               |
+| Action        | [Role](#player-roles)             | [Group](#player-groups) | [Attribute](#player-attributes)  |              When - Use and Limits                                                                                             |
+|:-------------:|:---------------------------------:|:-----------------------:|:--------------------------------:|--------------------------------------------------------------------------------------------------------------------------------|
+| eat           | 🐺<br/>werewolf                   | werewolves              | -                                | Each night - Kill a villager chosen by majority.                                                                               |
+| use-potion    | 🧙‍♀<br/>witch                     | villagers               | -                                | Each night - Protect or kill. One use available for each life and death potion.                                                |
+| look          | 🔮<br/>seer                       | villagers               | -                                | Each night - Reveal a role.                                                                                                    |
+| protect       | 🛡️<br/>guard                      | villagers               | -                                | Each night - Prevents from death for the night. Can't protect the same player twice in a row.                                  |
+| shoot         | 🔫<br/>hunter                     | villagers               | -                                | When hunter dies - Kill someone chosen by hunter, can't be himself.                                                            |
+| mark          | 🐦<br/>raven                      | villagers               | -                                | Each night - Mark someone. The next day, the target will have 2 votes against himself. The mark goes away after the judgement. |
+| elect-sheriff | -                                 | all                     | -                                | Before the first phase (`night`) - Anyone can be elected as a sheriff.                                                         |
+| vote          | -                                 | all                     | -                                | Each day - All alive players vote for someone to kill.                                                                         |
+| delegate      | -                                 | -                       | sheriff                          | When sheriff dies - The dying sheriff chooses the next one in among the living.                                                |
+| settle-votes  | -                                 | -                       | sheriff                          | When there is a tie in the votes during the `day` - Choose which one will be executed.                                         |
 
 ## <a id="player-attributes"></a>🎖️ Player Attributes
 
-| Attribute          |                Description                                |
-|:------------------:|------------------------------------|
-| sheriff              | Elected by all alive players. When dying, this attribute is transferred to someone chosen by the player.                                |
-| eaten              | Wolves decided to eat this player during the night. The player will die the next phase (`day`) if he has no protection.                               |
-| drank-life-potion  | The witch gave this potion during the night. It prevents from dying until the next phase (`day`).                                |
-| drank-death-potion | The witch gave this potion during the night. The player will die the next phase (`day`) if he has no protection.                               |
-| protected          | The protector protected this player during the night. He prevents from dying until the next phase (`day`).                               |
-| raven-marked       | The raven marked the player during the night. During the next phase (`day`), this player will have two votes against himself.                               |
+| Attribute          |                Description                                                                                                      |
+|:------------------:|---------------------------------------------------------------------------------------------------------------------------------|
+| sheriff            | Elected by all alive players. When dying, this attribute is transferred to someone chosen by the player.                        |
+| eaten              | Werewolves decided to eat this player during the night. The player will die the next phase (`day`) if he has no protection.     |
+| drank-life-potion  | The witch gave this potion during the night. It prevents from dying until the next phase (`day`).                               |
+| drank-death-potion | The witch gave this potion during the night. The player will die the next phase (`day`) if he has no protection.                |
+| protected          | The guard protected this player during the night. He prevents from dying until the next phase (`day`).                          |
+| raven-marked       | The raven marked the player during the night. During the next phase (`day`), this player will have two votes against himself.   |
 
 ## <a id="errors"></a>⚠️ Errors
 
@@ -68,7 +68,7 @@ Description for each case below:
 | 6    | BAD_TOKEN                         |    400    | You provided a bad or malformed token.                                          |
 | 7    | BAD_CREDENTIALS                   |    401    | The credentials provided don't match any in database.                           |
 | 8    | PLAYERS_NAME_NOT_UNIQUE           |    400    | Players provided don't have unique `name`.                                      |
-| 9    | NO_WOLF_IN_GAME_COMPOSITION       |    400    | There is no wolf in game composition.                                           |
+| 9    | NO_WEREWOLF_IN_GAME_COMPOSITION   |    400    | There is no werewolf in game composition.                                       |
 | 10   | NO_VILLAGER_IN_GAME_COMPOSITION   |    400    | There is no villager in game composition.                                       |
 | 11   | GAME_MASTER_HAS_ON_GOING_GAMES    |    400    | Game master has already on-going game(s).                                       |
 | 12   | GAME_DOESNT_BELONG_TO_USER        |    401    | This game doesn't belong to user.                                               |
@@ -88,12 +88,12 @@ Description for each case below:
 | 25   | BAD_TARGET_STRUCTURE              |    400    | One of play's target has a bad structure. (_See: [Classes - Play](#play-class)_ |
 | 26   | NOT_TARGETABLE                    |    400    | Player can't be a target.                                                       |
 | 27   | CANT_LOOK_AT_HERSELF              |    400    | Seer can't look at herself.                                                     |
-| 28   | CANT_EAT_EACH_OTHER               |    400    | Wolves's target can't be a player with group "wolves".                          |
-| 29   | BAD_LIFE_POTION_USE               |    400    | Witch can only use life potion on a target eaten by wolves.                     |
+| 28   | CANT_EAT_EACH_OTHER               |    400    | Werewolves's target can't be a player with group "werewolves".                  |
+| 29   | BAD_LIFE_POTION_USE               |    400    | Witch can only use life potion on a target eaten by werewolves.                 |
 | 30   | ONLY_ONE_LIFE_POTION              |    400    | Witch can only use one life potion per game.                                    |
 | 31   | ONLY_ONE_DEATH_POTION             |    400    | Witch can only use one death potion per game.                                   |
 | 32   | NON_UNIQUE_TARGETS                |    400    | Multiple targets are pointing the same player.                                  |
-| 33   | CANT_PROTECT_TWICE                |    400    | Protector can't protect the same player twice in a row.                         |
-| 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the sheriff.                      |
+| 33   | CANT_PROTECT_TWICE                |    400    | Guard can't protect the same player twice in a row.                             |
+| 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the sheriff.                    |
 | 35   | NO_MORE_PLAY_ALLOWED              |    400    | No more play are allowed because game's status is "done" or "canceled".         |
 | 36   | CANT_BE_RESET                     |    400    | Game can't be reset because game's status is "done" or "canceled".              |
