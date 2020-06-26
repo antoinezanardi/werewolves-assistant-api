@@ -1,6 +1,6 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
@@ -51,7 +51,7 @@
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "query-string": "^6.13.1",
+    "qs": "^6.9.4",
     "requirejs": "^2.3.6",
     "validator": "^13.1.1"
   }

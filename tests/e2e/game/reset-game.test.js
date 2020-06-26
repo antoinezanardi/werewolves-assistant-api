@@ -11,9 +11,9 @@ const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
 const players = [
-    { name: "Dag", role: "wolf" },
-    { name: "Dig", role: "wolf" },
-    { name: "Deg", role: "wolf" },
+    { name: "Dag", role: "werewolf" },
+    { name: "Dig", role: "werewolf" },
+    { name: "Deg", role: "werewolf" },
     { name: "Dog", role: "villager" },
 ];
 let token, game;
@@ -58,19 +58,19 @@ describe("D - Game Reset", () => {
         chai.request(app)
             .post(`/games/${mongoose.Types.ObjectId()}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor" })
+            .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });
-    it("👥 All elect the villager as the mayor (POST /games/:id/play)", done => {
+    it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[3]._id },
                 { from: players[1]._id, for: players[3]._id },
                 { from: players[2]._id, for: players[3]._id },
@@ -92,22 +92,22 @@ describe("D - Game Reset", () => {
                 expect(game.turn).to.equals(1);
                 expect(game.phase).to.equals("night");
                 expect(game.tick).to.equals(1);
-                expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-mayor" });
+                expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);
-                expect(game.players[0].role).to.deep.equals({ original: "wolf", current: "wolf", group: "wolves" });
-                expect(game.players[1].role).to.deep.equals({ original: "wolf", current: "wolf", group: "wolves" });
-                expect(game.players[2].role).to.deep.equals({ original: "wolf", current: "wolf", group: "wolves" });
+                expect(game.players[0].role).to.deep.equals({ original: "werewolf", current: "werewolf", group: "werewolves" });
+                expect(game.players[1].role).to.deep.equals({ original: "werewolf", current: "werewolf", group: "werewolves" });
+                expect(game.players[2].role).to.deep.equals({ original: "werewolf", current: "werewolf", group: "werewolves" });
                 expect(game.players[3].role).to.deep.equals({ original: "villager", current: "villager", group: "villagers" });
                 done();
             });
     });
-    it("👥 All elect the villager as the mayor (POST /games/:id/play)", done => {
+    it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-mayor", votes: [
+            .send({ source: "all", action: "elect-sheriff", votes: [
                 { from: players[0]._id, for: players[3]._id },
                 { from: players[1]._id, for: players[3]._id },
                 { from: players[2]._id, for: players[3]._id },
@@ -118,12 +118,12 @@ describe("D - Game Reset", () => {
                 done();
             });
     });
-    it("🐺 Wolves eat the villager (POST /games/:id/play)", done => {
+    it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
         const { players } = game;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "wolves", action: "eat", targets: [
+            .send({ source: "werewolves", action: "eat", targets: [
                 { player: players[3]._id },
             ] })
             .end((err, res) => {
@@ -132,9 +132,9 @@ describe("D - Game Reset", () => {
                 done();
             });
     });
-    it("🎲 Game is WON by 'wolves'!!", done => {
+    it("🎲 Game is WON by 'werewolves'!!", done => {
         expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("wolves");
+        expect(game.won.by).to.equals("werewolves");
         done();
     });
     it("🔐 Game can't be reset if status is 'done' (PATCH /games/:id/reset)", done => {
@@ -150,8 +150,8 @@ describe("D - Game Reset", () => {
 });
 
 // const players = [
-//     { name: "0Dag", role: "wolf" },
-//     { name: "1Dig", role: "wolf" },
-//     { name: "2Deg", role: "wolf" },
+//     { name: "0Dag", role: "werewolf" },
+//     { name: "1Dig", role: "werewolf" },
+//     { name: "2Deg", role: "werewolf" },
 //     { name: "3Dog", role: "villager" },
 // ];
