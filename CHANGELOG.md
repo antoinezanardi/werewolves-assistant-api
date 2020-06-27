@@ -1,5 +1,20 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.4.2 (2020-06-27)
+
+### 🐛 Bug fixes
+
+* Route `GET /games/repartion` fixed:
+    - Array of players with role and group.
+    - Random role picker respects the `maxInGame` value for each role.
+    
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.18.1`.
+
+---
+
 ## 0.4.1 (2020-06-25)
 
 ### ♻️ Refactoring

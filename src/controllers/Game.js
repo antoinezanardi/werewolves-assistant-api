@@ -7,7 +7,8 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const { isVillagerSideAlive, isWerewolfSideAlive } = require("../helpers/functions/Game");
 const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
-const { groupNames, roles } = require("../helpers/constants/Role");
+const { groupNames } = require("../helpers/constants/Role");
+const { getPlayerRoles } = require("../helpers/functions/Role");
 
 exports.find = async(search, projection, options = {}) => {
     let games = await Game.find(search, projection, options).populate(populate);
@@ -41,7 +42,7 @@ exports.checkRolesCompatibility = players => {
 
 exports.fillPlayersData = players => {
     for (const player of players) {
-        const role = roles.find(role => role.name === player.role);
+        const role = getPlayerRoles().find(role => role.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
     }
 };
@@ -104,6 +105,7 @@ exports.assignRoleToPlayers = (players, roles) => {
     for (let i = 0; i < players.length; i++) {
         const roleIdx = Math.floor(Math.random() * roles.length);
         players[i].role = roles[roleIdx].name;
+        players[i].group = roles[roleIdx].group;
         roles.splice(roleIdx, 1);
     }
     return players;
@@ -112,8 +114,8 @@ exports.assignRoleToPlayers = (players, roles) => {
 exports.getVillagerRoles = async(players, werewolfRoles) => {
     const villagerRoles = [];
     const villagerCount = players.length - werewolfRoles.length;
-    const availablePowerfulVillagerRoles = await roles.filter(role => role.group === "villagers" && role.name !== "villager");
-    const villagerRole = await roles.find(role => role.name === "villager");
+    const availablePowerfulVillagerRoles = await getPlayerRoles().filter(role => role.group === "villagers" && role.name !== "villager");
+    const villagerRole = await getPlayerRoles().find(role => role.name === "villager");
     for (let i = 0; i < villagerCount; i++) {
         if (!availablePowerfulVillagerRoles.length) {
             villagerRoles.push(JSON.parse(JSON.stringify(villagerRole)));
@@ -132,14 +134,14 @@ exports.pickRandomRole = roles => {
     if (!roles[idx].maxInGame) {
         roles.splice(idx, 1);
     }
-    delete role._id;
-    delete role.maxInGame;
     return role;
 };
 
 exports.getWerewolfCount = players => {
     let werewolfCount;
-    if (players.length < 12) {
+    if (players.length < 5) {
+        werewolfCount = 1;
+    } else if (players.length < 12) {
         werewolfCount = 2;
     } else if (players.length < 17) {
         werewolfCount = 3;
@@ -152,7 +154,7 @@ exports.getWerewolfCount = players => {
 exports.getWerewolfRoles = async players => {
     const werewolfRoles = [];
     const werewolfCount = this.getWerewolfCount(players);
-    const availableWerewolfRoles = roles.filter(role => role.group === "werewolves");
+    const availableWerewolfRoles = getPlayerRoles().filter(role => role.group === "werewolves");
     for (let i = 0; i < werewolfCount; i++) {
         werewolfRoles.push(this.pickRandomRole(availableWerewolfRoles));
     }
@@ -166,7 +168,7 @@ exports.getGameRepartition = async(req, res) => {
         const werewolfRoles = await this.getWerewolfRoles(query.players);
         const villagerRoles = await this.getVillagerRoles(query.players, werewolfRoles);
         this.assignRoleToPlayers(query.players, [...villagerRoles, ...werewolfRoles]);
-        res.status(200).json(query.players);
+        res.status(200).json({ players: query.players });
     } catch (e) {
         sendError(res, e);
     }
