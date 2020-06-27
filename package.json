@@ -1,6 +1,6 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "nodemon": "^2.0.4"
   },
   "dependencies": {
-    "@sentry/node": "^5.18.0",
+    "@sentry/node": "^5.18.1",
     "apidoc": "^0.23.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
