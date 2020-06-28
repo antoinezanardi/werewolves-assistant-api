@@ -1,5 +1,13 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.5.0 (2020-06-??)
+
+### 🚀 New features
+
+* Can get roles .
+
+---
+
 ## 0.4.2 (2020-06-27)
 
 ### 🐛 Bug fixes
