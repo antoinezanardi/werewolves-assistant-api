@@ -36,15 +36,15 @@ describe("A - Get roles", () => {
                 done();
             });
     });
-    it("🔐 Can't get roles without authentication (GET /games)", done => {
+    it("🔐 Can't get roles without authentication (GET /roles)", done => {
         chai.request(app)
-            .get(`/games`)
+            .get(`/roles`)
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 done();
             });
     });
-    it("🎲 Gets roles with JWT auth (GET /games)", done => {
+    it("🎲 Gets roles with JWT auth (GET /roles)", done => {
         chai.request(app)
             .get("/roles")
             .set({ "Authorization": `Bearer ${token}` })
@@ -57,7 +57,7 @@ describe("A - Get roles", () => {
                 done();
             });
     });
-    it("🎲 Gets roles with Basic auth (GET /games)", done => {
+    it("🎲 Gets roles with Basic auth (GET /roles)", done => {
         chai.request(app)
             .get("/roles")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)

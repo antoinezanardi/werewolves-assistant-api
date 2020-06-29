@@ -4,7 +4,15 @@
 
 ### 🚀 New features
 
-* Can get roles .
+* Can get available roles with route `GET /roles`.
+
+### 🛣️ Routes
+
+* Route `GET /roles` added for retrieving all available roles. Protected with both basic and JWT authentication.
+
+### 📦 Packages
+
+* `mocha` updated to version `8.0.1`.
 
 ---
 
