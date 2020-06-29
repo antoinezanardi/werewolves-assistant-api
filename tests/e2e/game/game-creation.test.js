@@ -220,7 +220,6 @@ describe("A - Game creation", () => {
         chai.request(app)
             .get("/games")
             .set({ "Authorization": `Bearer ${token}` })
-            .send({ players })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 const games = res.body;
