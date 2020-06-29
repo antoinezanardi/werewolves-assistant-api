@@ -1,5 +1,21 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.5.0 (2020-06-29)
+
+### 🚀 New features
+
+* Can get available roles with route `GET /roles`.
+
+### 🛣️ Routes
+
+* Route `GET /roles` added for retrieving all available roles. Protected with both basic and JWT authentication.
+
+### 📦 Packages
+
+* `mocha` updated to version `8.0.1`.
+
+---
+
 ## 0.4.2 (2020-06-27)
 
 ### 🐛 Bug fixes

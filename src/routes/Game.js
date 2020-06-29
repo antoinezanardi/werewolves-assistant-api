@@ -17,9 +17,9 @@ module.exports = app => {
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {Number} tick=1 Starting at `1`, tick increments each time a play is made.
      * @apiSuccess {Object[]} waiting Queue of upcoming actions.
-     * @apiSuccess {String} waiting.for Can be either a group, a role or the sheriff. (_See: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
-     * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (_See: [Codes - Player Actions](#player-actions)_)
-     * @apiSuccess {String} status Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)
+     * @apiSuccess {String} waiting.for Can be either a group, a role or the sheriff. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
+     * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (Possibilities: [Codes - Player Actions](#player-actions)_)
+     * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
      * @apiSuccess {Object} [won] Winners of the game when status is `done`.
      * @apiSuccess {String={"werewolves", "villagers"}} won.by Can be either a group or a role. (_Possibilities: `werewolves` or `villagers`_)
@@ -33,7 +33,7 @@ module.exports = app => {
      * @apiName GetGames
      * @apiGroup Games 🎲
      * @apiDescription Get games filtered by query string parameters if specified.
-     * - `JWT auth`: Only games created by the user attached to t   oken can be retrieved from this route.
+     * - `JWT auth`: Only games created by the user attached to token can be retrieved from this route.
      * - `Basic auth`: All games can be retrieved.
      * @apiParam (Query String Parameters) {String} [status] Filter by game's status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_
      * @apiPermission JWT

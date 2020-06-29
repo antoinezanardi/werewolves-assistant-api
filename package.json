@@ -1,6 +1,6 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "update_version": "./scripts/update-version.sh",
     "migrate": "npx migrate-mongo up -f ./config/migrate-mongo/index.js",
     "migrate_down": "npx migrate-mongo down -f ./config/migrate-mongo/index.js",
-    "test": "export NODE_ENV=test && npx mocha ./tests/e2e/index.js --exit"
+    "test": "export NODE_ENV=test && npx mocha ./tests/units/index.js ./tests/e2e/index.js --exit"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "eslint": "^7.3.1",
-    "mocha": "^7.2.0",
+    "mocha": "^8.0.1",
     "nodemon": "^2.0.4"
   },
   "dependencies": {
