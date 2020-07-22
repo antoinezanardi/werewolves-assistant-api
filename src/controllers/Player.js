@@ -1,6 +1,6 @@
 const GameHistory = require("./GameHistory");
 const { canBeEaten, hasAttribute } = require("../helpers/functions/Player");
-const { playerAttributes, murderedPossibilities } = require("../helpers/constants/Player");
+const { getPlayerAttributes, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -98,7 +98,7 @@ exports.killPlayer = (playerId, { action }, game) => {
     const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
     if (player && (action === "eat" && canBeEaten(player) || action !== "eat" && !hasAttribute(player, "protected"))) {
         player.isAlive = false;
-        const murdered = murderedPossibilities.find(({ of }) => of === action);
+        const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
         if (murdered) {
             player.murdered = murdered;
             if (player.role.current === "hunter") {
@@ -113,7 +113,7 @@ exports.killPlayer = (playerId, { action }, game) => {
 
 exports.addPlayerAttribute = (playerId, attribute, game, forcedSource) => {
     const player = game.players.find(player => player._id.toString() === playerId.toString());
-    const playerAttribute = playerAttributes.find(playerAttribute => playerAttribute.attribute === attribute);
+    const playerAttribute = getPlayerAttributes().find(playerAttribute => playerAttribute.attribute === attribute);
     if (player && playerAttribute) {
         if (forcedSource) {
             playerAttribute.source = forcedSource;
@@ -153,7 +153,9 @@ exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
     if (action === "vote") {
         const ravenMarkedPlayers = this.getPlayersWithAttribute("raven-marked", game);
         if (ravenMarkedPlayers.length) {
-            this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers[0]._id, game, 2);
+            if (ravenMarkedPlayers[0].isAlive) {
+                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers[0]._id, game, 2);
+            }
             this.removePlayerAttribute(ravenMarkedPlayers[0]._id, "raven-marked", game);
         }
     }
