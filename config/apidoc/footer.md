@@ -46,6 +46,7 @@
 | Attribute          |                Description                                                                                                      |
 |:------------------:|---------------------------------------------------------------------------------------------------------------------------------|
 | sheriff            | Elected by all alive players. When dying, this attribute is transferred to someone chosen by the player.                        |
+| seen               | The seer looked at this player during the night. The player's role is revealed to the seer.                                     |
 | eaten              | Werewolves decided to eat this player during the night. The player will die the next phase (`day`) if he has no protection.     |
 | drank-life-potion  | The witch gave this potion during the night. It prevents from dying until the next phase (`day`).                               |
 | drank-death-potion | The witch gave this potion during the night. The player will die the next phase (`day`) if he has no protection.                |
