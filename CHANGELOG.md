@@ -1,5 +1,29 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.5.1 (2020-07-22)
+
+### 🐛 Bug fixes
+
+* Player can't be nominated during player votes if he is dead and raven marked.
+
+### 📚 Documentation
+
+* `seen` attribute documented️.
+
+### ♻️ Refactoring
+
+* No more constants are directly imported in `route` and `controller` files to prevent data change in those files. A getter for each constant is implemented.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.20.0`.
+* `apidoc` updated to version `0.24.0`.
+* `eslint` updated to version `7.5.0`.
+* `migrate-mongo` updated to version `8.1.1`.
+* `mongoose` updated to version `5.9.25`.
+
+---
+
 ## 0.5.0 (2020-06-29)
 
 ### 🚀 New features

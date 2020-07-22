@@ -6,4 +6,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./tiny-game.test");
     require("./reset-game.test");
     require("./game-repartition.test");
+    require("./raven-marked-dead-player-game.test");
 });

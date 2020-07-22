@@ -2,9 +2,9 @@
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
-const { roleNames } = require("../helpers/constants/Role");
-const { patchableGameStatuses, waitingForPossibilities, gameStatuses } = require("../helpers/constants/Game");
-const { playerActions } = require("../helpers/constants/Player");
+const { getPlayerRoles } = require("../helpers/functions/Role");
+const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
+const { getPlayerActions } = require("../helpers/functions/Player");
 
 module.exports = app => {
 
@@ -43,7 +43,7 @@ module.exports = app => {
     app.get("/games", passport.authenticate(["basic", "jwt"], { session: false }), [
         query("status")
             .optional()
-            .isIn(gameStatuses).withMessage(`Must be equal to one of the following values: ${gameStatuses}`),
+            .isIn(getGameStatuses()).withMessage(`Must be equal to one of the following values: ${getGameStatuses()}`),
     ], Game.getGames);
 
     /**
@@ -108,7 +108,7 @@ module.exports = app => {
             .notEmpty().withMessage("Can't be empty"),
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
-            .isIn(roleNames).withMessage(`Must be equal to one of the following values: ${roleNames}`),
+            .isIn(getPlayerRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getPlayerRoles().map(({ name }) => name)}`),
     ], Game.postGame);
 
     /**
@@ -139,7 +139,7 @@ module.exports = app => {
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("status")
-            .isIn(patchableGameStatuses).withMessage(`Must be equal to one of the following values: ${patchableGameStatuses}`)
+            .isIn(getPatchableGameStatuses()).withMessage(`Must be equal to one of the following values: ${getPatchableGameStatuses()}`)
             .optional(),
     ], Game.patchGame);
 
@@ -166,9 +166,9 @@ module.exports = app => {
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("source")
-            .isIn(waitingForPossibilities).withMessage(`Must be equal to one of the following values: ${waitingForPossibilities}`),
+            .isIn(getWaitingForPossibilities()).withMessage(`Must be equal to one of the following values: ${getWaitingForPossibilities()}`),
         body("action")
-            .isIn(playerActions).withMessage(`Must be equal to one of the following values: ${playerActions}`),
+            .isIn(getPlayerActions()).withMessage(`Must be equal to one of the following values: ${getPlayerActions()}`),
         body("targets")
             .optional()
             .isArray().withMessage("Must be an array"),
