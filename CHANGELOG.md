@@ -1,5 +1,22 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.5.2 (2020-08-17)
+
+### 🐛 Bug fixes
+
+* [#24](https://github.com/antoinezanardi/werewolves-assistant-api/issues/24) - If a player is killed twice (death potion + werewolves), it doesn't trigger twice death effect (delegating for example).
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.21.1`.
+* `apidoc` updated to version `0.25.0`.
+* `eslint` updated to version `7.7.0`.
+* `express-validator` updated to version `6.6.1`.
+* `mocha` updated to version `8.1.1`.
+* `mongoose` updated to version `5.10.0`.
+
+---
+
 ## 0.5.1 (2020-07-22)
 
 ### 🐛 Bug fixes

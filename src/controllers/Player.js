@@ -95,7 +95,7 @@ exports.checkAndFillTargets = async(targets, game, options) => {
 };
 
 exports.killPlayer = (playerId, { action }, game) => {
-    const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
+    const player = game.players.find(({ _id, isAlive }) => _id.toString() === playerId.toString() && isAlive);
     if (player && (action === "eat" && canBeEaten(player) || action !== "eat" && !hasAttribute(player, "protected"))) {
         player.isAlive = false;
         const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
