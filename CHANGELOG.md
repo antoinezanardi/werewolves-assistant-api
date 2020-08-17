@@ -1,5 +1,13 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.5.3 (2020-08-17)
+
+### 🐛 Bug fixes
+
+* Correct order for actions when game's phase is `day`.
+
+---
+
 ## 0.5.2 (2020-08-17)
 
 ### 🐛 Bug fixes
