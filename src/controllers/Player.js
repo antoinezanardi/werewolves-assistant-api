@@ -94,6 +94,15 @@ exports.checkAndFillTargets = async(targets, game, options) => {
     await this.checkAllTargetsDependingOnAction(targets, game, options.action);
 };
 
+exports.insertActionBeforeAllVote = (game, waiting) => {
+    const waitingForAllToVoteIdx = game.waiting.findIndex(({ to }) => to === "vote");
+    if (waitingForAllToVoteIdx !== -1 && waitingForAllToVoteIdx !== 0) {
+        game.waiting.splice(waitingForAllToVoteIdx, 0, waiting);
+    } else {
+        game.waiting.push(waiting);
+    }
+};
+
 exports.killPlayer = (playerId, { action }, game) => {
     const player = game.players.find(({ _id, isAlive }) => _id.toString() === playerId.toString() && isAlive);
     if (player && (action === "eat" && canBeEaten(player) || action !== "eat" && !hasAttribute(player, "protected"))) {
@@ -102,10 +111,10 @@ exports.killPlayer = (playerId, { action }, game) => {
         if (murdered) {
             player.murdered = murdered;
             if (player.role.current === "hunter") {
-                game.waiting.push({ for: "hunter", to: "shoot" });
+                this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
             }
             if (hasAttribute(player, "sheriff")) {
-                game.waiting.push({ for: "sheriff", to: "delegate" });
+                this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
             }
         }
     }
