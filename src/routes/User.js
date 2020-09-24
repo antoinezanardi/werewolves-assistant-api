@@ -4,7 +4,6 @@ const { body, param } = require("express-validator");
 const User = require("../controllers/User");
 
 module.exports = app => {
-
     /**
      * @apiDefine JWT Bearer Authorization with JSON Web Token.
      */

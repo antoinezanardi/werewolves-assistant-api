@@ -26,6 +26,11 @@ exports.findOne = async(search, projection, options = {}) => {
     return game;
 };
 
+exports.fillFirstWaiting = data => {
+    const firstWaiting = { for: "all", to: "elect-sheriff" };
+    data.waiting = [firstWaiting];
+};
+
 exports.checkUserCurrentGames = async userId => {
     if (await Game.countDocuments({ gameMaster: userId, status: "playing" })) {
         throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already game with status `playing`.");
@@ -42,7 +47,7 @@ exports.checkRolesCompatibility = players => {
 
 exports.fillPlayersData = players => {
     for (const player of players) {
-        const role = getPlayerRoles().find(role => role.name === player.role);
+        const role = getPlayerRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
     }
 };
@@ -59,7 +64,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
-    data.waiting = [{ for: "all", to: "elect-sheriff" }];
+    this.fillFirstWaiting(data);
 };
 
 exports.create = async(data, options = {}) => {
@@ -151,7 +156,7 @@ exports.getWerewolfCount = players => {
     return werewolfCount;
 };
 
-exports.getWerewolfRoles = async players => {
+exports.getWerewolfRoles = players => {
     const werewolfRoles = [];
     const werewolfCount = this.getWerewolfCount(players);
     const availableWerewolfRoles = getPlayerRoles().filter(role => role.group === "werewolves");
@@ -194,7 +199,7 @@ exports.postGame = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         const game = await this.create({
-            gameMaster: mongoose.Types.ObjectId(req.user._id),
+            gameMaster: new mongoose.Types.ObjectId(req.user._id),
             players: body.players,
         });
         res.status(200).json(game);
@@ -372,7 +377,7 @@ exports.play = async play => {
     }
     game.tick++;
     this.checkGameWinners(game);
-    return await this.findOneAndUpdate({ _id: play.gameId }, game);
+    return this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
 exports.postPlay = async(req, res) => {

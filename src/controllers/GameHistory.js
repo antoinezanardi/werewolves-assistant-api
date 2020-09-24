@@ -4,22 +4,37 @@ const GameHistory = require("../db/models/GameHistory");
 const { generateError } = require("../helpers/functions/Error");
 const { turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 
-exports.find = async(search, projection, options = {}) => await GameHistory.find(search, projection, options);
+exports.find = (search, projection, options = {}) => GameHistory.find(search, projection, options);
 
-exports.findOne = async(search, projection, options = {}) => await GameHistory.findOne(search, projection, options);
+exports.findOne = (search, projection, options = {}) => GameHistory.findOne(search, projection, options);
+
+exports.fillPlayerTargets = (data, players) => {
+    for (const target of data.play.targets) {
+        if (typeof target.player === "string" && isMongoId(target.player)) {
+            target.player = players.find(({ _id }) => _id.toString() === target.player);
+        }
+    }
+};
+
+exports.fillPlayerVotes = (data, players) => {
+    data.play.votes = data.play.votes.map(vote => {
+        if (typeof vote.from === "string" && isMongoId(vote.from)) {
+            vote.from = players.find(({ _id }) => _id.toString() === vote.from);
+        }
+        if (typeof vote.for === "string" && isMongoId(vote.from)) {
+            vote.for = players.find(({ _id }) => _id.toString() === vote.for);
+        }
+        return vote;
+    });
+};
 
 exports.fillPlayers = (data, players) => {
     if (data.play) {
         if (data.play.votes) {
-            for (const vote of data.play.votes) {
-                vote.from = typeof vote.from === "string" && isMongoId(vote.from) ? players.find(({ _id }) => _id.toString() === vote.from) : vote.from;
-                vote.for = typeof vote.for === "string" && isMongoId(vote.from) ? players.find(({ _id }) => _id.toString() === vote.for) : vote.for;
-            }
+            this.fillPlayerVotes(data, players);
         }
         if (data.play.targets) {
-            for (const target of data.play.targets) {
-                target.player = typeof target.player === "string" && isMongoId(target.player) ? players.find(({ _id }) => _id.toString() === target.player) : target.player;
-            }
+            this.fillPlayerTargets(data, players);
         }
     }
 };
@@ -51,13 +66,13 @@ exports.create = async(data, options = {}) => {
 
 exports.deleteMany = search => GameHistory.deleteMany(search);
 
-exports.isLifePotionUsed = async gameId => await this.findOne({ gameId, "play.targets.potion.life": true });
+exports.isLifePotionUsed = gameId => this.findOne({ gameId, "play.targets.potion.life": true });
 
-exports.isDeathPotionUsed = async gameId => await this.findOne({ gameId, "play.targets.potion.death": true });
+exports.isDeathPotionUsed = gameId => this.findOne({ gameId, "play.targets.potion.death": true });
 
-exports.getLastNightPlay = async gameId => {
+exports.getLastNightPlay = gameId => {
     const nightPlayActions = [...turnPreNightActionsOrder, ...turnNightActionsOrder].map(({ action }) => action);
-    return await this.findOne({ gameId, "play.action": { $in: nightPlayActions } }, null, { sort: { createdAt: -1 } });
+    return this.findOne({ gameId, "play.action": { $in: nightPlayActions } }, null, { sort: { createdAt: -1 } });
 };
 
 exports.getLastProtectedPlayer = async gameId => {
@@ -65,4 +80,4 @@ exports.getLastProtectedPlayer = async gameId => {
     return lastGuardPlay ? lastGuardPlay.play.targets[0].player : null;
 };
 
-exports.getLastVotePlay = async gameId => await this.findOne({ gameId, "play.action": "vote" }, null, { sort: { createdAt: -1 } });
+exports.getLastVotePlay = gameId => this.findOne({ gameId, "play.action": "vote" }, null, { sort: { createdAt: -1 } });

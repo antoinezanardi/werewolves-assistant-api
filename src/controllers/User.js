@@ -18,9 +18,9 @@ exports.create = async(data, options = {}) => {
     return toJSON ? user.toObject() : user;
 };
 
-exports.find = async(search, projection, options = {}) => await User.find(search, projection, options);
+exports.find = (search, projection, options = {}) => User.find(search, projection, options);
 
-exports.findOne = async(search, projection, options = {}) => await User.findOne(search, projection, options);
+exports.findOne = (search, projection, options = {}) => User.findOne(search, projection, options);
 
 exports.findOneAndUpdate = async(search, data, options = {}) => {
     const { toJSON } = options;
@@ -35,19 +35,17 @@ exports.findOneAndUpdate = async(search, data, options = {}) => {
 };
 
 exports.generateSaltAndHash = body => new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-            return reject(err);
-        } else {
-            bcrypt.hash(body.password, salt, (err, hash) => {
-                if (err) {
-                    return reject(err);
-                } else {
-                    body.password = hash;
-                    return resolve(null);
-                }
-            });
+    bcrypt.genSalt(10, (genSaltErr, salt) => {
+        if (genSaltErr) {
+            return reject(genSaltErr);
         }
+        bcrypt.hash(body.password, salt, (hashErr, hash) => {
+            if (hashErr) {
+                return reject(hashErr);
+            }
+            body.password = hash;
+            return resolve(null);
+        });
     });
 });
 
@@ -90,9 +88,9 @@ exports.login = (req, res) => {
             if (err || !user) {
                 return res.status(401).json(generateError("BAD_CREDENTIALS", info));
             }
-            req.login(user, { session: false }, err => {
-                if (err) {
-                    res.status(500).send(err);
+            req.login(user, { session: false }, loginErr => {
+                if (loginErr) {
+                    res.status(500).send(loginErr);
                 }
                 const token = sign({ userId: user._id, exp: Math.floor(Date.now() / 1000) + 3600 * 24 }, Config.app.JWTSecret);
                 return res.status(200).json({ token });

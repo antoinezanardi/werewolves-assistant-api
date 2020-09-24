@@ -2,6 +2,10 @@
 
 ## 0.6.0 (2020-10-??)
 
+### 🌟 Enhancements
+
+* [#30](https://github.com/antoinezanardi/werewolves-assistant-web/issues/30) - `.eslintrc.js` file contains now all existing rules. 
+
 ### 📦 Packages
 
 * `@sentry/node` updated to version `5.24.2`.

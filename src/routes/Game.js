@@ -7,7 +7,6 @@ const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } 
 const { getPlayerActions } = require("../helpers/functions/Player");
 
 module.exports = app => {
-
     /**
      * @apiDefine GameResponse
      * @apiSuccess {MongoId} _id Game's ID.
@@ -63,7 +62,7 @@ module.exports = app => {
     app.get("/games/repartition", passport.authenticate(["basic", "jwt"], { session: false }), [
         query("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
+            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
             .withMessage("Must contain between 4 and 20 players"),
         query("players.*.name")
             .isString().withMessage("Must be a valid string")
@@ -100,7 +99,7 @@ module.exports = app => {
     app.post("/games", passport.authenticate("jwt", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
+            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
             .withMessage("Must contain between 4 and 20 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")

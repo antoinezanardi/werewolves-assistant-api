@@ -2,9 +2,11 @@ const { playerAttributes, murderedPossibilities, playerActions } = require("../c
 
 exports.canBeEaten = player => !this.hasAttribute(player, "protected") && !this.hasAttribute(player, "drank-life-potion");
 
-exports.hasAttribute = (player, attributeName) => player.attributes && player.attributes.findIndex(({ attribute }) => attribute === attributeName) !== -1;
+exports.hasAttribute = ({ attributes }, attributeName) => attributes && attributes.findIndex(({ attribute }) => attribute === attributeName) !== -1;
 
 exports.getPlayerAttributes = () => JSON.parse(JSON.stringify(playerAttributes));
+
+exports.getPlayerAttribute = attribute => this.getPlayerAttributes().find(playerAttribute => playerAttribute.attribute === attribute);
 
 exports.getPlayerActions = () => JSON.parse(JSON.stringify(playerActions));
 
