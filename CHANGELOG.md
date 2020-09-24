@@ -1,5 +1,19 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.6.0 (2020-10-??)
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.24.2`.
+* `apidoc` updated to version `5.24.2`.
+* `eslint` updated to version `7.9.0`.
+* `migrate-mongo` updated to version `8.1.2`.
+* `mocha` updated to version `8.1.3`.
+* `mongoose` updated to version `5.10.6`.
+* `validator` updated to version `13.1.17`.
+
+---
+
 ## 0.5.3 (2020-08-17)
 
 ### 🐛 Bug fixes
