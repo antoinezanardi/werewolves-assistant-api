@@ -10,9 +10,7 @@ const Config = {
             password: process.env.BASIC_PASSWORD || "secret",
         },
     },
-    db: {
-        name: process.env.DB_NAME || "werewolves-assistant",
-    },
+    db: { name: process.env.DB_NAME || "werewolves-assistant" },
     sentry: {
         enabled: process.env.SENTRY_ENABLED === "true",
         projectID: process.env.SENTRY_PROJECT_ID,
