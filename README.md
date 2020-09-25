@@ -48,12 +48,12 @@ Current release on **main API** is [![GitHub release](https://img.shields.io/git
 ## ☑️ Code analysis and consistency
 In order to keep the code clean, consistent and free of bad JS practises, **[ESLint](https://eslint.org/)** is installed with nearly **220 rules activated** !
 
-Complete list of all enabled rules is available in the **[.eslintrc.js file](https://github.com/antoinezanardi/werewolves-assistant-web/blob/master/.eslintrc.js)**.
+Complete list of all enabled rules is available in the **[.eslintrc.js file](https://github.com/antoinezanardi/werewolves-assistant-api/blob/master/.eslintrc.js)**.
 
 ## 🔨 Installation
 1. Install dependencies with `npm install` (add `--production` to omit dev dependencies).
 2. Copy `.env.example` and paste it as `.env`.
-3. Replace environment values in the fresh new `.env` file if necessary (When **⚠️Required** is specified):
+3. Replace environment values in the fresh new `.env` file if necessary (When **⚠️️ Required** is specified):
     * **DB_NAME**: Name of the MongoDB database. 
       - _**Not required - Default value**: `werewolves-assistant`_
     * **BASIC_USERNAME**: Username for basic authentication. 
