@@ -319,4 +319,18 @@ module.exports = {
         sourceType: "module",
         ecmaVersion: 2020,
     },
+    overrides: [
+        {
+            files: ["*.test.js", "*.spec.js"],
+            rules: {
+                "one-var": "off",
+                "max-lines-per-function": "off",
+                "max-nested-callbacks": "off",
+                "no-unused-expressions": "off",
+            },
+        }, {
+            files: ["src/routes/*.js"],
+            rules: { "max-lines-per-function": "off" },
+        },
+    ],
 };

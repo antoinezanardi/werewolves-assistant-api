@@ -11,7 +11,6 @@ const { expect } = chai;
 const credentials = { email: "test@test.fr", password: "secret" };
 let token;
 
-// eslint-disable-next-line max-lines-per-function
 describe("A - Get roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -47,7 +46,7 @@ describe("A - Get roles", () => {
     it("🎲 Gets roles with JWT auth (GET /roles)", done => {
         chai.request(app)
             .get("/roles")
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(Array.isArray(res.body)).to.equals(true);

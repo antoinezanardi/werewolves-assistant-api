@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 const passport = require("passport");
 const { body, param } = require("express-validator");
 const User = require("../controllers/User");
@@ -14,8 +13,8 @@ module.exports = app => {
 
     /**
      * @apiDefine UserRequestBody
-     * @apiParam (Request Body Parameters) {String} email User's email.
-     * @apiParam (Request Body Parameters) {String{>=5}} password User's password.
+     * @apiParam (Request Body Parameters) {String{>=30}} email User's email.
+     * @apiParam (Request Body Parameters) {String{>= 5 && <= 50}} password User's password.
      */
 
     /**
@@ -64,10 +63,11 @@ module.exports = app => {
     app.post("/users", [
         body("email")
             .isEmail().withMessage("Must be a valid email")
-            .trim(),
+            .trim()
+            .isLength({ max: 30 }).withMessage("Can't exceed 30 characters long"),
         body("password")
             .isString().withMessage("Must be a string")
-            .isLength({ min: 5 }).withMessage("Must be at least 5 characters long"),
+            .isLength({ min: 5, max: 50 }).withMessage("Must be at least 5 characters long"),
     ], User.postUser);
 
     /**
@@ -81,9 +81,10 @@ module.exports = app => {
     app.post("/users/login", [
         body("email")
             .isEmail().withMessage("Must be a valid email")
-            .trim(),
+            .trim()
+            .isLength({ max: 30 }).withMessage("Can't exceed 30 characters long"),
         body("password")
             .isString().withMessage("Must be a string")
-            .isLength({ min: 5 }).withMessage("Must be at least 5 characters long"),
+            .isLength({ min: 5, max: 50 }).withMessage("Must be at least 5 characters long"),
     ], User.login);
 };

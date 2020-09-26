@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "npx nodemon --watch .env --watch . --ignore 'public/apidoc/' app.js",
-    "lint": "npx eslint src/ --ext .js --fix",
+    "lint": "npx eslint src/ tests/ --ext .js --fix",
     "doc": "npx apidoc -c ./config/apidoc -i src/routes/ -o public/apidoc/",
     "start_sandbox": "forever start ./config/forever/sandbox.json",
     "stop_sandbox": "forever stop werewolves-assistant-api-sandbox",
@@ -53,6 +53,7 @@
     "passport-local": "^1.0.0",
     "qs": "^6.9.4",
     "requirejs": "^2.3.6",
-    "validator": "^13.1.17"
+    "validator": "^13.1.17",
+    "xss": "^1.0.8"
   }
 }

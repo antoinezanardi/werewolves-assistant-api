@@ -9,6 +9,7 @@ const { isVillagerSideAlive, isWerewolfSideAlive } = require("../helpers/functio
 const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
+const { filterOutHTMLTags } = require("../helpers/functions/String");
 
 exports.find = async(search, projection, options = {}) => {
     let games = await Game.find(search, projection, options).populate(populate);
@@ -47,6 +48,7 @@ exports.checkRolesCompatibility = players => {
 
 exports.fillPlayersData = players => {
     for (const player of players) {
+        player.name = filterOutHTMLTags(player.name);
         const role = getPlayerRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
     }

@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
-const players = [
+let players = [
     { name: "Dig", role: "witch" },
     { name: "Doug", role: "seer" },
     { name: "Dag", role: "guard" },
@@ -21,7 +21,6 @@ const players = [
 ];
 let token, game;
 
-// eslint-disable-next-line max-lines-per-function
 describe("B - Full game of 7 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -49,7 +48,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎲 Creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ players })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -59,8 +58,8 @@ describe("B - Full game of 7 players with all roles", () => {
     });
     it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
         chai.request(app)
-            .post(`/games/${mongoose.Types.ObjectId()}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .post(`/games/${new mongoose.Types.ObjectId()}/play`)
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
@@ -79,7 +78,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't elect sheriff if play's source is not 'all' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -90,7 +89,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't elect sheriff if play's action is not 'elect-sheriff' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "look" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -101,7 +100,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't elect sheriff if votes are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -112,7 +111,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't elect sheriff if votes are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff", votes: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -121,14 +120,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if one vote has same target and source (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[1]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("SAME_VOTE_SOURCE_AND_TARGET");
@@ -136,14 +137,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if one vote has an unknown source (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: mongoose.Types.ObjectId(), for: players[1]._id },
-                { from: players[0]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: new mongoose.Types.ObjectId(), for: players[1]._id },
+                    { from: players[0]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_VOTE");
@@ -151,14 +154,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if one vote has an unknown target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: mongoose.Types.ObjectId() },
-                { from: players[1]._id, for: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: new mongoose.Types.ObjectId() },
+                    { from: players[1]._id, for: players[0]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
@@ -166,14 +171,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if one player votes twice (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[0]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[0]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_VOTE_MULTIPLE_TIMES");
@@ -181,14 +188,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if there is a tie in votes (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[1]._id, for: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[0]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TIE_IN_VOTES");
@@ -196,15 +205,17 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All elect the witch as the sheriff (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[1]._id, for: players[0]._id },
-                { from: players[2]._id, for: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[0]._id },
+                    { from: players[2]._id, for: players[0]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -224,7 +235,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔮 Seer can't look if play's source is not 'seer' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "look" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -235,7 +246,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔮 Seer can't look if play's action is not 'look' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -246,7 +257,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔮 Seer can't look if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -257,7 +268,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔮 Seer can't look if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -266,14 +277,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔮 Seer can't look at multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "look", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "seer", action: "look", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -283,10 +296,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔮 Seer can't look at unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "look", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -294,13 +305,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔮 Seer can't look at herself (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "look", targets: [
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [{ player: players[1]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_LOOK_AT_HERSELF");
@@ -308,13 +317,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔮 Seer looks at the witch (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "look", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -331,7 +338,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐺 Werewolves can't eat if play's source is not 'werewolves' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -342,7 +349,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐺 Werewolves can't eat if play's action is not 'eat' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "shoot" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -353,7 +360,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐺 Werewolves can't eat if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -364,7 +371,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐺 Werewolves can't eat if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -373,14 +380,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🐺 Werewolves can't eat multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "werewolves", action: "eat", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -390,10 +399,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐺 Werewolves can't eat an unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -401,13 +408,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🐺 Werewolves can't eat another werewolf (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[5]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_EAT_EACH_OTHER");
@@ -415,13 +420,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[2]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -438,7 +441,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🧹 Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "use-potion" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -449,7 +452,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🧹 Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -458,13 +461,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch can't use potion if one target doesn't have `potion` field (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGET_STRUCTURE");
@@ -472,13 +473,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch can't use potion if one target have both `potion.life` and `potion.death` fields set to `true` (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[0]._id, potion: { life: true, death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, potion: { life: true, death: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGET_STRUCTURE");
@@ -488,10 +487,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🧹 Witch can't use potion on unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: mongoose.Types.ObjectId(), potion: { life: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: new mongoose.Types.ObjectId(), potion: { life: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -499,13 +496,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch can't use life potion on player not eaten by werewolves (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[0]._id, potion: { life: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, potion: { life: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_LIFE_POTION_USE");
@@ -513,14 +508,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch can't use life potion and death potion on same target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[2]._id, potion: { life: true } },
-                { player: players[2]._id, potion: { death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "witch", action: "use-potion", targets: [
+                    { player: players[2]._id, potion: { life: true } },
+                    { player: players[2]._id, potion: { death: true } },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NON_UNIQUE_TARGETS");
@@ -528,14 +525,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch can't use death potion twice (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[0]._id, potion: { death: true } },
-                { player: players[1]._id, potion: { death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "witch", action: "use-potion", targets: [
+                    { player: players[0]._id, potion: { death: true } },
+                    { player: players[1]._id, potion: { death: true } },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("ONLY_ONE_DEATH_POTION");
@@ -543,13 +542,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch use life potion on guard (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[2]._id, potion: { life: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, potion: { life: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -567,7 +564,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🛡 Guard can't protect if play's source is not 'guard' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "protect" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -578,7 +575,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🛡 Guard can't protect if play's action is not 'protect' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "vote" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -589,7 +586,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🛡 Guard can't protect if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -600,7 +597,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🛡 Guard can't protect if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -609,14 +606,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🛡 Guard can't protect multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "guard", action: "protect", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -626,10 +625,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🛡 Guard can't protect an unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -637,13 +634,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🛡 Guard protects the werewolf (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [
-                { player: players[5]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -660,7 +655,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐦 Raven can't mark if play's source is not 'raven' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager", action: "mark" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -671,7 +666,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐦 Raven can't mark if play's action is not 'mark' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "use-potion" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -680,14 +675,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🐦 Raven can't mark multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "raven", action: "mark", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "raven", action: "mark", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -697,10 +694,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐦 Raven can't mark an unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "raven", action: "mark", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "raven", action: "mark", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -708,13 +703,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🐦 Raven marks the villager (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "raven", action: "mark", targets: [
-                { player: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "raven", action: "mark", targets: [{ player: players[6]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -740,7 +733,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "vote" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -751,7 +744,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't vote if play's action is not 'vote' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -762,7 +755,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't vote if votes are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -773,7 +766,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("👪 All can't vote if votes are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -782,14 +775,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't vote if one vote has same target and source (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[1]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("SAME_VOTE_SOURCE_AND_TARGET");
@@ -797,14 +792,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't vote if one vote has an unknown source (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: mongoose.Types.ObjectId(), for: players[1]._id },
-                { from: players[0]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: new mongoose.Types.ObjectId(), for: players[1]._id },
+                    { from: players[0]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_VOTE");
@@ -812,14 +809,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't vote if one vote has an unknown target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[0]._id, for: mongoose.Types.ObjectId() },
-                { from: players[1]._id, for: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: new mongoose.Types.ObjectId() },
+                    { from: players[1]._id, for: players[0]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
@@ -827,14 +826,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't vote if one player votes twice (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[0]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[0]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_VOTE_MULTIPLE_TIMES");
@@ -842,18 +843,20 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🐦]  (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[1]._id, for: players[5]._id },
-                { from: players[2]._id, for: players[5]._id },
-                { from: players[3]._id, for: players[1]._id },
-                { from: players[4]._id, for: players[5]._id },
-                { from: players[5]._id, for: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[5]._id },
+                    { from: players[2]._id, for: players[5]._id },
+                    { from: players[3]._id, for: players[1]._id },
+                    { from: players[4]._id, for: players[5]._id },
+                    { from: players[5]._id, for: players[6]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -871,7 +874,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't settle votes if play's source is not 'sheriff' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager", action: "settle-votes" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -882,7 +885,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't settle votes if play's action is not 'settle-votes' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -893,7 +896,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't settle votes if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -904,7 +907,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't settle votes if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -913,14 +916,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't settle votes with multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "settle-votes", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "sheriff", action: "settle-votes", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -930,10 +935,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't settle votes with unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "settle-votes", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "settle-votes", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -941,13 +944,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't settle votes with player who was not in previous tie in votes (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "settle-votes", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_BE_CHOSEN_AS_TIEBREAKER");
@@ -955,13 +956,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🎖 Sheriff settles votes by choosing villager (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "settle-votes", targets: [
-                { player: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[6]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -982,13 +981,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🔮 Seer can't look at dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "look", targets: [
-                { player: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [{ player: players[6]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -996,13 +993,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔮 Seer looks at the guard (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "seer", action: "look", targets: [
-                { player: players[2]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "seer", action: "look", targets: [{ player: players[2]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1017,13 +1012,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🐺 Werewolves can't eat a dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1031,13 +1024,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[2]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1052,13 +1043,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🧹 Witch can't use death potion on dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[6]._id, potion: { death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[6]._id, potion: { death: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1066,13 +1055,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch can't use life potion twice (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[2]._id, potion: { life: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, potion: { life: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("ONLY_ONE_LIFE_POTION");
@@ -1080,13 +1067,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🧹 Witch use death potion on seer (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[1]._id, potion: { death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, potion: { death: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1102,13 +1087,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🛡 Guard can't protect a dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [
-                { player: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[6]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1116,13 +1099,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🛡 Guard can't protect the same player twice in a row (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [
-                { player: players[5]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_PROTECT_TWICE");
@@ -1130,13 +1111,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [
-                { player: players[2]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1151,13 +1130,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🐦 Raven can't mark a dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "raven", action: "mark", targets: [
-                { player: players[6]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "raven", action: "mark", targets: [{ player: players[6]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1167,7 +1144,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🐦 Raven skips (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -1192,14 +1169,16 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("👪 All can't vote if one vote has a dead source (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[6]._id, for: players[1]._id },
-                { from: players[0]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[6]._id, for: players[1]._id },
+                    { from: players[0]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_VOTE");
@@ -1207,14 +1186,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All can't vote if one vote has a dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[0]._id, for: players[6]._id },
-                { from: players[1]._id, for: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[6]._id },
+                    { from: players[1]._id, for: players[0]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
@@ -1222,13 +1203,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All vote for guard (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[0]._id, for: players[2]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[2]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1247,13 +1226,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🐺 Werewolves eat the witch (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1268,13 +1245,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🧹 Witch can't use death potion twice (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[3]._id, potion: { death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, potion: { death: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("ONLY_ONE_DEATH_POTION");
@@ -1284,7 +1259,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🧹 Witch skips (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -1298,13 +1273,11 @@ describe("B - Full game of 7 players with all roles", () => {
         done();
     });
     it("🐦 Raven marks the hunter (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "raven", action: "mark", targets: [
-                { player: players[4]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "raven", action: "mark", targets: [{ player: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1328,7 +1301,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't delegate if play's source is not 'sheriff' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager", action: "delegate" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1339,7 +1312,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't delegate if play's action is not 'delegate' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1350,7 +1323,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't delegate if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1361,7 +1334,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't delegate if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1370,14 +1343,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't delegate to multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "delegate", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "sheriff", action: "delegate", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -1387,10 +1362,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🎖 Sheriff can't delegate to unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "delegate", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1398,13 +1371,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't delegate to a dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "delegate", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1412,13 +1383,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🎖 Sheriff delegates to the hunter (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "delegate", targets: [
-                { player: players[4]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1430,13 +1399,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("👪 All vote for hunter (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [
-                { from: players[3]._id, for: players[4]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1453,7 +1420,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔫 Hunter can't shoot if play's source is not 'hunter' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "shoot" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1464,7 +1431,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔫 Hunter can't shoot if play's action is not 'shoot' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "use-potion" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1475,7 +1442,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔫 Hunter can't shoot if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1486,7 +1453,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔫 Hunter can't shoot if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1495,14 +1462,16 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot at multiple targets (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "hunter", action: "shoot", targets: [
-                { player: players[0]._id },
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "hunter", action: "shoot", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
@@ -1512,10 +1481,8 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔫 Hunter can't shoot at an unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "hunter", action: "shoot", targets: [
-                { player: mongoose.Types.ObjectId() },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [{ player: new mongoose.Types.ObjectId() }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1523,13 +1490,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot at a dead target (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "hunter", action: "shoot", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1537,13 +1502,11 @@ describe("B - Full game of 7 players with all roles", () => {
             });
     });
     it("🔫 Hunter shoots at the werewolf (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "hunter", action: "shoot", targets: [
-                { player: players[5]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "hunter", action: "shoot", targets: [{ player: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -1563,7 +1526,7 @@ describe("B - Full game of 7 players with all roles", () => {
     it("🔐 Can't make a play if game's done (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
@@ -1573,12 +1536,14 @@ describe("B - Full game of 7 players with all roles", () => {
     });
 });
 
-// const players = [
-//     { name: "0Dig", role: "witch" }, X
-//     { name: "1Doug", role: "seer" }, X
-//     { name: "2Dag", role: "guard" }, X
-//     { name: "3Dug", role: "raven" },
-//     { name: "4Dyg", role: "hunter" }, X
-//     { name: "5Deg", role: "werewolf" },
-//     { name: "6Dog", role: "villager" }, X
-// ];
+/*
+ * const players = [
+ *     { name: "0Dig", role: "witch" }, X
+ *     { name: "1Doug", role: "seer" }, X
+ *     { name: "2Dag", role: "guard" }, X
+ *     { name: "3Dug", role: "raven" },
+ *     { name: "4Dyg", role: "hunter" }, X
+ *     { name: "5Deg", role: "werewolf" },
+ *     { name: "6Dog", role: "villager" }, X
+ * ];
+ */

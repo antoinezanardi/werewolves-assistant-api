@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
@@ -92,7 +91,7 @@ module.exports = app => {
      *
      * @apiPermission JWT
      * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 20 players.
-     * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
+     * @apiParam (Request Body Parameters) {String{<>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiUse GameResponse
      */
@@ -104,7 +103,7 @@ module.exports = app => {
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
-            .notEmpty().withMessage("Can't be empty"),
+            .isLength({ min: 1, max: 30 }).withMessage("Must be between 1 and 30 characters long"),
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getPlayerRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getPlayerRoles().map(({ name }) => name)}`),
