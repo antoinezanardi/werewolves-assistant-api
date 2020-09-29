@@ -147,4 +147,8 @@ exports.errorMetadata = {
         code: 36,
         HTTPCode: 400,
     },
+    TOO_MANY_REQUESTS: {
+        code: 37,
+        HTTPCode: 429,
+    },
 };

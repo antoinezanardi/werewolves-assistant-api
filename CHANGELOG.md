@@ -8,16 +8,18 @@
 * [#31](https://github.com/antoinezanardi/werewolves-assistant-web/issues/31) - `README.md` file has been approved with new badges and 4 new sections.
 * [#32](https://github.com/antoinezanardi/werewolves-assistant-web/issues/32) - Player names can't exceed 30 characters long and are filter out of HTML tags.
 * [#33](https://github.com/antoinezanardi/werewolves-assistant-web/issues/33) - Users email address and password can't exceed 30 characters long for better database storage.
+* [#35](https://github.com/antoinezanardi/werewolves-assistant-web/issues/35) - Request rate limit implemented for all routes with no auth or `JWT` auth.
 
 ### 📦 Packages
 
+* `express-rate-limit` installed with version `5.1.3`.
 * `xss` installed with version `1.0.8`.
 * `@sentry/node` updated to version `5.24.2`.
 * `apidoc` updated to version `5.24.2`.
-* `eslint` updated to version `7.9.0`.
+* `eslint` updated to version `7.10.0`.
 * `migrate-mongo` updated to version `8.1.2`.
 * `mocha` updated to version `8.1.3`.
-* `mongoose` updated to version `5.10.6`.
+* `mongoose` updated to version `5.10.7`.
 * `validator` updated to version `13.1.17`.
 
 ---

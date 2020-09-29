@@ -98,3 +98,4 @@ Description for each case below:
 | 34   | CANT_BE_CHOSEN_AS_TIEBREAKER      |    400    | Player is not part of the tiebreaker choice for the sheriff.                    |
 | 35   | NO_MORE_PLAY_ALLOWED              |    400    | No more play are allowed because game's status is "done" or "canceled".         |
 | 36   | CANT_BE_RESET                     |    400    | Game can't be reset because game's status is "done" or "canceled".              |
+| 37   | TOO_MANY_REQUESTS                 |    429    | Too many requests have been done on this route. Try again later.                |

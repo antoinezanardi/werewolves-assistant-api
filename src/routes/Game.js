@@ -4,6 +4,7 @@ const Game = require("../controllers/Game");
 const { getPlayerRoles } = require("../helpers/functions/Role");
 const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
+const { basicLimiter } = require("../helpers/constants/Route");
 
 module.exports = app => {
     /**
@@ -38,7 +39,7 @@ module.exports = app => {
      * @apiPermission Basic
      * @apiUse GameResponse
      */
-    app.get("/games", passport.authenticate(["basic", "jwt"], { session: false }), [
+    app.get("/games", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("status")
             .optional()
             .isIn(getGameStatuses()).withMessage(`Must be equal to one of the following values: ${getGameStatuses()}`),
@@ -58,7 +59,7 @@ module.exports = app => {
      * @apiSuccess {String} players.name Player's name.
      * @apiSuccess {String} players.role Player's role.
      */
-    app.get("/games/repartition", passport.authenticate(["basic", "jwt"], { session: false }), [
+    app.get("/games/repartition", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("players")
             .isArray().withMessage("Must be a valid array")
             .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
@@ -79,7 +80,7 @@ module.exports = app => {
      * @apiPermission JWT
      * @apiUse GameResponse
      */
-    app.get("/games/:id", passport.authenticate(["basic", "jwt"], { session: false }), [
+    app.get("/games/:id", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.getGame);
@@ -95,7 +96,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiUse GameResponse
      */
-    app.post("/games", passport.authenticate("jwt", { session: false }), [
+    app.post("/games", basicLimiter, passport.authenticate("jwt", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
             .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
@@ -118,7 +119,7 @@ module.exports = app => {
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiUse GameResponse
      */
-    app.patch("/games/:id/reset", passport.authenticate("jwt", { session: false }), [
+    app.patch("/games/:id/reset", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.resetGame);
@@ -133,7 +134,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String="canceled"} [status] Game master can cancel a game only if its status is set to `playing`.
      * @apiUse GameResponse
      */
-    app.patch("/games/:id", passport.authenticate("jwt", { session: false }), [
+    app.patch("/games/:id", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("status")
@@ -160,7 +161,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
      * @apiUse GameResponse
      */
-    app.post("/games/:id/play", passport.authenticate("jwt", { session: false }), [
+    app.post("/games/:id/play", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("source")

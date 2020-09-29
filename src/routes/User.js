@@ -1,6 +1,7 @@
 const passport = require("passport");
 const { body, param } = require("express-validator");
 const User = require("../controllers/User");
+const { createAccountLimiter, loginLimiter, basicLimiter } = require("../helpers/constants/Route");
 
 module.exports = app => {
     /**
@@ -47,7 +48,7 @@ module.exports = app => {
      * - `Basic Auth`: Any user can be retrieved.
      * @apiUse UserResponse
      */
-    app.get("/users/:id", passport.authenticate(["jwt", "basic"], { session: false }), [
+    app.get("/users/:id", basicLimiter, passport.authenticate(["jwt", "basic"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], User.getUser);
@@ -60,7 +61,7 @@ module.exports = app => {
      * @apiUse UserRequestBody
      * @apiUse UserResponse
      */
-    app.post("/users", [
+    app.post("/users", createAccountLimiter, [
         body("email")
             .isEmail().withMessage("Must be a valid email")
             .trim()
@@ -78,7 +79,7 @@ module.exports = app => {
      * @apiUse UserRequestBody
      * @apiSuccess {String} token JSON Web Token to keep for further route authentication.
      */
-    app.post("/users/login", [
+    app.post("/users/login", loginLimiter, [
         body("email")
             .isEmail().withMessage("Must be a valid email")
             .trim()
