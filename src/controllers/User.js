@@ -61,9 +61,18 @@ exports.postUser = async(req, res) => {
     }
 };
 
+exports.getFindProjection = query => {
+    if (query.fields) {
+        return query.fields.split(",").map(field => field.trim()).filter(field => field !== "password");
+    }
+    return "-password";
+};
+
 exports.getUsers = async(req, res) => {
     try {
-        const users = await this.find({}, "-password");
+        const { query } = checkRequestData(req);
+        const projection = this.getFindProjection(query);
+        const users = await this.find({}, projection);
         res.status(200).json(users);
     } catch (e) {
         sendError(res, e);

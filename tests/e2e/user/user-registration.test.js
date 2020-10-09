@@ -173,4 +173,17 @@ describe("A - Sign up and log in", () => {
                 done();
             });
     });
+    it("👤 Get users with only _id and email in response (GET /users?fields=email,_id)", done => {
+        chai.request(app)
+            .get(`/users?fields=email,_id`)
+            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body[0]._id).to.exist;
+                expect(res.body[0].email).to.exist;
+                expect(res.body[0].password).to.not.exist;
+                expect(res.body[0].createdAt).to.not.exist;
+                done();
+            });
+    });
 });

@@ -19,6 +19,22 @@ const WonSchema = new Schema({
     versionKey: false,
 });
 
+const ReviewSchema = new Schema({
+    rating: {
+        type: Number,
+        required: true,
+    },
+    comment: { type: String },
+    dysfunctionFound: {
+        type: Boolean,
+        default: false,
+    },
+}, {
+    _id: false,
+    timestamps: false,
+    versionKey: false,
+});
+
 const WaitingSchema = new Schema({
     for: {
         type: String,
@@ -77,6 +93,10 @@ const GameSchema = new Schema({
     },
     won: {
         type: WonSchema,
+        required: false,
+    },
+    review: {
+        type: ReviewSchema,
         required: false,
     },
 }, {

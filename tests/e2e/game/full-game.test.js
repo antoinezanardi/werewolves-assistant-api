@@ -67,6 +67,17 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
+    it("🌟 Can't update game review if its status is `playing` (PATCH /games/:id)", done => {
+        chai.request(app)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ review: { rating: 3 } })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
     it("🌙 Night falls", done => {
         expect(game.phase).to.equals("night");
         done();
@@ -1531,6 +1542,43 @@ describe("B - Full game of 7 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NO_MORE_PLAY_ALLOWED");
+                done();
+            });
+    });
+    it("🌟 Can't update game review if `rating` is absent (PATCH /games/:id)", done => {
+        chai.request(app)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ review: { comment: "That was ok.." } })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🌟 Setting game review of 3.5 stars (PATCH /games/:id)", done => {
+        chai.request(app)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ review: { rating: 3.5, comment: "That was ok..", dysfunctionFound: true } })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.review.rating).to.equals(3.5);
+                expect(game.review.dysfunctionFound).to.be.true;
+                done();
+            });
+    });
+    it("🌟 Can update game review  (PATCH /games/:id)", done => {
+        chai.request(app)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ review: { rating: 3.5, comment: "That was ok..", dysfunctionFound: true } })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.review.rating).to.equals(3.5);
+                expect(game.review.dysfunctionFound).to.be.true;
                 done();
             });
     });

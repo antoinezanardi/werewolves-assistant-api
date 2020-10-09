@@ -81,14 +81,24 @@ exports.create = async(data, options = {}) => {
     return toJSON ? game.toJSON() : game;
 };
 
+exports.checkDataBeforeUpdate = (game, data) => {
+    if (!game) {
+        throw generateError("NOT_FOUND", `Game not found`);
+    } else if (data.review) {
+        if (data.review.rating === undefined) {
+            throw generateError("BAD_REQUEST", `Rating is mandatory for posting a game review.`);
+        } else if (game.status !== "done" && game.status !== "canceled") {
+            throw generateError("BAD_REQUEST", `Game needs to be done or canceled to have a review.`);
+        }
+    }
+};
+
 exports.findOneAndUpdate = async(search, data, options = {}) => {
     const { toJSON } = options;
     delete options.toJSON;
     options.new = options.new === undefined ? true : options.new;
     const game = await this.findOne(search);
-    if (!game) {
-        throw generateError("NOT_FOUND", `Game not found`);
-    }
+    this.checkDataBeforeUpdate(game, data);
     const updatedGame = await Game.findOneAndUpdate(search, flatten(data), options);
     await updatedGame.populate(populate).execPopulate();
     return toJSON ? updatedGame.toJSON() : updatedGame;

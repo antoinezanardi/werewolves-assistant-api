@@ -1,5 +1,5 @@
 const passport = require("passport");
-const { body, param } = require("express-validator");
+const { body, param, query } = require("express-validator");
 const User = require("../controllers/User");
 const { createAccountLimiter, loginLimiter, basicLimiter } = require("../helpers/constants/Route");
 
@@ -32,9 +32,13 @@ module.exports = app => {
      * @apiGroup Users 👤
      *
      * @apiPermission Basic
+     * @apiParam (Query String Parameters) {String} [fields] Specifies which user fields to include. Each value must be separated by a `,`.
      * @apiUse UserResponse
      */
-    app.get("/users", passport.authenticate("basic", { session: false }), User.getUsers);
+    app.get("/users", passport.authenticate("basic", { session: false }), [
+        query("fields")
+            .optional(),
+    ], User.getUsers);
 
     /**
      * @api {GET} /users/:id B] Get an user

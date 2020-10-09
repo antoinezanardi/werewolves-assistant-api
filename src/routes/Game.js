@@ -92,7 +92,7 @@ module.exports = app => {
      *
      * @apiPermission JWT
      * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 20 players.
-     * @apiParam (Request Body Parameters) {String{<>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
+     * @apiParam (Request Body Parameters) {String{>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiUse GameResponse
      */
@@ -111,7 +111,7 @@ module.exports = app => {
     ], Game.postGame);
 
     /**
-     * @api {PATCH} /games/:id H] Reset a game
+     * @api {PATCH} /games/:id/reset H] Reset a game
      * @apiName ResetGame
      * @apiGroup Games 🎲
      *
@@ -132,14 +132,31 @@ module.exports = app => {
      * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String="canceled"} [status] Game master can cancel a game only if its status is set to `playing`.
+     * @apiParam (Request Body Parameters) {Object} [review] Game master can attach a game review only if its status is set to `canceled` or `done`.
+     * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} review.rating Review's rating, from 0 to 5. Not required if it is already set.
+     * @apiParam (Request Body Parameters) {String{>= 0 && <= 500}} [review.comment] Review's comment, from 1 to 500 characters long.
+     * @apiParam (Request Body Parameters) {Boolean=false} [review.dysfunctionFound] Must be set to true if a bug or a dysfunction was found during the game.
      * @apiUse GameResponse
      */
     app.patch("/games/:id", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("status")
-            .isIn(getPatchableGameStatuses()).withMessage(`Must be equal to one of the following values: ${getPatchableGameStatuses()}`)
-            .optional(),
+            .optional()
+            .isIn(getPatchableGameStatuses()).withMessage(`Must be equal to one of the following values: ${getPatchableGameStatuses()}`),
+        body("review.rating")
+            .optional()
+            .isFloat({ min: 0, max: 5 }).withMessage("Must be a valid float")
+            .toFloat(),
+        body("review.comment")
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .trim()
+            .isLength({ min: 1, max: 500 }).withMessage("Must be between 1 and 500 characters long"),
+        body("review.dysfunctionFound")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
     ], Game.patchGame);
 
     /**
