@@ -1,13 +1,12 @@
-/* eslint-disable max-lines-per-function */
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
 const { getPlayerRoles } = require("../helpers/functions/Role");
 const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
+const { basicLimiter } = require("../helpers/constants/Route");
 
 module.exports = app => {
-
     /**
      * @apiDefine GameResponse
      * @apiSuccess {MongoId} _id Game's ID.
@@ -40,7 +39,7 @@ module.exports = app => {
      * @apiPermission Basic
      * @apiUse GameResponse
      */
-    app.get("/games", passport.authenticate(["basic", "jwt"], { session: false }), [
+    app.get("/games", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("status")
             .optional()
             .isIn(getGameStatuses()).withMessage(`Must be equal to one of the following values: ${getGameStatuses()}`),
@@ -60,10 +59,10 @@ module.exports = app => {
      * @apiSuccess {String} players.name Player's name.
      * @apiSuccess {String} players.role Player's role.
      */
-    app.get("/games/repartition", passport.authenticate(["basic", "jwt"], { session: false }), [
+    app.get("/games/repartition", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
+            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
             .withMessage("Must contain between 4 and 20 players"),
         query("players.*.name")
             .isString().withMessage("Must be a valid string")
@@ -81,7 +80,7 @@ module.exports = app => {
      * @apiPermission JWT
      * @apiUse GameResponse
      */
-    app.get("/games/:id", passport.authenticate(["basic", "jwt"], { session: false }), [
+    app.get("/games/:id", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.getGame);
@@ -93,26 +92,26 @@ module.exports = app => {
      *
      * @apiPermission JWT
      * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 20 players.
-     * @apiParam (Request Body Parameters) {String} players.name Player's name. Must be unique in the array.
+     * @apiParam (Request Body Parameters) {String{>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiUse GameResponse
      */
-    app.post("/games", passport.authenticate("jwt", { session: false }), [
+    app.post("/games", basicLimiter, passport.authenticate("jwt", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject())
+            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
             .withMessage("Must contain between 4 and 20 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
-            .notEmpty().withMessage("Can't be empty"),
+            .isLength({ min: 1, max: 30 }).withMessage("Must be between 1 and 30 characters long"),
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getPlayerRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getPlayerRoles().map(({ name }) => name)}`),
     ], Game.postGame);
 
     /**
-     * @api {PATCH} /games/:id H] Reset a game
+     * @api {PATCH} /games/:id/reset H] Reset a game
      * @apiName ResetGame
      * @apiGroup Games 🎲
      *
@@ -120,7 +119,7 @@ module.exports = app => {
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiUse GameResponse
      */
-    app.patch("/games/:id/reset", passport.authenticate("jwt", { session: false }), [
+    app.patch("/games/:id/reset", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
     ], Game.resetGame);
@@ -133,14 +132,31 @@ module.exports = app => {
      * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String="canceled"} [status] Game master can cancel a game only if its status is set to `playing`.
+     * @apiParam (Request Body Parameters) {Object} [review] Game master can attach a game review only if its status is set to `canceled` or `done`.
+     * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} review.rating Review's rating, from 0 to 5. Not required if it is already set.
+     * @apiParam (Request Body Parameters) {String{>= 0 && <= 500}} [review.comment] Review's comment, from 1 to 500 characters long.
+     * @apiParam (Request Body Parameters) {Boolean=false} [review.dysfunctionFound] Must be set to true if a bug or a dysfunction was found during the game.
      * @apiUse GameResponse
      */
-    app.patch("/games/:id", passport.authenticate("jwt", { session: false }), [
+    app.patch("/games/:id", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("status")
-            .isIn(getPatchableGameStatuses()).withMessage(`Must be equal to one of the following values: ${getPatchableGameStatuses()}`)
-            .optional(),
+            .optional()
+            .isIn(getPatchableGameStatuses()).withMessage(`Must be equal to one of the following values: ${getPatchableGameStatuses()}`),
+        body("review.rating")
+            .optional()
+            .isFloat({ min: 0, max: 5 }).withMessage("Must be a valid float")
+            .toFloat(),
+        body("review.comment")
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .trim()
+            .isLength({ min: 1, max: 500 }).withMessage("Must be between 1 and 500 characters long"),
+        body("review.dysfunctionFound")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
     ], Game.patchGame);
 
     /**
@@ -162,7 +178,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
      * @apiUse GameResponse
      */
-    app.post("/games/:id/play", passport.authenticate("jwt", { session: false }), [
+    app.post("/games/:id/play", basicLimiter, passport.authenticate("jwt", { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("source")

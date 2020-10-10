@@ -18,7 +18,6 @@ const players = [
 ];
 let token;
 
-// eslint-disable-next-line max-lines-per-function
 describe("E - Game repartition with multiple teams", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -55,7 +54,7 @@ describe("E - Game repartition with multiple teams", () => {
     it("👪 Gets game repartition for 4 players with JWT auth (GET /games/repartition)", done => {
         chai.request(app)
             .get(`/games/repartition?${stringify({ players })}`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 done();

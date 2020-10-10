@@ -15,9 +15,7 @@ exports.populate = [
     { path: "history" },
 ];
 
-exports.turnPreNightActionsOrder = [
-    { source: "all", action: "elect-sheriff" },
-];
+exports.turnPreNightActionsOrder = [{ source: "all", action: "elect-sheriff" }];
 
 exports.turnNightActionsOrder = [
     { source: "seer", action: "look" },

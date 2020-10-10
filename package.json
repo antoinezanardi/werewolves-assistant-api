@@ -1,11 +1,11 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
     "start": "npx nodemon --watch .env --watch . --ignore 'public/apidoc/' app.js",
-    "lint": "npx eslint src/ --ext .js --fix",
+    "lint": "npx eslint src/ tests/ --ext .js --fix",
     "doc": "npx apidoc -c ./config/apidoc -i src/routes/ -o public/apidoc/",
     "start_sandbox": "forever start ./config/forever/sandbox.json",
     "stop_sandbox": "forever stop werewolves-assistant-api-sandbox",
@@ -29,30 +29,32 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "eslint": "^7.7.0",
-    "mocha": "^8.1.1",
+    "eslint": "^7.11.0",
+    "mocha": "^8.1.3",
     "nodemon": "^2.0.4"
   },
   "dependencies": {
-    "@sentry/node": "^5.21.1",
-    "apidoc": "^0.24.0",
+    "@sentry/node": "^5.25.0",
+    "apidoc": "^0.25.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-rate-limit": "^5.1.3",
     "express-validator": "^6.6.1",
     "jsonwebtoken": "^8.5.1",
-    "migrate-mongo": "^8.1.1",
+    "migrate-mongo": "^8.1.2",
     "mongo-dot-notation": "^2.0.0",
-    "mongoose": "^5.10.0",
+    "mongoose": "^5.10.9",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "qs": "^6.9.4",
     "requirejs": "^2.3.6",
-    "validator": "^13.1.1"
+    "validator": "^13.1.17",
+    "xss": "^1.0.8"
   }
 }

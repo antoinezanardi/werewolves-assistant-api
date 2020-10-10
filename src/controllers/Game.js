@@ -9,6 +9,7 @@ const { isVillagerSideAlive, isWerewolfSideAlive } = require("../helpers/functio
 const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
+const { filterOutHTMLTags } = require("../helpers/functions/String");
 
 exports.find = async(search, projection, options = {}) => {
     let games = await Game.find(search, projection, options).populate(populate);
@@ -24,6 +25,11 @@ exports.findOne = async(search, projection, options = {}) => {
         game = game.toJSON();
     }
     return game;
+};
+
+exports.fillFirstWaiting = data => {
+    const firstWaiting = { for: "all", to: "elect-sheriff" };
+    data.waiting = [firstWaiting];
 };
 
 exports.checkUserCurrentGames = async userId => {
@@ -42,7 +48,8 @@ exports.checkRolesCompatibility = players => {
 
 exports.fillPlayersData = players => {
     for (const player of players) {
-        const role = getPlayerRoles().find(role => role.name === player.role);
+        player.name = filterOutHTMLTags(player.name);
+        const role = getPlayerRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
     }
 };
@@ -59,7 +66,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
-    data.waiting = [{ for: "all", to: "elect-sheriff" }];
+    this.fillFirstWaiting(data);
 };
 
 exports.create = async(data, options = {}) => {
@@ -74,14 +81,24 @@ exports.create = async(data, options = {}) => {
     return toJSON ? game.toJSON() : game;
 };
 
+exports.checkDataBeforeUpdate = (game, data) => {
+    if (!game) {
+        throw generateError("NOT_FOUND", `Game not found`);
+    } else if (data.review) {
+        if (data.review.rating === undefined) {
+            throw generateError("BAD_REQUEST", `Rating is mandatory for posting a game review.`);
+        } else if (game.status !== "done" && game.status !== "canceled") {
+            throw generateError("BAD_REQUEST", `Game needs to be done or canceled to have a review.`);
+        }
+    }
+};
+
 exports.findOneAndUpdate = async(search, data, options = {}) => {
     const { toJSON } = options;
     delete options.toJSON;
     options.new = options.new === undefined ? true : options.new;
     const game = await this.findOne(search);
-    if (!game) {
-        throw generateError("NOT_FOUND", `Game not found`);
-    }
+    this.checkDataBeforeUpdate(game, data);
     const updatedGame = await Game.findOneAndUpdate(search, flatten(data), options);
     await updatedGame.populate(populate).execPopulate();
     return toJSON ? updatedGame.toJSON() : updatedGame;
@@ -151,7 +168,7 @@ exports.getWerewolfCount = players => {
     return werewolfCount;
 };
 
-exports.getWerewolfRoles = async players => {
+exports.getWerewolfRoles = players => {
     const werewolfRoles = [];
     const werewolfCount = this.getWerewolfCount(players);
     const availableWerewolfRoles = getPlayerRoles().filter(role => role.group === "werewolves");
@@ -194,7 +211,7 @@ exports.postGame = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         const game = await this.create({
-            gameMaster: mongoose.Types.ObjectId(req.user._id),
+            gameMaster: new mongoose.Types.ObjectId(req.user._id),
             players: body.players,
         });
         res.status(200).json(game);
@@ -372,7 +389,7 @@ exports.play = async play => {
     }
     game.tick++;
     this.checkGameWinners(game);
-    return await this.findOneAndUpdate({ _id: play.gameId }, game);
+    return this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
 exports.postPlay = async(req, res) => {

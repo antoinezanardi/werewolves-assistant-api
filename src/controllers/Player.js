@@ -1,6 +1,6 @@
 const GameHistory = require("./GameHistory");
 const { canBeEaten, hasAttribute } = require("../helpers/functions/Player");
-const { getPlayerAttributes, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
+const { getPlayerAttribute, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -43,7 +43,7 @@ exports.checkTargetDependingOnAction = async(target, game, action) => {
 };
 
 exports.checkAndFillPlayerTarget = (target, game) => {
-    const player = game.players.find(player => player._id.toString() === target.player);
+    const player = game.players.find(({ _id }) => _id.toString() === target.player);
     if (!player) {
         throw generateError("NOT_TARGETABLE", `Target with id "${target.player}" is not targetable because the player is not in the game.`);
     } else if (!player.isAlive) {
@@ -121,8 +121,8 @@ exports.killPlayer = (playerId, { action }, game) => {
 };
 
 exports.addPlayerAttribute = (playerId, attribute, game, forcedSource) => {
-    const player = game.players.find(player => player._id.toString() === playerId.toString());
-    const playerAttribute = getPlayerAttributes().find(playerAttribute => playerAttribute.attribute === attribute);
+    const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
+    const playerAttribute = getPlayerAttribute(attribute);
     if (player && playerAttribute) {
         if (forcedSource) {
             playerAttribute.source = forcedSource;
@@ -136,20 +136,20 @@ exports.addPlayerAttribute = (playerId, attribute, game, forcedSource) => {
 };
 
 exports.removePlayerAttribute = (playerId, attributeName, game) => {
-    const player = game.players.find(player => player._id.toString() === playerId.toString());
+    const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
     if (player && player.attributes) {
         player.attributes = player.attributes.filter(({ attribute }) => attribute !== attributeName);
     }
 };
 
-exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => player.attributes && player.attributes.find(({ attribute }) => attribute === attributeName));
+exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => hasAttribute(player, attributeName));
 
 exports.incrementPlayerVoteCount = (votedPlayers, playerId, game, inc = 1) => {
     const votedPlayer = votedPlayers.find(player => player._id.toString() === playerId.toString());
     if (votedPlayer) {
         votedPlayer.vote += inc;
     } else {
-        const player = game.players.find(player => player._id.toString() === playerId.toString());
+        const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
         votedPlayers.push({ ...player, vote: inc });
     }
 };
@@ -185,7 +185,7 @@ exports.checkPlayerMultipleVotes = (votes, players) => {
 };
 
 exports.checkVoteTarget = (playerId, players) => {
-    const player = players.find(player => player._id.toString() === playerId);
+    const player = players.find(({ _id }) => _id.toString() === playerId);
     if (!player) {
         throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${playerId}" is not in game and so can't be a vote's target.`);
     } else if (!player.isAlive) {
@@ -194,7 +194,7 @@ exports.checkVoteTarget = (playerId, players) => {
 };
 
 exports.checkPlayerAbilityToVote = (playerId, players) => {
-    const player = players.find(player => player._id.toString() === playerId);
+    const player = players.find(({ _id }) => _id.toString() === playerId);
     if (!player) {
         throw generateError("CANT_VOTE", `Player with id "${playerId}" is not in game and so can't vote.`);
     } else if (!player.isAlive) {
@@ -297,7 +297,7 @@ exports.seerPlays = async(play, game) => {
     this.addPlayerAttribute(targets[0].player._id, "seen", game);
 };
 
-exports.allVote = async(play, game, gameHistoryEntry) => {
+exports.allVote = (play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
@@ -309,7 +309,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
-exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
+exports.allElectSheriff = (play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });

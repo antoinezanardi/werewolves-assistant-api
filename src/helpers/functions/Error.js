@@ -4,7 +4,7 @@ const Config = require("../../../config");
 exports.generateError = (errorType, data) => new Error(errorType, data);
 
 exports.sendUniqueViolationError = (res, e) => {
-    const myRegexp = new RegExp(`${Config.db.name}.([a-z]+)`);
+    const myRegexp = new RegExp(`${Config.db.name}.([a-z]+)`, "u");
     const match = myRegexp.exec(e.toString());
     if (match[1] === "users") {
         res.status(400).json(this.generateError("EMAIL_EXISTS", e.toString()));
@@ -15,6 +15,7 @@ exports.sendUniqueViolationError = (res, e) => {
 
 exports.sendError = (res, e) => {
     if (e && res.headersSent) {
+        // eslint-disable-next-line no-console
         console.log(e);
     } else if (e && e.response && e.response.data && e.response.data.HTTPCode) {
         res.status(e.response.data.HTTPCode).json(this.generateError(e.response.data.type, e.response.data.error || e.response.data.errors));

@@ -7,29 +7,30 @@ const User = require("../../db/models/User");
 const Config = require("../../../config");
 
 // TODO: Error response for bad auth in jwt check for example.
-
-passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, cb) => User.findOne({ email: email }, (err, user) => {
-    if (err) {
-        cb(err);
-    } else if (!user) {
-        return cb(null, false, { message: "Incorrect email or password." });
-    } else {
-        bcrypt.compare(password, user.password, (err, res) => {
-            if (!err && res) {
-                return cb(null, user, { message: "Logged In Successfully" });
-            } else {
+function baseLocalStrategy(email, password, cb) {
+    return User.findOne({ email }, (err, user) => {
+        if (err) {
+            cb(err);
+        } else if (!user) {
+            return cb(null, false, { message: "Incorrect email or password." });
+        } else {
+            bcrypt.compare(password, user.password, (compareErr, res) => {
+                if (!compareErr && res) {
+                    return cb(null, user, { message: "Logged In Successfully" });
+                }
                 return cb(null, false, { message: "Incorrect email or password." });
-            }
-        });
-    }
-})));
+            });
+        }
+    });
+}
+
+passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, baseLocalStrategy));
 
 passport.use(new BasicStrategy((username, password, done) => {
     if (username === Config.app.basicAuth.username && password === Config.app.basicAuth.password) {
         return done(null, { strategy: "basic" });
-    } else {
-        return done(null, false);
     }
+    return done(null, false);
 }));
 
 passport.use(new JWTStrategy({
@@ -41,8 +42,7 @@ passport.use(new JWTStrategy({
             return cb(err);
         } else if (user) {
             return cb(null, { ...user.toJSON(), strategy: "JWT" });
-        } else {
-            return cb(null);
         }
+        return cb(null);
     });
 }));
