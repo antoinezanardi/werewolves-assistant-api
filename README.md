@@ -28,7 +28,7 @@ Two versions are available for testing this API:
 
 #### 🚀🧑‍🚀 Fan of Postman ? Try out the [official public collection](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
-## 🔍 Roles available
+## 🃏 Roles available
 
 On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **7 different roles** are available to play:
 

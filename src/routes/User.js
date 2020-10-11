@@ -37,7 +37,8 @@ module.exports = app => {
      */
     app.get("/users", passport.authenticate("basic", { session: false }), [
         query("fields")
-            .optional(),
+            .optional()
+            .isString().withMessage("Must be a valid string"),
     ], User.getUsers);
 
     /**

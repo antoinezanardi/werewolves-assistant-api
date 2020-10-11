@@ -34,12 +34,16 @@ module.exports = app => {
      * @apiDescription Get games filtered by query string parameters if specified.
      * - `JWT auth`: Only games created by the user attached to token can be retrieved from this route.
      * - `Basic auth`: All games can be retrieved.
+     * @apiParam (Query String Parameters) {String} [fields] Specifies which user fields to include. Each value must be separated by a `,`.
      * @apiParam (Query String Parameters) {String} [status] Filter by game's status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_
      * @apiPermission JWT
      * @apiPermission Basic
      * @apiUse GameResponse
      */
     app.get("/games", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
+        query("fields")
+            .optional()
+            .isString().withMessage("Must be a valid string"),
         query("status")
             .optional()
             .isIn(getGameStatuses()).withMessage(`Must be equal to one of the following values: ${getGameStatuses()}`),
