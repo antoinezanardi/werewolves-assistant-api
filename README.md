@@ -28,6 +28,20 @@ Two versions are available for testing this API:
 
 #### 🚀🧑‍🚀 Fan of Postman ? Try out the [official public collection](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
+## 🔍 Roles available
+
+On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **7 different roles** are available to play:
+
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/witch.png" width="25"/> The Witch**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/seer.png" width="25"/> The Seer**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="25"/> The Guard**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/hunter.png" width="25"/> The Hunter**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="25"/> The Raven**
+
+Please check the <a href="https://werewolves-assistant-api.antoinezanardi.fr/apidoc/#player-roles" target="_blank">**Player role section on API documentation**</a> for more details about each role.
+
 ## 📚 API Documentation
 Documentation is available for both versions:
 

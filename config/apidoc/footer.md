@@ -16,15 +16,15 @@
 
 ## <a id="player-roles"></a>🃏 Player Roles
 
-| Role               | [Group](#player-groups) |                 Description                                                                                                                                  |
-|:------------------:|:-----------------------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🐺<br/>werewolf    | werewolves              | Each night, his group eats a villager chosen by the majority.                                                                                                |
-| 🧑‍🌾<br/>villager    | villagers               | Has no powers, can only count on his speech.                                                                                                                 |
-| 🧙‍♀<br/>️‍witch      | villagers               | She has one life potion which prevents from being eaten by werewolves and a death potion which instantly kills. She can only use each one once in the game.  |
-| 🔮<br/>seer        | villagers               | Each night, she sees the role of the player she wants.                                                                                                       |
-| 🛡️<br/>guard       | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                                            |
-| 🔫<br/>hunter      | villagers               | If he dies, he shoots a victim to take his revenge. He can't kill himself.                                                                                   |
-| 🐦<br/>raven       | villagers               | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                 |
+| Role               | Card                                                                                                         | [Group](#player-groups) |                 Description                                                                                                                                 |
+|:------------------:|:------------------------------------------------------------------------------------------------------------:|:-----------------------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🐺<br/>werewolf    | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="50"/>            | werewolves              | Each night, his group eats a villager chosen by the majority.                                                                                                |
+| 🧑‍🌾<br/>villager    | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="50"/>            | villagers               | Has no powers, can only count on his speech skills.                                                                                                          |
+| 🧙‍♀<br/>️‍witch      | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/witch.png" width="50"/>               | villagers               | She has one life potion which prevents from being eaten by werewolves and a death potion which instantly kills. She can only use each one once in the game.  |
+| 🔮<br/>seer        | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/seer.png" width="50"/>                | villagers               | Each night, she sees the role of the player she wants.                                                                                                       |
+| 🛡️<br/>guard       | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="50"/>               | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                                            |
+| 🔫<br/>hunter      | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/hunter.png" width="50"/>              | villagers               | If he dies, he shoots a victim to take his revenge. He can't kill himself.                                                                                   |
+| 🐦<br/>raven       | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="50"/>               | villagers               | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                 |
 
 ## <a id="player-actions"></a>🔪 Player Actions
 

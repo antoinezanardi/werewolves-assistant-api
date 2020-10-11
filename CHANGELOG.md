@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#34](https://github.com/antoinezanardi/werewolves-assistant-web/issues/34) - Users can review a game with rating and comment.
+* [#39](https://github.com/antoinezanardi/werewolves-assistant-web/issues/39) - All player role cards are hosted on the server.
 
 ### 🌟 Enhancements
 
