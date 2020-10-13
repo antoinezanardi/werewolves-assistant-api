@@ -6,12 +6,24 @@ const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const { isVillagerSideAlive, isWerewolfSideAlive } = require("../helpers/functions/Game");
-const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
+const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
 const { filterOutHTMLTags } = require("../helpers/functions/String");
 
+exports.getFindPopulate = projection => {
+    const populate = [];
+    if (!projection || projection.includes("gameMaster")) {
+        populate.push({ path: "gameMaster", select: "-password" });
+    }
+    if (!projection || projection.includes("history")) {
+        populate.push({ path: "history" });
+    }
+    return populate;
+};
+
 exports.find = async(search, projection, options = {}) => {
+    const populate = this.getFindPopulate(projection);
     let games = await Game.find(search, projection, options).populate(populate);
     if (options.toJSON) {
         games = games.map(game => game.toJSON());
@@ -20,6 +32,7 @@ exports.find = async(search, projection, options = {}) => {
 };
 
 exports.findOne = async(search, projection, options = {}) => {
+    const populate = this.getFindPopulate(projection);
     let game = await Game.findOne(search, projection, options).populate(populate);
     if (game && options.toJSON) {
         game = game.toJSON();
@@ -77,7 +90,7 @@ exports.create = async(data, options = {}) => {
     }
     await this.checkAndFillDataBeforeCreate(data);
     const game = await Game.create(data, options);
-    await game.populate(populate).execPopulate();
+    await game.populate(fullGamePopulate).execPopulate();
     return toJSON ? game.toJSON() : game;
 };
 
@@ -100,18 +113,34 @@ exports.findOneAndUpdate = async(search, data, options = {}) => {
     const game = await this.findOne(search);
     this.checkDataBeforeUpdate(game, data);
     const updatedGame = await Game.findOneAndUpdate(search, flatten(data), options);
-    await updatedGame.populate(populate).execPopulate();
+    await updatedGame.populate(fullGamePopulate).execPopulate();
     return toJSON ? updatedGame.toJSON() : updatedGame;
+};
+
+exports.getFindProjection = query => query.fields ? query.fields.split(",").map(field => field.trim()) : null;
+
+exports.getFindSearch = (query, req) => {
+    const search = {};
+    if (req.user.strategy === "JWT") {
+        search.gameMaster = req.user._id;
+    }
+    for (const parameter in query) {
+        if (query[parameter] !== undefined) {
+            const value = query[parameter];
+            if (parameter !== "fields") {
+                search[parameter] = value;
+            }
+        }
+    }
+    return search;
 };
 
 exports.getGames = async(req, res) => {
     try {
-        const search = {};
         const { query } = checkRequestData(req);
-        if (req.user.strategy === "JWT") {
-            search.gameMaster = req.user._id;
-        }
-        const games = await this.find({ ...search, ...query });
+        const search = this.getFindSearch(query, req);
+        const projection = this.getFindProjection(query);
+        const games = await this.find(search, projection);
         res.status(200).json(games);
     } catch (e) {
         sendError(res, e);

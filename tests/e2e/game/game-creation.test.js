@@ -34,7 +34,7 @@ const playersWithoutVillagers = [
     { name: "Dyg", role: "werewolf" },
     { name: "Deg", role: "werewolf" },
 ];
-let token, token2, game, game2, queryStrings;
+let token, token2, game, game2, queryString;
 
 describe("A - Game creation", () => {
     before(done => resetDatabase(done));
@@ -239,10 +239,10 @@ describe("A - Game creation", () => {
                 done();
             });
     });
-    queryStrings = stringify({ status: "playing" });
-    it(`🎲 User1 gets his games with playing status with JWT auth (GET /games?${queryStrings})`, done => {
+    it(`🎲 User1 gets his games with playing status with JWT auth (GET /games?${queryString})`, done => {
+        queryString = stringify({ status: "playing" });
         chai.request(app)
-            .get(`/games?${queryStrings}`)
+            .get(`/games?${queryString}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
             .end((err, res) => {
@@ -253,10 +253,10 @@ describe("A - Game creation", () => {
                 done();
             });
     });
-    queryStrings = stringify({ status: "canceled" });
-    it(`🎲 User2 gets his games with canceled status with JWT auth (GET /games?${queryStrings})`, done => {
+    it(`🎲 User2 gets his games with canceled status with JWT auth (GET /games?${queryString})`, done => {
+        queryString = stringify({ status: "canceled" });
         chai.request(app)
-            .get(`/games?${queryStrings}`)
+            .get(`/games?${queryString}`)
             .set({ Authorization: `Bearer ${token2}` })
             .send({ players })
             .end((err, res) => {
@@ -309,6 +309,20 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
+                done();
+            });
+    });
+    it("👤 Get games with only _id and waiting in response (GET /games?fields=_id,waiting)", done => {
+        queryString = stringify({ fields: "_id,waiting" });
+        chai.request(app)
+            .get(`/games?${queryString}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body[0]._id).to.exist;
+                expect(res.body[0].waiting).to.exist;
+                expect(res.body[0].turn).to.not.exist;
+                expect(res.body[0].tick).to.not.exist;
                 done();
             });
     });

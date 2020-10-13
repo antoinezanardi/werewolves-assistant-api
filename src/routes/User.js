@@ -32,12 +32,15 @@ module.exports = app => {
      * @apiGroup Users 👤
      *
      * @apiPermission Basic
-     * @apiParam (Query String Parameters) {String} [fields] Specifies which user fields to include. Each value must be separated by a `,`.
+     * @apiParam (Query String Parameters) {String} [fields] Specifies which user fields to include. Each value must be separated by a `,` without space. (e.g: `field1,field2`)
      * @apiUse UserResponse
      */
     app.get("/users", passport.authenticate("basic", { session: false }), [
         query("fields")
-            .optional(),
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .custom(value => (/^(?:\w+)(?:,\w+)*$/u).test(value) ? Promise.resolve() : Promise.reject(new Error()))
+            .withMessage("Each value must be separated by a `,` without space. (e.g: `field1,field2`)"),
     ], User.getUsers);
 
     /**
