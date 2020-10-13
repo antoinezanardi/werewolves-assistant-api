@@ -13,7 +13,7 @@
 ## 🐺 What is this API ?
 Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.
 
-This is the project's API used by **[Werewolves Assistant Web](https://github.com/antoinezanardi/werewolves-assistant-web)**, the main web **VueJS** client.  
+This is the project's API used by [**Werewolves Assistant Web**](https://github.com/antoinezanardi/werewolves-assistant-web), the main web **VueJS** client.  
 
 #### 🤔 Want to know more about this awesome project ? <a href="https://werewolves-assistant.antoinezanardi.fr/about" target="_blank">**Check out the dedicated about page**</a>.
 
@@ -26,7 +26,7 @@ Two versions are available for testing this API:
 
 **Sandbox API** may contains some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
 
-#### 🚀🧑‍🚀 Fan of Postman ? Try out the [official public collection](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
+#### 🚀🧑‍🚀 Fan of Postman ? Try out the [**official public collection**](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
 ## 🃏 Roles available
 
@@ -95,6 +95,25 @@ To start the API **on production mode**, run `npm run start_sandbox` or `npm run
 - **Lint**: `npm run lint` checks for code style. Based on AirBnB configuration with many more rules.
 - **Doc**: `npm run doc` generates doc for API.
 
+## ©️ License
+
+This project is licensed under the [MIT License](http://opensource.org/licenses/MIT).
+
 ## ❤️ Contributor list
 
-There are no contributor yet... Be the first one by **[creating a pull request](https://github.com/antoinezanardi/werewolves-assistant-api/pulls)** !
+If you want to contribute to this project, please read the [**contribution guide**](https://github.com/antoinezanardi/werewolves-assistant-api/pulls/CONTRIBUTING.md).
+
+Thank you to all our contributors:
+
+<table>
+    <tbody>
+        <tr>
+            <td align="center" valign="top">
+                <a href="https://github.com/DeschampsThomas">
+                    <img src="https://github.com/DeschampsThomas.png?s=75" width="75" height="75"><br/><br/>
+                    Thomas Deschamps
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>

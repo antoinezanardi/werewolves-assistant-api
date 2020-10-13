@@ -16,11 +16,15 @@
 * [#33](https://github.com/antoinezanardi/werewolves-assistant-web/issues/33) - Users email address and password can't exceed 30 characters long for better database storage.
 * [#35](https://github.com/antoinezanardi/werewolves-assistant-web/issues/35) - Request rate limit implemented for all routes with no auth or `JWT` auth.
 
+### 📚 Documentation
+
+* [#36](https://github.com/antoinezanardi/werewolves-assistant-web/issues/36) - `CONTRIBUTING.md` file added for helping people contribute to this project.
+
 ### 📦 Packages
 
 * `express-rate-limit` installed with version `5.1.3`.
 * `xss` installed with version `1.0.8`.
-* `@sentry/node` updated to version `5.25.0`.
+* `@sentry/node` updated to version `5.26.0`.
 * `apidoc` updated to version `5.24.2`.
 * `eslint` updated to version `7.10.0`.
 * `migrate-mongo` updated to version `8.1.2`.

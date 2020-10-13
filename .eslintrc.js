@@ -331,6 +331,9 @@ module.exports = {
         }, {
             files: ["src/routes/*.js"],
             rules: { "max-lines-per-function": "off" },
+        }, {
+            files: ["app.js"],
+            rules: { "no-console": "off" },
         },
     ],
 };
