@@ -9,15 +9,14 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
-const players = [
-    { name: "Dug", role: "witch" }, // O
-    { name: "Dig", role: "villager" }, // 1
-    { name: "Deg", role: "werewolf" }, // 2
-    { name: "Dog", role: "werewolf" }, // 3
+let players = [
+    { name: "Dug", role: "witch" },
+    { name: "Dig", role: "villager" },
+    { name: "Deg", role: "werewolf" },
+    { name: "Dog", role: "werewolf" },
 ];
 let token, game;
 
-// eslint-disable-next-line max-lines-per-function
 describe("G - Game where player is killed twice during the night", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -45,7 +44,7 @@ describe("G - Game where player is killed twice during the night", () => {
     it("🎲 Creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ players })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -54,14 +53,16 @@ describe("G - Game where player is killed twice during the night", () => {
             });
     });
     it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: players[1]._id },
-                { from: players[2]._id, for: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[2]._id, for: players[1]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -75,13 +76,11 @@ describe("G - Game where player is killed twice during the night", () => {
             });
     });
     it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[1]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -92,13 +91,11 @@ describe("G - Game where player is killed twice during the night", () => {
             });
     });
     it("🧹 Witch use death potion on villager (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [
-                { player: players[1]._id, potion: { death: true } },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, potion: { death: true } }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -118,13 +115,11 @@ describe("G - Game where player is killed twice during the night", () => {
         done();
     });
     it("🎖 Sheriff delegates to the hunter (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "sheriff", action: "delegate", targets: [
-                { player: players[0]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;

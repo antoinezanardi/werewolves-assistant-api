@@ -15,34 +15,34 @@ const playSchema = new Schema({
         required: true,
     },
     targets: {
-        type: [{
-            player: {
-                type: Player,
-                required: true,
-            },
-            potion: {
-                life: {
-                    type: Boolean,
+        type: [
+            {
+                player: {
+                    type: Player,
+                    required: true,
                 },
-                death: {
-                    type: Boolean,
+                potion: {
+                    life: { type: Boolean },
+                    death: { type: Boolean },
                 },
             },
-        }],
+        ],
         _id: false,
         default: undefined,
     },
     votes: {
-        type: [{
-            from: {
-                type: Player,
-                required: true,
+        type: [
+            {
+                from: {
+                    type: Player,
+                    required: true,
+                },
+                for: {
+                    type: Player,
+                    required: true,
+                },
             },
-            for: {
-                type: Player,
-                required: true,
-            },
-        }],
+        ],
         _id: false,
         default: undefined,
     },
@@ -52,25 +52,27 @@ const playSchema = new Schema({
     versionKey: false,
 });
 
-// const eventSchema = new Schema({
-//     type: {
-//         type: String,
-//         required: true,
-//     },
-//     source: {
-//         type: String,
-//         enum: waitingForPossibilities,
-//         required: true,
-//     },
-//     targets: {
-//         type: [Player],
-//         default: undefined,
-//     },
-// }, {
-//     _id: false,
-//     timestamps: false,
-//     versionKey: false,
-// });
+/*
+ * const eventSchema = new Schema({
+ *     type: {
+ *         type: String,
+ *         required: true,
+ *     },
+ *     source: {
+ *         type: String,
+ *         enum: waitingForPossibilities,
+ *         required: true,
+ *     },
+ *     targets: {
+ *         type: [Player],
+ *         default: undefined,
+ *     },
+ * }, {
+ *     _id: false,
+ *     timestamps: false,
+ *     versionKey: false,
+ * });
+ */
 
 const gameHistorySchema = new Schema({
     gameId: {
@@ -97,10 +99,12 @@ const gameHistorySchema = new Schema({
         type: playSchema,
         required: false,
     },
-    // event: {
-    //     type: eventSchema,
-    //     required: false,
-    // },
+    /*
+     * event: {
+     *     type: eventSchema,
+     *     required: false,
+     * },
+     */
 }, {
     timestamps: true,
     versionKey: false,

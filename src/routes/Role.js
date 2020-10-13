@@ -9,7 +9,6 @@ const { getPlayerRoles } = require("../helpers/functions/Role");
  */
 
 module.exports = app => {
-
     /**
      * @api {GET} /roles A] Get roles
      * @apiName GetRoles

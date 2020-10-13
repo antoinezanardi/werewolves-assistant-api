@@ -6,11 +6,24 @@ const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const { isVillagerSideAlive, isWerewolfSideAlive } = require("../helpers/functions/Game");
-const { populate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
+const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
+const { filterOutHTMLTags } = require("../helpers/functions/String");
+
+exports.getFindPopulate = projection => {
+    const populate = [];
+    if (!projection || projection.includes("gameMaster")) {
+        populate.push({ path: "gameMaster", select: "-password" });
+    }
+    if (!projection || projection.includes("history")) {
+        populate.push({ path: "history" });
+    }
+    return populate;
+};
 
 exports.find = async(search, projection, options = {}) => {
+    const populate = this.getFindPopulate(projection);
     let games = await Game.find(search, projection, options).populate(populate);
     if (options.toJSON) {
         games = games.map(game => game.toJSON());
@@ -19,11 +32,17 @@ exports.find = async(search, projection, options = {}) => {
 };
 
 exports.findOne = async(search, projection, options = {}) => {
+    const populate = this.getFindPopulate(projection);
     let game = await Game.findOne(search, projection, options).populate(populate);
     if (game && options.toJSON) {
         game = game.toJSON();
     }
     return game;
+};
+
+exports.fillFirstWaiting = data => {
+    const firstWaiting = { for: "all", to: "elect-sheriff" };
+    data.waiting = [firstWaiting];
 };
 
 exports.checkUserCurrentGames = async userId => {
@@ -42,7 +61,8 @@ exports.checkRolesCompatibility = players => {
 
 exports.fillPlayersData = players => {
     for (const player of players) {
-        const role = getPlayerRoles().find(role => role.name === player.role);
+        player.name = filterOutHTMLTags(player.name);
+        const role = getPlayerRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name, group: role.group };
     }
 };
@@ -59,7 +79,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
-    data.waiting = [{ for: "all", to: "elect-sheriff" }];
+    this.fillFirstWaiting(data);
 };
 
 exports.create = async(data, options = {}) => {
@@ -70,8 +90,20 @@ exports.create = async(data, options = {}) => {
     }
     await this.checkAndFillDataBeforeCreate(data);
     const game = await Game.create(data, options);
-    await game.populate(populate).execPopulate();
+    await game.populate(fullGamePopulate).execPopulate();
     return toJSON ? game.toJSON() : game;
+};
+
+exports.checkDataBeforeUpdate = (game, data) => {
+    if (!game) {
+        throw generateError("NOT_FOUND", `Game not found`);
+    } else if (data.review) {
+        if (data.review.rating === undefined) {
+            throw generateError("BAD_REQUEST", `Rating is mandatory for posting a game review.`);
+        } else if (game.status !== "done" && game.status !== "canceled") {
+            throw generateError("BAD_REQUEST", `Game needs to be done or canceled to have a review.`);
+        }
+    }
 };
 
 exports.findOneAndUpdate = async(search, data, options = {}) => {
@@ -79,22 +111,36 @@ exports.findOneAndUpdate = async(search, data, options = {}) => {
     delete options.toJSON;
     options.new = options.new === undefined ? true : options.new;
     const game = await this.findOne(search);
-    if (!game) {
-        throw generateError("NOT_FOUND", `Game not found`);
-    }
+    this.checkDataBeforeUpdate(game, data);
     const updatedGame = await Game.findOneAndUpdate(search, flatten(data), options);
-    await updatedGame.populate(populate).execPopulate();
+    await updatedGame.populate(fullGamePopulate).execPopulate();
     return toJSON ? updatedGame.toJSON() : updatedGame;
+};
+
+exports.getFindProjection = query => query.fields ? query.fields.split(",").map(field => field.trim()) : null;
+
+exports.getFindSearch = (query, req) => {
+    const search = {};
+    if (req.user.strategy === "JWT") {
+        search.gameMaster = req.user._id;
+    }
+    for (const parameter in query) {
+        if (query[parameter] !== undefined) {
+            const value = query[parameter];
+            if (parameter !== "fields") {
+                search[parameter] = value;
+            }
+        }
+    }
+    return search;
 };
 
 exports.getGames = async(req, res) => {
     try {
-        const search = {};
         const { query } = checkRequestData(req);
-        if (req.user.strategy === "JWT") {
-            search.gameMaster = req.user._id;
-        }
-        const games = await this.find({ ...search, ...query });
+        const search = this.getFindSearch(query, req);
+        const projection = this.getFindProjection(query);
+        const games = await this.find(search, projection);
         res.status(200).json(games);
     } catch (e) {
         sendError(res, e);
@@ -151,7 +197,7 @@ exports.getWerewolfCount = players => {
     return werewolfCount;
 };
 
-exports.getWerewolfRoles = async players => {
+exports.getWerewolfRoles = players => {
     const werewolfRoles = [];
     const werewolfCount = this.getWerewolfCount(players);
     const availableWerewolfRoles = getPlayerRoles().filter(role => role.group === "werewolves");
@@ -194,7 +240,7 @@ exports.postGame = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         const game = await this.create({
-            gameMaster: mongoose.Types.ObjectId(req.user._id),
+            gameMaster: new mongoose.Types.ObjectId(req.user._id),
             players: body.players,
         });
         res.status(200).json(game);
@@ -372,7 +418,7 @@ exports.play = async play => {
     }
     game.tick++;
     this.checkGameWinners(game);
-    return await this.findOneAndUpdate({ _id: play.gameId }, game);
+    return this.findOneAndUpdate({ _id: play.gameId }, game);
 };
 
 exports.postPlay = async(req, res) => {

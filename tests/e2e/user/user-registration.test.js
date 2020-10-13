@@ -11,7 +11,6 @@ const { expect } = chai;
 const credentials = { email: "test@test.fr", password: "secret" };
 let user, token, user2;
 
-// eslint-disable-next-line max-lines-per-function
 describe("A - Sign up and log in", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -19,6 +18,36 @@ describe("A - Sign up and log in", () => {
         chai.request(app)
             .post("/users")
             .send({ email: "foobar", password: "secret" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("📧 Doesn't allow email longer than 30 characters (POST /users)", done => {
+        chai.request(app)
+            .post("/users")
+            .send({ email: "foobar@foooooooooooooooooooooobar.com", password: "secret" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🔏 Doesn't allow password shorter than 5 characters (POST /users)", done => {
+        chai.request(app)
+            .post("/users")
+            .send({ email: "foobar@lol.com", password: "lol" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🔏 Doesn't allow password longer than 50 characters (POST /users)", done => {
+        chai.request(app)
+            .post("/users")
+            .send({ email: "foobar@lol.com", password: "IamASuperLongPasswordHowAreYouDoing?ReviewingCodeIsFun!" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_REQUEST");
@@ -55,6 +84,36 @@ describe("A - Sign up and log in", () => {
                 done();
             });
     });
+    it("📧 Can't log in with a too long email address (POST /users/login)", done => {
+        chai.request(app)
+            .post(`/users/login`)
+            .send({ email: "foobar@foooooooooooooooooooooobar.com", password: "secret" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🔏 Can't log in with a too small password (POST /users/login)", done => {
+        chai.request(app)
+            .post(`/users/login`)
+            .send({ email: "foobar@lol.com", password: "lol" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🔏 Can't log in with a too long password (POST /users/login)", done => {
+        chai.request(app)
+            .post(`/users/login`)
+            .send({ email: "foobar@lol.com", password: "IamASuperLongPasswordHowAreYouDoing?ReviewingCodeIsFun!" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
     it("🔐 Doesn't allow bad credentials (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
@@ -79,7 +138,7 @@ describe("A - Sign up and log in", () => {
     it("👤 Gets freshly created user with JWT auth (GET /users/:id)", done => {
         chai.request(app)
             .get(`/users/${user._id}`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body.email).to.equals(credentials.email);
@@ -107,10 +166,23 @@ describe("A - Sign up and log in", () => {
     it("🔐 Doesn't allow to get user without the right token (GET /users/:id)", done => {
         chai.request(app)
             .get(`/users/${user2._id}`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 expect(res.body.type).to.equals("UNAUTHORIZED");
+                done();
+            });
+    });
+    it("👤 Get users with only _id and email in response (GET /users?fields=email,_id)", done => {
+        chai.request(app)
+            .get(`/users?fields=email,_id`)
+            .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                expect(res.body[0]._id).to.exist;
+                expect(res.body[0].email).to.exist;
+                expect(res.body[0].password).to.not.exist;
+                expect(res.body[0].createdAt).to.not.exist;
                 done();
             });
     });

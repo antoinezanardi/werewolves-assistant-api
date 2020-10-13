@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
-const players = [
+let players = [
     { name: "Dag", role: "werewolf" },
     { name: "Dig", role: "werewolf" },
     { name: "Deg", role: "werewolf" },
@@ -18,7 +18,6 @@ const players = [
 ];
 let token, game;
 
-// eslint-disable-next-line max-lines-per-function
 describe("C - Tiny game of 4 players with only werewolves and one poor villager", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
@@ -46,7 +45,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
     it("🎲 Creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
-            .set({ "Authorization": `Bearer ${token}` })
+            .set({ Authorization: `Bearer ${token}` })
             .send({ players })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -56,8 +55,8 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
     });
     it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
         chai.request(app)
-            .post(`/games/${mongoose.Types.ObjectId()}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
+            .post(`/games/${new mongoose.Types.ObjectId()}/play`)
+            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
@@ -66,15 +65,17 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
             });
     });
     it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [
-                { from: players[0]._id, for: players[3]._id },
-                { from: players[1]._id, for: players[3]._id },
-                { from: players[2]._id, for: players[3]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[0]._id, for: players[3]._id },
+                    { from: players[1]._id, for: players[3]._id },
+                    { from: players[2]._id, for: players[3]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -82,13 +83,11 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
             });
     });
     it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
-        const { players } = game;
+        players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
-            .set({ "Authorization": `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [
-                { player: players[3]._id },
-            ] })
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -102,9 +101,11 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
     });
 });
 
-// const players = [
-//     { name: "0Dag", role: "werewolf" },
-//     { name: "1Dig", role: "werewolf" },
-//     { name: "2Deg", role: "werewolf" },
-//     { name: "3Dog", role: "villager" },
-// ];
+/*
+ * const players = [
+ *     { name: "0Dag", role: "werewolf" },
+ *     { name: "1Dig", role: "werewolf" },
+ *     { name: "2Deg", role: "werewolf" },
+ *     { name: "3Dog", role: "villager" },
+ * ];
+ */

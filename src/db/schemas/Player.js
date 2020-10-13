@@ -14,9 +14,7 @@ const PlayerAttributeSchema = new Schema({
         enum: waitingForPossibilities,
         required: true,
     },
-    remainingPhases: {
-        type: Number,
-    },
+    remainingPhases: { type: Number },
 }, {
     _id: false,
     timestamps: false,

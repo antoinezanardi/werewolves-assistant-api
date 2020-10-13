@@ -1,5 +1,40 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.6.0 (2020-10-13)
+
+### 🚀 New features
+
+* [#34](https://github.com/antoinezanardi/werewolves-assistant-web/issues/34) - Users can review a game with rating and comment.
+* [#37](https://github.com/antoinezanardi/werewolves-assistant-web/issues/37) - Users and games can be retrieved with only desired fields.
+* [#39](https://github.com/antoinezanardi/werewolves-assistant-web/issues/39) - All player role cards are hosted on the server.
+
+### 🌟 Enhancements
+
+* [#30](https://github.com/antoinezanardi/werewolves-assistant-web/issues/30) - `.eslintrc.js` file contains now all existing rules. Rules were adapted for each type of files.
+* [#31](https://github.com/antoinezanardi/werewolves-assistant-web/issues/31) - `README.md` file has been approved with new badges and 4 new sections.
+* [#32](https://github.com/antoinezanardi/werewolves-assistant-web/issues/32) - Player names can't exceed 30 characters long and are filter out of HTML tags.
+* [#33](https://github.com/antoinezanardi/werewolves-assistant-web/issues/33) - Users email address and password can't exceed 30 characters long for better database storage.
+* [#35](https://github.com/antoinezanardi/werewolves-assistant-web/issues/35) - Request rate limit implemented for all routes with no auth or `JWT` auth.
+
+### 📚 Documentation
+
+* [#36](https://github.com/antoinezanardi/werewolves-assistant-web/issues/36) - `CONTRIBUTING.md` file added for helping people contribute to this project.
+
+### 📦 Packages
+
+* `express-rate-limit` installed with version `5.1.3`.
+* `xss` installed with version `1.0.8`.
+* `@sentry/node` updated to version `5.26.0`.
+* `apidoc` updated to version `5.24.2`.
+* `eslint` updated to version `7.10.0`.
+* `migrate-mongo` updated to version `8.1.2`.
+* `mocha` updated to version `8.1.3`.
+* `mongoose` updated to version `5.10.9`.
+* `nodemon` updated to version `2.0.5`.
+* `validator` updated to version `13.1.17`.
+
+---
+
 ## 0.5.3 (2020-08-17)
 
 ### 🐛 Bug fixes
