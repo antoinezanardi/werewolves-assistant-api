@@ -12,17 +12,17 @@
 
 ## 📋 Table of Contents
 
-1. [🐺 What is this API ?](#what-is-this-api)
-2. [🔍 Let's try !](#lets-try)
-3. [🃏 Roles available](#roles-available)
-4. [📚 API Documentation](#api-documentation)
-5. [📈 Versions & changelog](#versions)
-6. [☑️ Code analysis and consistency](#code-analysis-and-consistency)
-7. [🔨 Installation](#installation)
-8. [🔌 Let's go](#lets-go)
-9. [⚙️ Other useful commands](#other-useful-commands)
-10. [©️ License](#license)
-11. [❤️ Contributors](#contributors)
+1. 🐺 [What is this API ?](#what-is-this-api)
+2. 🔍 [Let's try !](#lets-try)
+3. 🃏 [Roles available](#roles-available)
+4. 📚 [API Documentation](#api-documentation)
+5. 📈 [Versions & changelog](#versions)
+6. ☑️ [Code analysis and consistency](#code-analysis-and-consistency)
+7. 🔨 [Installation](#installation)
+8. 🔌 [Let's go](#lets-go)
+9. ⚙️ [Other useful commands](#other-useful-commands)
+10. ©️ [License](#license)
+11. ❤️ [Contributors](#contributors)
 
 ## <a name="what-is-this-api">🐺 What is this API ?</a>
 Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.
