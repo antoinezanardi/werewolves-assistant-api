@@ -11,7 +11,7 @@
     "stop_sandbox": "forever stop werewolves-assistant-api-sandbox",
     "start_production": "forever start ./config/forever/production.json",
     "stop_production": "forever stop werewolves-assistant-api",
-    "update_version": "./scripts/update-version.sh",
+    "update_version": "src/scripts/update-version.sh",
     "migrate": "npx migrate-mongo up -f ./config/migrate-mongo/index.js",
     "migrate_down": "npx migrate-mongo down -f ./config/migrate-mongo/index.js",
     "test": "export NODE_ENV=test && npx mocha ./tests/units/index.js ./tests/e2e/index.js --exit"

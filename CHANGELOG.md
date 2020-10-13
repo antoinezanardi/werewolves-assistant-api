@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.6.0 (2020-10-??)
+## 0.6.0 (2020-10-13)
 
 ### 🚀 New features
 
@@ -30,6 +30,7 @@
 * `migrate-mongo` updated to version `8.1.2`.
 * `mocha` updated to version `8.1.3`.
 * `mongoose` updated to version `5.10.9`.
+* `nodemon` updated to version `2.0.5`.
 * `validator` updated to version `13.1.17`.
 
 ---

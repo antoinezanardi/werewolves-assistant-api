@@ -10,14 +10,28 @@
 [![ForTheBadge built-with-love](http://ForTheBadge.com/images/badges/built-with-love.svg)](https://GitHub.com/antoinezanardi/)
 [![ForTheBadge uses-js](http://ForTheBadge.com/images/badges/uses-js.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api)
 
-## 🐺 What is this API ?
+## 📋 Table of Contents
+
+1. [🐺 What is this API ?](#what-is-this-api)
+2. [🔍 Let's try !](#lets-try)
+3. [🃏 Roles available](#roles-available)
+4. [📚 API Documentation](#api-documentation)
+5. [📈 Versions & changelog](#versions)
+6. [☑️ Code analysis and consistency](#code-analysis-and-consistency)
+7. [🔨 Installation](#installation)
+8. [🔌 Let's go](#lets-go)
+9. [⚙️ Other useful commands](#other-useful-commands)
+10. [©️ License](#license)
+11. [❤️ Contributors](#contributors)
+
+## <a name="what-is-this-api">🐺 What is this API ?</a>
 Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.
 
 This is the project's API used by [**Werewolves Assistant Web**](https://github.com/antoinezanardi/werewolves-assistant-web), the main web **VueJS** client.  
 
 #### 🤔 Want to know more about this awesome project ? <a href="https://werewolves-assistant.antoinezanardi.fr/about" target="_blank">**Check out the dedicated about page**</a>.
 
-## 🔍 Let's try !
+## <a name="lets-try">🔍 Let's try !</a>
 Two versions are available for testing this API:
 
 ✨ <a href="https://werewolves-assistant-api.antoinezanardi.fr" target="_blank">**Main API**</a> _(Base URL: https://werewolves-assistant-api.antoinezanardi.fr)_
@@ -28,7 +42,7 @@ Two versions are available for testing this API:
 
 #### 🚀🧑‍🚀 Fan of Postman ? Try out the [**official public collection**](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
-## 🃏 Roles available
+## <a name="roles-available">🃏 Roles available</a>
 
 On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **7 different roles** are available to play:
 
@@ -42,7 +56,8 @@ On this current version [![GitHub release](https://img.shields.io/github/release
 
 Please check the <a href="https://werewolves-assistant-api.antoinezanardi.fr/apidoc/#player-roles" target="_blank">**Player role section on API documentation**</a> for more details about each role.
 
-## 📚 API Documentation
+## <a name="api-documentation">📚 API Documentation</a>
+
 Documentation is available for both versions:
 
 * **✨ [Main API Documentation](https://werewolves-assistant-api.antoinezanardi.fr/apidoc)**
@@ -50,7 +65,8 @@ Documentation is available for both versions:
 
 Note that contributors try their best to maintain documentations up to date. If you find any typos or oversights, please open an issue, or a pull request.
 
-## 📈 Versions & changelog
+## <a name="versions">📈 Versions & changelog</a>
+
 Each change when a new version comes up is listed in the <a href="https://github.com/antoinezanardi/werewolves-assistant-api/blob/master/CHANGELOG.md" target="_blank">CHANGELOG.md file</a> placed at project's root.
 
 Also, you can keep up with changes by watching releases with the **Watch GitHub button** at the top of this page.
@@ -59,12 +75,14 @@ Current release on **main API** is [![GitHub release](https://img.shields.io/git
 
 #### 🏷️ <a href="https://github.com/antoinezanardi/werewolves-assistant-api/releases" target="_blank">All releases for this project are available here</a>. 
 
-## ☑️ Code analysis and consistency
+## <a name="code-analysis-and-consistency">☑️ Code analysis and consistency</a>
+
 In order to keep the code clean, consistent and free of bad JS practises, **[ESLint](https://eslint.org/)** is installed with nearly **220 rules activated** !
 
 Complete list of all enabled rules is available in the **[.eslintrc.js file](https://github.com/antoinezanardi/werewolves-assistant-api/blob/master/.eslintrc.js)**.
 
-## 🔨 Installation
+## <a name="installation">🔨 Installation</a>
+
 1. Install dependencies with `npm install` (add `--production` to omit dev dependencies).
 2. Copy `.env.example` and paste it as `.env`.
 3. Replace environment values in the fresh new `.env` file if necessary (When **⚠️️ Required** is specified):
@@ -85,25 +103,26 @@ Complete list of all enabled rules is available in the **[.eslintrc.js file](htt
     * **SENTRY_KEY**: Sentry secret key. 
       - _**Not required**_
 
-## 🔌 Let's go
+## <a name="lets-go">🔌 Let's go</a>
+
 To start the API **on development mode**, simply run `npm start`.
 
 To start the API **on production mode**, run `npm run start_sandbox` or `npm run start_production`.
 
-## ⚙️ Other useful commands
+## <a name="other-useful-commands">⚙️ Other useful commands</a>
 - **Tests**: `npm run test` runs various tests to check API endpoints.
 - **Lint**: `npm run lint` checks for code style. Based on AirBnB configuration with many more rules.
 - **Doc**: `npm run doc` generates doc for API.
 
-## ©️ License
+## <a name="license">©️ License</a>
 
 This project is licensed under the [MIT License](http://opensource.org/licenses/MIT).
 
-## ❤️ Contributor list
+## <a name="contributors">❤️ Contributors</a>
 
 If you want to contribute to this project, please read the [**contribution guide**](https://github.com/antoinezanardi/werewolves-assistant-api/pulls/CONTRIBUTING.md).
 
-Thank you to all our contributors:
+Thank you to all the contributors:
 
 <table>
     <tbody>
