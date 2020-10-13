@@ -110,7 +110,7 @@ Thank you to all our contributors:
         <tr>
             <td align="center" valign="top">
                 <a href="https://github.com/DeschampsThomas">
-                    <img src="https://github.com/DeschampsThomas.png?s=75" width="75" height="75"><br/><br/>
+                    <img src="https://github.com/DeschampsThomas.png?s=75" width="75" height="75"><br/>
                     Thomas Deschamps
                 </a>
             </td>
