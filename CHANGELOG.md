@@ -2,6 +2,10 @@
 
 ## 0.6.1 (2020-10-??)
 
+### 🐛 Bug fixes
+
+* [#46](https://github.com/antoinezanardi/werewolves-assistant-web/issues/46) - Travis warnings fixed according to build info.
+
 ### 🛣️ Routes
 
 * [#44](https://github.com/antoinezanardi/werewolves-assistant-web/issues/44) - Users can review a game with rating and comment.
