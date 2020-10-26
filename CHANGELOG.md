@@ -2,6 +2,14 @@
 
 ## 0.6.1 (2020-10-??)
 
+### 🐛 Bug fixes
+
+* [#46](https://github.com/antoinezanardi/werewolves-assistant-web/issues/46) - Travis warnings fixed according to build info.
+
+### ♻️ Refactoring
+
+* [#47](https://github.com/antoinezanardi/werewolves-assistant-web/issues/47) - Email's length limit for logging in and registering has been enlarged to 50 characters.
+
 ### 🛣️ Routes
 
 * [#44](https://github.com/antoinezanardi/werewolves-assistant-web/issues/44) - Users can review a game with rating and comment.

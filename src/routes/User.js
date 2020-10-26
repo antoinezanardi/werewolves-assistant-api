@@ -14,7 +14,7 @@ module.exports = app => {
 
     /**
      * @apiDefine UserRequestBody
-     * @apiParam (Request Body Parameters) {String{>=30}} email User's email.
+     * @apiParam (Request Body Parameters) {String{>= 50}} email User's email.
      * @apiParam (Request Body Parameters) {String{>= 5 && <= 50}} password User's password.
      */
 
@@ -72,7 +72,7 @@ module.exports = app => {
         body("email")
             .isEmail().withMessage("Must be a valid email")
             .trim()
-            .isLength({ max: 30 }).withMessage("Can't exceed 30 characters long"),
+            .isLength({ max: 50 }).withMessage("Can't exceed 50 characters long"),
         body("password")
             .isString().withMessage("Must be a string")
             .isLength({ min: 5, max: 50 }).withMessage("Must be at least 5 characters long"),
@@ -90,7 +90,7 @@ module.exports = app => {
         body("email")
             .isEmail().withMessage("Must be a valid email")
             .trim()
-            .isLength({ max: 30 }).withMessage("Can't exceed 30 characters long"),
+            .isLength({ max: 50 }).withMessage("Can't exceed 50 characters long"),
         body("password")
             .isString().withMessage("Must be a string")
             .isLength({ min: 5, max: 50 }).withMessage("Must be at least 5 characters long"),
