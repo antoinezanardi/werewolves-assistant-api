@@ -24,10 +24,10 @@ describe("A - Sign up and log in", () => {
                 done();
             });
     });
-    it("📧 Doesn't allow email longer than 30 characters (POST /users)", done => {
+    it("📧 Doesn't allow email longer than 50 characters (POST /users)", done => {
         chai.request(app)
             .post("/users")
-            .send({ email: "foobar@foooooooooooooooooooooobar.com", password: "secret" })
+            .send({ email: "foobar@foooooooooooooooooooooooooooooooooooobar.com", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_REQUEST");
@@ -87,7 +87,7 @@ describe("A - Sign up and log in", () => {
     it("📧 Can't log in with a too long email address (POST /users/login)", done => {
         chai.request(app)
             .post(`/users/login`)
-            .send({ email: "foobar@foooooooooooooooooooooobar.com", password: "secret" })
+            .send({ email: "foobar@foooooooooooooooooooooooooooooooooooobar.com", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_REQUEST");
