@@ -1,5 +1,20 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.6.1 (2020-10-??)
+
+### 🛣️ Routes
+
+* [#44](https://github.com/antoinezanardi/werewolves-assistant-web/issues/44) - Users can review a game with rating and comment.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.27.1`.
+* `eslint` updated to version `7.12.0`.
+* `migrate-mongo` updated to version `8.1.4`.
+* `mocha` updated to version `8.2.0`.
+* `mongoose` updated to version `5.10.10`.
+* `nodemon` updated to version `2.0.6`.
+
 ## 0.6.0 (2020-10-13)
 
 ### 🚀 New features
