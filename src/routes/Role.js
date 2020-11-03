@@ -1,4 +1,3 @@
-const passport = require("passport");
 const { getPlayerRoles } = require("../helpers/functions/Role");
 
 /**
@@ -14,11 +13,9 @@ module.exports = app => {
      * @apiName GetRoles
      * @apiGroup Roles 🃏
      *
-     * @apiPermission JWT
-     * @apiPermission Basic
      * @apiUse RoleResponse
      */
-    app.get("/roles", passport.authenticate(["basic", "jwt"], { session: false }), (req, res) => {
+    app.get("/roles", (req, res) => {
         res.status(200).json(getPlayerRoles());
     });
 };
