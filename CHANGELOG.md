@@ -6,6 +6,10 @@
 
 * [#42](https://github.com/antoinezanardi/werewolves-assistant-web/issues/42) - When there is no player left, game is won by nobody.
 
+### ♻️ Refactoring
+
+* [#43](https://github.com/antoinezanardi/werewolves-assistant-web/issues/43) - Many game rules changes according to the official game's guide.
+
 ### 📦 Packages
 
 * `@sentry/node` updated to version `5.27.3`.
