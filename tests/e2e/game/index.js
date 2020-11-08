@@ -9,4 +9,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./raven-marked-dead-player-game.test");
     require("./kill-player-twice-game.test");
     require("./hunter-kills-mayor-on-day-time.test");
+    require("./no-winner-game.test");
 });

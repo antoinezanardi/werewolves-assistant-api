@@ -19,8 +19,8 @@ exports.turnPreNightActionsOrder = [{ source: "all", action: "elect-sheriff" }];
 
 exports.turnNightActionsOrder = [
     { source: "seer", action: "look" },
+    { source: "raven", action: "mark" },
+    { source: "guard", action: "protect" },
     { source: "werewolves", action: "eat" },
     { source: "witch", action: "use-potion" },
-    { source: "guard", action: "protect" },
-    { source: "raven", action: "mark" },
 ];

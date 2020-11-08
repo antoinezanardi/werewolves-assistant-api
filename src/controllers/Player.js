@@ -105,7 +105,7 @@ exports.insertActionBeforeAllVote = (game, waiting) => {
 
 exports.killPlayer = (playerId, { action }, game) => {
     const player = game.players.find(({ _id, isAlive }) => _id.toString() === playerId.toString() && isAlive);
-    if (player && (action === "eat" && canBeEaten(player) || action !== "eat" && !hasAttribute(player, "protected"))) {
+    if (player && (action === "eat" && canBeEaten(player) || action !== "eat")) {
         player.isAlive = false;
         const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
         if (murdered) {
