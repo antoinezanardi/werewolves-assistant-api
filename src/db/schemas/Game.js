@@ -11,7 +11,7 @@ const WonSchema = new Schema({
     },
     players: {
         type: [PlayerSchema],
-        required: true,
+        default: undefined,
     },
 }, {
     _id: false,

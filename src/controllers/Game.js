@@ -5,7 +5,7 @@ const Player = require("./Player");
 const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
-const { isVillagerSideAlive, isWerewolfSideAlive } = require("../helpers/functions/Game");
+const { isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, isGameDone } = require("../helpers/functions/Game");
 const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
@@ -269,17 +269,13 @@ exports.patchGame = async(req, res) => {
 };
 
 exports.checkGameWinners = game => {
-    if (!isVillagerSideAlive(game) || !isWerewolfSideAlive(game)) {
-        if (!isVillagerSideAlive(game)) {
-            game.won = {
-                by: "werewolves",
-                players: game.players.filter(player => player.role.group === "werewolves"),
-            };
+    if (isGameDone(game)) {
+        if (areAllPlayersDead(game)) {
+            game.won = { by: null };
+        } else if (!isVillagerSideAlive(game)) {
+            game.won = { by: "werewolves", players: game.players.filter(player => player.role.group === "werewolves") };
         } else if (!isWerewolfSideAlive(game)) {
-            game.won = {
-                by: "villagers",
-                players: game.players.filter(player => player.role.group === "villagers"),
-            };
+            game.won = { by: "villagers", players: game.players.filter(player => player.role.group === "villagers") };
         }
         game.status = "done";
     }

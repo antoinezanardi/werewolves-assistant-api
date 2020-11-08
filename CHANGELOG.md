@@ -1,5 +1,23 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.6.2 (2020-11-08)
+
+### 🐛 Bug fixes
+
+* [#42](https://github.com/antoinezanardi/werewolves-assistant-web/issues/42) - When there is no player left, game is won by nobody.
+
+### ♻️ Refactoring
+
+* [#43](https://github.com/antoinezanardi/werewolves-assistant-web/issues/43) - Many game rules changes according to the official game's guide.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.27.3`.
+* `eslint` updated to version `7.13.0`.
+* `mongoose` updated to version `5.10.13`.
+
+---
+
 ## 0.6.1 (2020-11-03)
 
 ### 🐛 Bug fixes
