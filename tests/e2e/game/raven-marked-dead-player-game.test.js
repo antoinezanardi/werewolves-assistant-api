@@ -76,21 +76,6 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 done();
             });
     });
-    it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
-        players = game.players;
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                game = res.body;
-                expect(game.players[1].attributes).to.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
-                expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                done();
-            });
-    });
     it("🐦 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
@@ -101,6 +86,20 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                done();
+            });
+    });
+    it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
                 done();
