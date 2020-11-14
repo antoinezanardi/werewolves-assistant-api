@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#58](https://github.com/antoinezanardi/werewolves-assistant-web/issues/58) - Little girl role implemented.
+* [#59](https://github.com/antoinezanardi/werewolves-assistant-web/issues/59) - Villager-villager role implemented.
 
 ### 📚 Documentation
 
