@@ -1,5 +1,18 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.7.0 (2020-11-??)
+
+### 📚 Documentation
+
+* [#57](https://github.com/antoinezanardi/werewolves-assistant-web/issues/57) - Fix doc for `game.won`.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.27.4`.
+* `mongoose` updated to version `5.10.14`.
+
+---
+
 ## 0.6.2 (2020-11-08)
 
 ### 🐛 Bug fixes
