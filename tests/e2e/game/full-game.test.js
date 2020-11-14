@@ -18,10 +18,12 @@ let players = [
     { name: "Dyg", role: "hunter" },
     { name: "Deg", role: "werewolf" },
     { name: "Dog", role: "villager" },
+    { name: "Dœg", role: "little-girl" },
+    { name: "Dºg", role: "villager-villager" },
 ];
 let token, game;
 
-describe("B - Full game of 7 players with all roles", () => {
+describe("B - Full game of 9 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -215,7 +217,7 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👪 All elect the witch as the sheriff (POST /games/:id/play)", done => {
+    it("👪 All elect the little girl as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -223,19 +225,19 @@ describe("B - Full game of 7 players with all roles", () => {
             .send({
                 source: "all", action: "elect-sheriff", votes: [
                     { from: players[0]._id, for: players[1]._id },
-                    { from: players[1]._id, for: players[0]._id },
-                    { from: players[2]._id, for: players[0]._id },
+                    { from: players[1]._id, for: players[7]._id },
+                    { from: players[2]._id, for: players[7]._id },
                 ],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.players[7].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
                 expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[7]._id);
                 done();
             });
     });
@@ -1211,17 +1213,17 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("👪 All vote for guard (POST /games/:id/play)", done => {
+    it("👪 All vote for villager-villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[2]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[8]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[2].isAlive).to.equals(false);
-                expect(game.players[2].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[8].isAlive).to.equals(false);
+                expect(game.players[8].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -1249,22 +1251,41 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'wolves' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+    it("🎲 Game is waiting for 'guard' to 'protect'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "guard", to: "protect" });
         done();
     });
-    it("🐺 Werewolves eat the witch (POST /games/:id/play)", done => {
+    it("🛡 Guard protects the little girl (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[0]._id }] })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[7]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
+                expect(game.players[7].attributes).to.deep.include({ attribute: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'wolves' to 'eat'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        done();
+    });
+    it("🐺 Werewolves eat the little girl (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[7]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[7].attributes).to.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
                 done();
             });
     });
@@ -1296,11 +1317,11 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("☀️ Sun is rising", done => {
+    it("☀️ Sun is rising, little girl is eaten even if protected by guard", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[0].attributes).to.not.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
-        expect(game.players[0].isAlive).to.equals(false);
-        expect(game.players[0].murdered).to.deep.equals({ by: "werewolves", of: "eat" });
+        expect(game.players[7].attributes).to.not.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
+        expect(game.players[7].isAlive).to.equals(false);
+        expect(game.players[7].murdered).to.deep.equals({ by: "werewolves", of: "eat" });
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
@@ -1384,7 +1405,7 @@ describe("B - Full game of 7 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[0]._id }] })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[8]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1503,7 +1524,7 @@ describe("B - Full game of 7 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "hunter", action: "shoot", targets: [{ player: players[0]._id }] })
+            .send({ source: "hunter", action: "shoot", targets: [{ player: players[8]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1567,7 +1588,7 @@ describe("B - Full game of 7 players with all roles", () => {
                 done();
             });
     });
-    it("🌟 Can update game review  (PATCH /games/:id)", done => {
+    it("🌟 Can update game review (PATCH /games/:id)", done => {
         chai.request(app)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
@@ -1584,12 +1605,14 @@ describe("B - Full game of 7 players with all roles", () => {
 
 /*
  * const players = [
- *     { name: "0Dig", role: "witch" }, X
- *     { name: "1Doug", role: "seer" }, X
- *     { name: "2Dag", role: "guard" }, X
+ *     { name: "0Dig", role: "witch" },
+ *     { name: "1Doug", role: "seer" },
+ *     { name: "2Dag", role: "guard" },
  *     { name: "3Dug", role: "raven" },
- *     { name: "4Dyg", role: "hunter" }, X
+ *     { name: "4Dyg", role: "hunter" },
  *     { name: "5Deg", role: "werewolf" },
- *     { name: "6Dog", role: "villager" }, X
+ *     { name: "6Dog", role: "villager" },
+ *     { name: "7Diig", role: "little-girl" },
+ *     { name: "8Diig", role: "villager-villager" },
  * ];
  */

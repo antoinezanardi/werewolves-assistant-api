@@ -2,6 +2,10 @@
 
 ## 0.7.0 (2020-11-??)
 
+### 🚀 New features
+
+* [#58](https://github.com/antoinezanardi/werewolves-assistant-web/issues/58) - Little girl role implemented.
+
 ### 📚 Documentation
 
 * [#57](https://github.com/antoinezanardi/werewolves-assistant-web/issues/57) - Fix doc for `game.won`.

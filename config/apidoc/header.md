@@ -14,10 +14,10 @@
 
 | Field                | Type     | Description                                                         |
 |----------------------|:--------:|---------------------------------------------------------------------|
-| _id                  | ObjectId | User's ID.                                                     |
-| email                | String   | User's email.                                                     |
-| createdAt            | Date     | When the user created his account.                                                     |
-| updatedAt            | Date     | When the user updated his account.                                                     |
+| _id                  | ObjectId | User's ID.                                                          |
+| email                | String   | User's email.                                                       |
+| createdAt            | Date     | When the user created his account.                                  |
+| updatedAt            | Date     | When the user updated his account.                                  |
 
 ## <a id="game-class"></a>🎲 Game
 
