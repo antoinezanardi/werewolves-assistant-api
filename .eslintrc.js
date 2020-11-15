@@ -327,6 +327,7 @@ module.exports = {
                 "max-lines-per-function": "off",
                 "max-nested-callbacks": "off",
                 "no-unused-expressions": "off",
+                "max-len": "off",
             },
         }, {
             files: ["src/routes/*.js"],

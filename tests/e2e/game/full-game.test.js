@@ -854,7 +854,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🐦]  (POST /games/:id/play)", done => {
+    it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🐦 and little girl, the sheriff, has double vote] (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -863,10 +863,11 @@ describe("B - Full game of 9 players with all roles", () => {
                 source: "all", action: "vote", votes: [
                     { from: players[0]._id, for: players[1]._id },
                     { from: players[1]._id, for: players[5]._id },
-                    { from: players[2]._id, for: players[5]._id },
-                    { from: players[3]._id, for: players[1]._id },
-                    { from: players[4]._id, for: players[5]._id },
+                    { from: players[2]._id, for: players[1]._id },
+                    { from: players[3]._id, for: players[0]._id },
+                    { from: players[4]._id, for: players[1]._id },
                     { from: players[5]._id, for: players[6]._id },
+                    { from: players[7]._id, for: players[5]._id },
                 ],
             })
             .end((err, res) => {

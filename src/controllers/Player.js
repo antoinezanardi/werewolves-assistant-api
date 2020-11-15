@@ -1,5 +1,6 @@
 const GameHistory = require("./GameHistory");
 const { canBeEaten, hasAttribute } = require("../helpers/functions/Player");
+const { getPlayerWithAttribute } = require("../helpers/functions/Game");
 const { getPlayerAttribute, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
 const { generateError } = require("../helpers/functions/Error");
 
@@ -142,8 +143,6 @@ exports.removePlayerAttribute = (playerId, attributeName, game) => {
     }
 };
 
-exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => hasAttribute(player, attributeName));
-
 exports.incrementPlayerVoteCount = (votedPlayers, playerId, game, inc = 1) => {
     const votedPlayer = votedPlayers.find(player => player._id.toString() === playerId.toString());
     if (votedPlayer) {
@@ -156,16 +155,21 @@ exports.incrementPlayerVoteCount = (votedPlayers, playerId, game, inc = 1) => {
 
 exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
     const votedPlayers = [];
+    const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
     for (const vote of votes) {
-        this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game);
+        if (action === "vote" && sheriffPlayer && sheriffPlayer._id === vote.from._id) {
+            this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game, 2);
+        } else {
+            this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game);
+        }
     }
     if (action === "vote") {
-        const ravenMarkedPlayers = this.getPlayersWithAttribute("raven-marked", game);
-        if (ravenMarkedPlayers.length) {
-            if (ravenMarkedPlayers[0].isAlive) {
-                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers[0]._id, game, 2);
+        const ravenMarkedPlayers = getPlayerWithAttribute("raven-marked", game);
+        if (ravenMarkedPlayers) {
+            if (ravenMarkedPlayers.isAlive) {
+                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers._id, game, 2);
             }
-            this.removePlayerAttribute(ravenMarkedPlayers[0]._id, "raven-marked", game);
+            this.removePlayerAttribute(ravenMarkedPlayers._id, "raven-marked", game);
         }
     }
     const maxVotes = Math.max(...votedPlayers.map(player => player.vote));
@@ -326,7 +330,7 @@ exports.allPlay = async(play, game, gameHistoryEntry) => {
 };
 
 exports.eaten = game => {
-    const eatenPlayer = this.getPlayersWithAttribute("eaten", game)[0];
+    const eatenPlayer = getPlayerWithAttribute("eaten", game);
     this.killPlayer(eatenPlayer._id, { action: "eat" }, game);
     this.removePlayerAttribute(eatenPlayer._id, "eaten", game);
 };
@@ -338,7 +342,7 @@ exports.removeAttributeFromAllPlayers = (attributeName, game) => {
 };
 
 exports.drankDeathPotion = game => {
-    const poisonedPlayer = this.getPlayersWithAttribute("drank-death-potion", game)[0];
+    const poisonedPlayer = getPlayerWithAttribute("drank-death-potion", game);
     this.killPlayer(poisonedPlayer._id, { action: "use-potion" }, game);
     this.removePlayerAttribute(poisonedPlayer._id, "drank-death-potion", game);
 };
