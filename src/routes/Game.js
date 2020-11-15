@@ -21,8 +21,8 @@ module.exports = app => {
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
      * @apiSuccess {Object} [won] Winners of the game when status is `done`.
-     * @apiSuccess {String={"werewolves", "villagers"}} won.by Can be either a group or a role. (_Possibilities: `werewolves` or `villagers`_)
-     * @apiSuccess {Player[]} won.players List of player(s) who won. (_See: [Classes - Player](#player-class)_)
+     * @apiSuccess {String={"werewolves", "villagers", null}} won.by Can be either a group or a role. (_Possibilities: `werewolves`, `villagers` or null if nobody won_)
+     * @apiSuccess {Player[]} [won.players] List of player(s) who won. (_See: [Classes - Player](#player-class)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
      */

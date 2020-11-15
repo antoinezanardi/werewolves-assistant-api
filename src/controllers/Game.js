@@ -5,7 +5,7 @@ const Player = require("./Player");
 const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
-const { isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, isGameDone } = require("../helpers/functions/Game");
+const { isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, isGameDone, getPlayerWithAttribute } = require("../helpers/functions/Game");
 const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
@@ -305,7 +305,7 @@ exports.fillWaitingQueueWithDayActions = async game => {
         { attribute: "drank-death-potion", trigger: Player.drankDeathPotion },
     ];
     for (const { attribute, trigger } of playerAttributeMethods) {
-        if (Player.getPlayersWithAttribute(attribute, game).length) {
+        if (getPlayerWithAttribute(attribute, game)) {
             trigger(game);
         }
     }
