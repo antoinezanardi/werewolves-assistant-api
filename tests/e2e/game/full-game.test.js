@@ -348,7 +348,7 @@ describe("B - Full game of 9 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
     });
-    it("🐦 Raven can't mark if play's source is not 'raven' (POST /games/:id/play)", done => {
+    it("🪶 Raven can't mark if play's source is not 'raven' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -359,7 +359,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🐦 Raven can't mark if play's action is not 'mark' (POST /games/:id/play)", done => {
+    it("🪶 Raven can't mark if play's action is not 'mark' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -370,7 +370,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🐦 Raven can't mark multiple targets (POST /games/:id/play)", done => {
+    it("🪶 Raven can't mark multiple targets (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -387,7 +387,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🐦 Raven can't mark an unknown target (POST /games/:id/play)", done => {
+    it("🪶 Raven can't mark an unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -398,7 +398,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🐦 Raven marks the villager (POST /games/:id/play)", done => {
+    it("🪶 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -611,7 +611,7 @@ describe("B - Full game of 9 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "witch", to: "use-potion" });
         done();
     });
-    it("🧹 Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -622,7 +622,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -633,7 +633,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use potion if one target doesn't have `potion` field (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use potion if one target doesn't have `potion` field (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -645,7 +645,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use potion if one target have both `potion.life` and `potion.death` fields set to `true` (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use potion if one target have both `potion.life` and `potion.death` fields set to `true` (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -657,7 +657,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use potion on unknown target (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use potion on unknown target (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -668,7 +668,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use life potion on player not eaten by werewolves (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use life potion on player not eaten by werewolves (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -680,7 +680,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use life potion and death potion on same target (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use life potion and death potion on same target (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -697,7 +697,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use death potion twice (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use death potion twice (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -714,7 +714,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch use life potion on guard (POST /games/:id/play)", done => {
+    it("🪄 Witch use life potion on guard (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -854,7 +854,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🐦 and little girl, the sheriff, has double vote] (POST /games/:id/play)", done => {
+    it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🪶 and little girl, the sheriff, has double vote] (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1024,7 +1024,7 @@ describe("B - Full game of 9 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
     });
-    it("🐦 Raven can't mark a dead target (POST /games/:id/play)", done => {
+    it("🪶 Raven can't mark a dead target (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1036,7 +1036,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🐦 Raven skips (POST /games/:id/play)", done => {
+    it("🪶 Raven skips (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -1126,7 +1126,7 @@ describe("B - Full game of 9 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "witch", to: "use-potion" });
         done();
     });
-    it("🧹 Witch can't use death potion on dead target (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use death potion on dead target (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1138,7 +1138,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch can't use life potion twice (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use life potion twice (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1150,7 +1150,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch use death potion on seer (POST /games/:id/play)", done => {
+    it("🪄 Witch use death potion on seer (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1237,7 +1237,7 @@ describe("B - Full game of 9 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
     });
-    it("🐦 Raven marks the hunter (POST /games/:id/play)", done => {
+    it("🪶 Raven marks the hunter (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1294,7 +1294,7 @@ describe("B - Full game of 9 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "witch", to: "use-potion" });
         done();
     });
-    it("🧹 Witch can't use death potion twice (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use death potion twice (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1306,7 +1306,7 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("🧹 Witch skips (POST /games/:id/play)", done => {
+    it("🪄 Witch skips (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })

@@ -76,7 +76,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 done();
             });
     });
-    it("🐦 Raven marks the villager (POST /games/:id/play)", done => {
+    it("🪶 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)

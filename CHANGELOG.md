@@ -6,6 +6,7 @@
 
 * [#58](https://github.com/antoinezanardi/werewolves-assistant-api/issues/58) - Little girl role implemented.
 * [#59](https://github.com/antoinezanardi/werewolves-assistant-api/issues/59) - Villager-villager role implemented.
+* [#61](https://github.com/antoinezanardi/werewolves-assistant-api/issues/61) - Travis CI linked to Slack.
 
 ### 🐛 Bug fixes
 
@@ -14,11 +15,12 @@
 ### 📚 Documentation
 
 * [#57](https://github.com/antoinezanardi/werewolves-assistant-api/issues/57) - Fix doc for `game.won`.
+* [#62](https://github.com/antoinezanardi/werewolves-assistant-api/issues/62) - Icon for witch 🪄 and raven 🪶 changed.
 
 ### 📦 Packages
 
 * `@sentry/node` updated to version `5.27.4`.
-* `mongoose` updated to version `5.10.14`.
+* `mongoose` updated to version `5.10.15`.
 
 ---
 
