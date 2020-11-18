@@ -6,6 +6,7 @@
 
 * [#58](https://github.com/antoinezanardi/werewolves-assistant-api/issues/58) - Little girl role implemented.
 * [#59](https://github.com/antoinezanardi/werewolves-assistant-api/issues/59) - Villager-villager role implemented.
+* [#61](https://github.com/antoinezanardi/werewolves-assistant-api/issues/61) - Travis CI linked to Slack.
 
 ### 🐛 Bug fixes
 
