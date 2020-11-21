@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.7.0 (2020-11-??)
+## 0.7.0 (2020-11-21)
 
 ### 🚀 New features
 
@@ -20,6 +20,8 @@
 ### 📦 Packages
 
 * `@sentry/node` updated to version `5.27.4`.
+* `eslint` updated to version `7.14.0`.
+* `express-rate-limit` updated to version `5.2.3`.
 * `mongoose` updated to version `5.10.15`.
 
 ---
