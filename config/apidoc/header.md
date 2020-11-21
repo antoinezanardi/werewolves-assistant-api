@@ -14,10 +14,10 @@
 
 | Field                | Type     | Description                                                         |
 |----------------------|:--------:|---------------------------------------------------------------------|
-| _id                  | ObjectId | User's ID.                                                     |
-| email                | String   | User's email.                                                     |
-| createdAt            | Date     | When the user created his account.                                                     |
-| updatedAt            | Date     | When the user updated his account.                                                     |
+| _id                  | ObjectId | User's ID.                                                          |
+| email                | String   | User's email.                                                       |
+| createdAt            | Date     | When the user created his account.                                  |
+| updatedAt            | Date     | When the user updated his account.                                  |
 
 ## <a id="game-class"></a>🎲 Game
 
@@ -35,8 +35,8 @@
 | status                                | String                                | Game's current status. (_See: [Codes - Game Statuses](#game-statuses)_)                                                                               |
 | history                               | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History](#game-history-class)_)                                                                                |
 | **won***                              | Object                                | Winner(s) of the game when status is `done`.                                                                                                          |
-| &emsp;&emsp;by                        | String                                | Can be either a group or a role. (_Possibilites: `werewolves` or `villagers`_)                                                                        |
-| &emsp;&emsp;players                   | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                                                 |
+| &emsp;&emsp;by                        | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers` or null if nobody won_)                                                   |
+| **&emsp;&emsp;players***              | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                                                 |
 | **review***                           | Object                                | Game master can attach a game review only if its status is set to `canceled` or `done`.                                                               |
 | &emsp;&emsp;rating                    | Number                                | Review's rating, from 0 to 5.                                                                                                                         |
 | **&emsp;&emsp;comment***              | String                                | Review's comment, from 1 to 500 characters long.                                                                                                      |

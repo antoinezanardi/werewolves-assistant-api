@@ -1,14 +1,40 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.7.0 (2020-11-21)
+
+### 🚀 New features
+
+* [#58](https://github.com/antoinezanardi/werewolves-assistant-api/issues/58) - Little girl role implemented.
+* [#59](https://github.com/antoinezanardi/werewolves-assistant-api/issues/59) - Villager-villager role implemented.
+* [#61](https://github.com/antoinezanardi/werewolves-assistant-api/issues/61) - Travis CI linked to Slack.
+
+### 🐛 Bug fixes
+
+* [#54](https://github.com/antoinezanardi/werewolves-assistant-api/issues/54) - Sheriff has double votes, as specified in the rules.
+
+### 📚 Documentation
+
+* [#57](https://github.com/antoinezanardi/werewolves-assistant-api/issues/57) - Fix doc for `game.won`.
+* [#62](https://github.com/antoinezanardi/werewolves-assistant-api/issues/62) - Icon for witch 🪄 and raven 🪶 changed.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.27.4`.
+* `eslint` updated to version `7.14.0`.
+* `express-rate-limit` updated to version `5.2.3`.
+* `mongoose` updated to version `5.10.15`.
+
+---
+
 ## 0.6.2 (2020-11-08)
 
 ### 🐛 Bug fixes
 
-* [#42](https://github.com/antoinezanardi/werewolves-assistant-web/issues/42) - When there is no player left, game is won by nobody.
+* [#42](https://github.com/antoinezanardi/werewolves-assistant-api/issues/42) - When there is no player left, game is won by nobody.
 
 ### ♻️ Refactoring
 
-* [#43](https://github.com/antoinezanardi/werewolves-assistant-web/issues/43) - Many game rules changes according to the official game's guide.
+* [#43](https://github.com/antoinezanardi/werewolves-assistant-api/issues/43) - Many game rules changes according to the official game's guide.
 
 ### 📦 Packages
 
@@ -22,15 +48,15 @@
 
 ### 🐛 Bug fixes
 
-* [#46](https://github.com/antoinezanardi/werewolves-assistant-web/issues/46) - Travis warnings fixed according to build info.
+* [#46](https://github.com/antoinezanardi/werewolves-assistant-api/issues/46) - Travis warnings fixed according to build info.
 
 ### ♻️ Refactoring
 
-* [#47](https://github.com/antoinezanardi/werewolves-assistant-web/issues/47) - Email's length limit for logging in and registering has been enlarged to 50 characters.
+* [#47](https://github.com/antoinezanardi/werewolves-assistant-api/issues/47) - Email's length limit for logging in and registering has been enlarged to 50 characters.
 
 ### 🛣️ Routes
 
-* [#44](https://github.com/antoinezanardi/werewolves-assistant-web/issues/44) - Users can review a game with rating and comment.
+* [#44](https://github.com/antoinezanardi/werewolves-assistant-api/issues/44) - Users can review a game with rating and comment.
 
 ### 📦 Packages
 
@@ -47,21 +73,21 @@
 
 ### 🚀 New features
 
-* [#34](https://github.com/antoinezanardi/werewolves-assistant-web/issues/34) - Users can review a game with rating and comment.
-* [#37](https://github.com/antoinezanardi/werewolves-assistant-web/issues/37) - Users and games can be retrieved with only desired fields.
-* [#39](https://github.com/antoinezanardi/werewolves-assistant-web/issues/39) - All player role cards are hosted on the server.
+* [#34](https://github.com/antoinezanardi/werewolves-assistant-api/issues/34) - Users can review a game with rating and comment.
+* [#37](https://github.com/antoinezanardi/werewolves-assistant-api/issues/37) - Users and games can be retrieved with only desired fields.
+* [#39](https://github.com/antoinezanardi/werewolves-assistant-api/issues/39) - All player role cards are hosted on the server.
 
 ### 🌟 Enhancements
 
-* [#30](https://github.com/antoinezanardi/werewolves-assistant-web/issues/30) - `.eslintrc.js` file contains now all existing rules. Rules were adapted for each type of files.
-* [#31](https://github.com/antoinezanardi/werewolves-assistant-web/issues/31) - `README.md` file has been approved with new badges and 4 new sections.
-* [#32](https://github.com/antoinezanardi/werewolves-assistant-web/issues/32) - Player names can't exceed 30 characters long and are filter out of HTML tags.
-* [#33](https://github.com/antoinezanardi/werewolves-assistant-web/issues/33) - Users email address and password can't exceed 30 characters long for better database storage.
-* [#35](https://github.com/antoinezanardi/werewolves-assistant-web/issues/35) - Request rate limit implemented for all routes with no auth or `JWT` auth.
+* [#30](https://github.com/antoinezanardi/werewolves-assistant-api/issues/30) - `.eslintrc.js` file contains now all existing rules. Rules were adapted for each type of files.
+* [#31](https://github.com/antoinezanardi/werewolves-assistant-api/issues/31) - `README.md` file has been approved with new badges and 4 new sections.
+* [#32](https://github.com/antoinezanardi/werewolves-assistant-api/issues/32) - Player names can't exceed 30 characters long and are filter out of HTML tags.
+* [#33](https://github.com/antoinezanardi/werewolves-assistant-api/issues/33) - Users email address and password can't exceed 30 characters long for better database storage.
+* [#35](https://github.com/antoinezanardi/werewolves-assistant-api/issues/35) - Request rate limit implemented for all routes with no auth or `JWT` auth.
 
 ### 📚 Documentation
 
-* [#36](https://github.com/antoinezanardi/werewolves-assistant-web/issues/36) - `CONTRIBUTING.md` file added for helping people contribute to this project.
+* [#36](https://github.com/antoinezanardi/werewolves-assistant-api/issues/36) - `CONTRIBUTING.md` file added for helping people contribute to this project.
 
 ### 📦 Packages
 

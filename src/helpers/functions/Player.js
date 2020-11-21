@@ -1,6 +1,7 @@
 const { playerAttributes, murderedPossibilities, playerActions } = require("../constants/Player");
 
-exports.canBeEaten = player => !this.hasAttribute(player, "protected") && !this.hasAttribute(player, "drank-life-potion");
+exports.canBeEaten = player => !this.hasAttribute(player, "drank-life-potion") && (!this.hasAttribute(player, "protected") ||
+                                player.role.current === "little-girl");
 
 exports.hasAttribute = ({ attributes }, attributeName) => attributes && attributes.findIndex(({ attribute }) => attribute === attributeName) !== -1;
 

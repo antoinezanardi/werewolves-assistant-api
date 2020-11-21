@@ -1,4 +1,5 @@
 const { patchableGameStatuses, waitingForPossibilities, gameStatuses } = require("../constants/Game");
+const { hasAttribute } = require("./Player");
 
 exports.isWerewolfSideAlive = game => game.players.some(player => player.role.group === "werewolves" && player.isAlive);
 
@@ -16,3 +17,7 @@ exports.getPatchableGameStatuses = () => JSON.parse(JSON.stringify(patchableGame
 exports.getWaitingForPossibilities = () => JSON.parse(JSON.stringify(waitingForPossibilities));
 
 exports.getGameStatuses = () => JSON.parse(JSON.stringify(gameStatuses));
+
+exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(player => hasAttribute(player, attributeName));
+
+exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => hasAttribute(player, attributeName));
