@@ -20,11 +20,11 @@ let players = [
     { name: "Dog", role: "villager" },
     { name: "Dœg", role: "little-girl" },
     { name: "Dºg", role: "villager-villager" },
-    // { name: "Dêg", role: "cupid" },
+    { name: "Dêg", role: "cupid" },
 ];
 let token, game;
 
-describe("B - Full game of 9 players with all roles", () => {
+describe("B - Full game of 10 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -239,6 +239,176 @@ describe("B - Full game of 9 players with all roles", () => {
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[7]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'cupid' to 'charm'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "cupid", to: "charm" });
+        done();
+    });
+    it("👼 Cupid can't charm if play's source is not 'cupid' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "charm" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm if play's action is not 'charm' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "cupid", action: "shoot" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "cupid", action: "charm" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "cupid", action: "charm", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm just one target (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "cupid", action: "charm", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm more than two targets (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                    { player: players[2]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm unknown targets (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: new mongoose.Types.ObjectId() },
+                    { player: new mongoose.Types.ObjectId() },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("👼 Cupid can't charm the same targets (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[2]._id },
+                    { player: players[2]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NON_UNIQUE_TARGETS");
+                done();
+            });
+    });
+    it("👼 Cupid charms himself and the little girl (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[7]._id },
+                    { player: players[9]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[7].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
+                expect(game.players[9].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[9]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'lovers' to 'meet-each-other'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "lovers", to: "meet-each-other" });
+        done();
+    });
+    it("💕 Lovers can't meet each other if play's source is not 'lovers' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("💕 Lovers can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "lovers", action: "vote" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("💕 Lovers meet each other (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "lovers", action: "meet-each-other" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });
@@ -1319,11 +1489,13 @@ describe("B - Full game of 9 players with all roles", () => {
                 done();
             });
     });
-    it("☀️ Sun is rising, little girl is eaten even if protected by guard", done => {
+    it("☀️ Sun is rising, little girl is eaten even if protected by guard and cupid dies from broken heart 💔", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[7].attributes).to.not.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
         expect(game.players[7].isAlive).to.equals(false);
         expect(game.players[7].murdered).to.deep.equals({ by: "werewolves", of: "eat" });
+        expect(game.players[9].isAlive).to.equals(false);
+        expect(game.players[9].murdered).to.deep.equals({ by: "cupid", of: "charm" });
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
@@ -1616,5 +1788,6 @@ describe("B - Full game of 9 players with all roles", () => {
  *     { name: "6Dog", role: "villager" },
  *     { name: "7Diig", role: "little-girl" },
  *     { name: "8Diig", role: "villager-villager" },
+ *     { name: "9Dêg", role: "cupid" },
  * ];
  */

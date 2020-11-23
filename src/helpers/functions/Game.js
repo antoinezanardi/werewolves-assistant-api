@@ -7,7 +7,7 @@ exports.isVillagerSideAlive = game => game.players.some(player => player.role.gr
 
 exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive);
 
-exports.areLoversTheOnlyAlive = game => this.getPlayerWithRole("cupid", game) &&
+exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
                                     game.players.every(player => hasAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
 
 exports.isGameDone = game => this.areAllPlayersDead(game) ||

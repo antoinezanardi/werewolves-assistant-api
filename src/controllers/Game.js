@@ -7,7 +7,7 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute, getPlayerWithRole,
 } = require("../helpers/functions/Game");
 const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
@@ -321,7 +321,7 @@ exports.fillWaitingQueueWithDayActions = async game => {
 };
 
 exports.isSourceAvailableInPlayers = (players, source) => {
-    if (source === "all" || source === "sheriff") {
+    if (source === "all" || source === "sheriff" || source === "lovers" && getPlayerWithRole("cupid", { players })) {
         return true;
     }
     const sourceType = groupNames.includes(source) ? "group" : "role";

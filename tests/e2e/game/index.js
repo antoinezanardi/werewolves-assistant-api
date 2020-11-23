@@ -10,4 +10,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./kill-player-twice-game.test");
     require("./hunter-kills-mayor-on-day-time.test");
     require("./no-winner-game.test");
+    require("./game-won-by-lovers.test");
 });

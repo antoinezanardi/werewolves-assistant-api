@@ -2,6 +2,13 @@
 
 ## 0.8.0 (2020-11-??)
 
+### 🚀 New features
+
+* [#66](https://github.com/antoinezanardi/werewolves-assistant-api/issues/66) - Cupid role implemented.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.27.6`.
 
 ---
 
