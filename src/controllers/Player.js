@@ -118,6 +118,13 @@ exports.killPlayer = (playerId, { action }, game) => {
                 this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
             }
         }
+        if (hasAttribute(player, "in-love")) {
+            const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== playerId.toString() &&
+                isAlive && hasAttribute({ attributes }, "in-love"));
+            if (otherLoverPlayer) {
+                this.killPlayer(otherLoverPlayer._id, { action: "charm" }, game);
+            }
+        }
     }
 };
 
@@ -234,6 +241,13 @@ exports.checkAndFillVotes = (votes, game, options) => {
         votes[i].from = game.players.find(player => player._id.toString() === votes[i].from);
         votes[i].for = game.players.find(player => player._id.toString() === votes[i].for);
     }
+};
+
+exports.cupidPlays = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 2, action: play.action });
+    this.addPlayerAttribute(targets[0].player._id, "in-love", game);
+    this.addPlayerAttribute(targets[1].player._id, "in-love", game);
 };
 
 exports.sheriffDelegates = async(play, game) => {

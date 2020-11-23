@@ -7,8 +7,12 @@ exports.isVillagerSideAlive = game => game.players.some(player => player.role.gr
 
 exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive);
 
+exports.areLoversTheOnlyAlive = game => this.getPlayerWithRole("cupid", game) &&
+                                    game.players.every(player => hasAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
+
 exports.isGameDone = game => this.areAllPlayersDead(game) ||
-                            (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game)) && !this.isActionInWaitingQueue(game, "shoot");
+                            (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game)) &&
+                            !this.isActionInWaitingQueue(game, "shoot");
 
 exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) => to === action);
 
@@ -21,3 +25,5 @@ exports.getGameStatuses = () => JSON.parse(JSON.stringify(gameStatuses));
 exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(player => hasAttribute(player, attributeName));
 
 exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => hasAttribute(player, attributeName));
+
+exports.getPlayerWithRole = (roleName, game) => game.players.find(({ role }) => role.current === roleName);

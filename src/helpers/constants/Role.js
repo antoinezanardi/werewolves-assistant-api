@@ -1,6 +1,6 @@
-exports.roleNames = ["villager", "werewolf", "seer", "guard", "witch", "hunter", "raven", "little-girl", "villager-villager"];
+exports.roleNames = ["villager", "werewolf", "seer", "guard", "witch", "hunter", "raven", "little-girl", "villager-villager", "cupid"];
 
-exports.groupNames = ["villagers", "werewolves"];
+exports.groupNames = ["villagers", "werewolves", "lovers"];
 
 exports.roles = [
     { name: "villager", group: "villagers", maxInGame: 9 },
@@ -11,5 +11,6 @@ exports.roles = [
     { name: "hunter", group: "villagers", maxInGame: 1, powers: [{ name: "shoot" }] },
     { name: "raven", group: "villagers", maxInGame: 1, powers: [{ name: "mark" }] },
     { name: "little-girl", group: "villagers", maxInGame: 1 },
+    { name: "cupid", group: "villagers", maxInGame: 1, powers: [{ name: "charm" }] },
     { name: "werewolf", group: "werewolves", maxInGame: 4, powers: [{ name: "eat" }] },
 ];

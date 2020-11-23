@@ -5,7 +5,10 @@ const Player = require("./Player");
 const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
-const { isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, isGameDone, getPlayerWithAttribute } = require("../helpers/functions/Game");
+const {
+    isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute,
+} = require("../helpers/functions/Game");
 const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
@@ -272,6 +275,8 @@ exports.checkGameWinners = game => {
     if (isGameDone(game)) {
         if (areAllPlayersDead(game)) {
             game.won = { by: null };
+        } else if (areLoversTheOnlyAlive(game)) {
+            game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
         } else if (!isVillagerSideAlive(game)) {
             game.won = { by: "werewolves", players: game.players.filter(player => player.role.group === "werewolves") };
         } else if (!isWerewolfSideAlive(game)) {
@@ -378,6 +383,8 @@ exports.generatePlayMethods = () => ({
     hunter: Player.hunterPlays,
     werewolves: Player.werewolvesPlay,
     sheriff: Player.sheriffPlays,
+    cupid: Player.cupidPlays,
+    lovers: () => undefined,
 });
 
 exports.generateGameHistoryEntry = (game, play) => ({

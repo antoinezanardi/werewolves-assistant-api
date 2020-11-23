@@ -8,11 +8,12 @@
 | canceled          | The game has been canceled by game master and cannot be played any longer. |
 
 ## <a id="player-groups"></a>👪 Player Groups
-| Group                |                 Description                                                          |
-|:--------------------:|--------------------------------------------------------------------------------------|
-| 👪<br/>all           | All players alive.                                                                   |
-| 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game.   |
-| 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game.  |
+| Group                |                 Description                                                                                                              |
+|:--------------------:|------------------------------------------------------------------------------------------------------------------------------------------|
+| 👪<br/>all           | All players alive.                                                                                                                       |
+| 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game.                                                       |
+| 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game.                                                      |
+| 💕<br/>lovers        | They are teaming up against `all` but themselves and need to be the last survivors to win the game despite their current group and role. |
 
 ## <a id="player-roles"></a>🃏 Player Roles
 
@@ -21,39 +22,43 @@
 | 🐺<br/>werewolf               | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="50"/>            | werewolves              | Each night, his group eats a villager chosen by the majority.                                                                                                                 |
 | 🧑‍🌾<br/>villager               | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="50"/>            | villagers               | Has no powers, can only count on his speech skills.                                                                                                                           |
 | 🧑‍🌾🧑‍🌾<br/>villager-villager     | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="50"/>            | villagers               | Like the normal villager, has no power but on the two faces of his role card, there is the illustration of a simple villager. So, everybody knows that it's a simple villager.|
-| 🪄<br/>️‍witch                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/witch.png" width="50"/>               | villagers               | She has one life potion which prevents from being eaten by werewolves and a death potion which instantly kills. She can only use each one once in the game.                   |
-| 👧<br/>little-girl            | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/little-girl.png" width="50"/>         | villagers               | She can slightly open her eyes during werewolves turn to spot some of them. Even if the guard protects her, she will die by the werewolves if she is chosen by them.          |
 | 🔮<br/>seer                   | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/seer.png" width="50"/>                | villagers               | Each night, she sees the role of the player she wants.                                                                                                                        |
-| 🛡️<br/>guard                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="50"/>               | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                                                             |
+| 👼<br/>cupid                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/cupid.png" width="50"/>               | villagers               | The first night, he chooses two players that fall instantly in love (he can choose himself). Next, the lovers wake up to meet each other and must win together.               |
+| 🪄<br/>️‍witch                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/witch.png" width="50"/>               | villagers               | She has one life potion which prevents from being eaten by werewolves and a death potion which instantly kills. She can only use each one once in the game.                   |
 | 🔫<br/>hunter                 | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/hunter.png" width="50"/>              | villagers               | If he dies, he shoots a victim to take his revenge. He can't kill himself.                                                                                                    |
+| 👧<br/>little-girl            | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/little-girl.png" width="50"/>         | villagers               | She can slightly open her eyes during werewolves turn to spot some of them. Even if the guard protects her, she will die by the werewolves if she is chosen by them.          |
+| 🛡️<br/>guard                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="50"/>               | villagers               | Each night, he protects the player he wants (including himself). He can't protect the same player twice in a row.                                                             |
 | 🪶<br/>raven                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="50"/>               | villagers               | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                                  |
 
 ## <a id="player-actions"></a>🔪 Player Actions
 
-| Action        | [Role](#player-roles)             | [Group](#player-groups) | [Attribute](#player-attributes)  |              When - Use and Limits                                                                                             |
-|:-------------:|:---------------------------------:|:-----------------------:|:--------------------------------:|--------------------------------------------------------------------------------------------------------------------------------|
-| eat           | 🐺<br/>werewolf                   | werewolves              | -                                | Each night - Kill a villager chosen by majority.                                                                               |
-| use-potion    | 🧙‍♀<br/>witch                     | villagers               | -                                | Each night - Protect or kill. One use available for each life and death potion.                                                |
-| look          | 🔮<br/>seer                       | villagers               | -                                | Each night - Reveal a role.                                                                                                    |
-| protect       | 🛡️<br/>guard                      | villagers               | -                                | Each night - Prevents from death for the night. Can't protect the same player twice in a row.                                  |
-| shoot         | 🔫<br/>hunter                     | villagers               | -                                | When hunter dies - Kill someone chosen by hunter, can't be himself.                                                            |
-| mark          | 🪶<br/>raven                      | villagers               | -                                | Each night - Mark someone. The next day, the target will have 2 votes against himself. The mark goes away after the judgement. |
-| elect-sheriff | -                                 | all                     | -                                | Before the first phase (`night`) - Anyone can be elected as a sheriff.                                                         |
-| vote          | -                                 | all                     | -                                | Each day - All alive players vote for someone to kill.                                                                         |
-| delegate      | -                                 | -                       | sheriff                          | When sheriff dies - The dying sheriff chooses the next one in among the living.                                                |
-| settle-votes  | -                                 | -                       | sheriff                          | When there is a tie in the votes during the `day` - Choose which one will be executed.                                         |
+| Action            | [Role](#player-roles)             | [Group](#player-groups) | [Attribute](#player-attributes)  |              When - Use and Limits                                                                                             |
+|:-----------------:|:---------------------------------:|:-----------------------:|:--------------------------------:|--------------------------------------------------------------------------------------------------------------------------------|
+| eat               | 🐺<br/>werewolf                   | 🐺<br/>werewolves        | -                                | Each night - Kill a villager chosen by majority.                                                                               |
+| look              | 🔮<br/>seer                       | 🧑‍🌾<br/>villagers         | -                                | Each night - Reveal a role.                                                                                                    |
+| charm             | 👼<br/>cupid                      | 🧑‍🌾<br/>villagers         | -                                | During the first phase (`night`) - Charm two people who have to win together.                                                  |
+| use-potion        | 🪄<br/>witch                      | 🧑‍🌾<br/>villagers         | -                                | Each night - Protect or kill. One use available for each life and death potion.                                                |
+| shoot             | 🔫<br/>hunter                     | 🧑‍🌾<br/>villagers         | -                                | When hunter dies - Kill someone chosen by hunter, can't be himself.                                                            |
+| protect           | 🛡️<br/>guard                      | 🧑‍🌾<br/>villagers         | -                                | Each night - Prevents from death for the night. Can't protect the same player twice in a row.                                  |
+| mark              | 🪶<br/>raven                      | 🧑‍🌾<br/>villagers         | -                                | Each night - Mark someone. The next day, the target will have 2 votes against himself. The mark goes away after the judgement. |
+| elect-sheriff     | -                                 | 👪<br/>all               | -                                | During the first phase (`night`) - Anyone can be elected as a sheriff.                                                         |
+| vote              | -                                 | 👪<br/>all               | -                                | Each day - All alive players vote for someone to kill.                                                                         |
+| delegate          | -                                 | -                       | sheriff                          | When sheriff dies - The dying sheriff chooses the next one in among the living.                                                 |
+| settle-votes      | -                                 | -                       | sheriff                          | When there is a tie in the votes during the `day` - Choose which one will be executed.                                          |
+| meet-each-other   | -                                 | -                       | in-love                          | Right after Cupid chose his targets, lovers wake up and meet each other.                                                        |
 
 ## <a id="player-attributes"></a>🎖️ Player Attributes
 
 | Attribute          |                Description                                                                                                      |
 |:------------------:|---------------------------------------------------------------------------------------------------------------------------------|
-| sheriff            | Elected by all alive players. When dying, this attribute is transferred to someone chosen by the player.                        |
+| sheriff            | Elected by all alive players, has the doubled vote. When dying, this attribute is transferred to someone chosen by the player.  |
 | seen               | The seer looked at this player during the night. The player's role is revealed to the seer.                                     |
 | eaten              | Werewolves decided to eat this player during the night. The player will die the next phase (`day`) if he has no protection.     |
 | drank-life-potion  | The witch gave this potion during the night. It prevents from dying until the next phase (`day`).                               |
 | drank-death-potion | The witch gave this potion during the night. The player will die the next phase (`day`) if he has no protection.                |
 | protected          | The guard protected this player during the night. He prevents from dying until the next phase (`day`).                          |
 | raven-marked       | The raven marked the player during the night. During the next phase (`day`), this player will have two votes against himself.   |
+| in-love            | Shot by the Cupid arrow, they must win together the game. If one dies, the other one dies too.                                  |
 
 ## <a id="errors"></a>⚠️ Errors
 

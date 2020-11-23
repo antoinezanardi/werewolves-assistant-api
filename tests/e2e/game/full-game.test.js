@@ -20,6 +20,7 @@ let players = [
     { name: "Dog", role: "villager" },
     { name: "Dœg", role: "little-girl" },
     { name: "Dºg", role: "villager-villager" },
+    // { name: "Dêg", role: "cupid" },
 ];
 let token, game;
 
