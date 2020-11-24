@@ -6,10 +6,10 @@ const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
-    isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute,
+    isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute, getPlayerWithRole, getPlayersWithGroup,
 } = require("../helpers/functions/Game");
-const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
+const { populate: fullGamePopulate } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
 const { getPlayerRoles } = require("../helpers/functions/Role");
 const { filterOutHTMLTags } = require("../helpers/functions/String");
@@ -60,6 +60,9 @@ exports.checkRolesCompatibility = players => {
         throw generateError("NO_WEREWOLF_IN_GAME_COMPOSITION", "No player has the `werewolf` role in game composition.");
     } else if (!players.filter(player => player.role.group === "villagers").length) {
         throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
+    } else if (getPlayerWithRole("two-sisters", { players }) &&
+        players.filter(({ role }) => role.current === "two-sisters").length !== 2) {
+        throw generateError("SISTERS_MUST_BE_TWO", `There must be exactly two sisters in game composition if at least one is chosen by a player.`);
     }
 };
 
@@ -84,7 +87,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
     this.fillTickData(data);
-    this.fillWaitingQueueWithNightActions(data);
+    await this.fillWaitingQueueWithNightActions(data);
 };
 
 exports.create = async(data, options = {}) => {
@@ -162,17 +165,31 @@ exports.assignRoleToPlayers = (players, roles) => {
     return players;
 };
 
-exports.getVillagerRoles = async(players, werewolfRoles) => {
+exports.filterAvailablePowerfulVillagerRoles = (roles, players, leftToPick) => roles.filter(role => role.group === "villagers" &&
+    role.name !== "villager" && (!role.recommendedMinPlayers || role.recommendedMinPlayers <= players.length) &&
+    (!role.minInGame || role.minInGame <= leftToPick));
+
+exports.getVillagerRoles = (players, werewolfRoles) => {
     const villagerRoles = [];
     const villagerCount = players.length - werewolfRoles.length;
-    const availablePowerfulVillagerRoles = await getPlayerRoles().filter(role => role.group === "villagers" && role.name !== "villager");
-    const villagerRole = await getPlayerRoles().find(role => role.name === "villager");
+    const villagerRole = getPlayerRoles().find(role => role.name === "villager");
+    let availablePowerfulVillagerRoles = getPlayerRoles();
     for (let i = 0; i < villagerCount; i++) {
+        const leftToPick = villagerCount - i;
+        availablePowerfulVillagerRoles = this.filterAvailablePowerfulVillagerRoles(availablePowerfulVillagerRoles, players, leftToPick);
         if (!availablePowerfulVillagerRoles.length) {
             villagerRoles.push(JSON.parse(JSON.stringify(villagerRole)));
             villagerRole.maxInGame--;
         } else {
-            villagerRoles.push(this.pickRandomRole(availablePowerfulVillagerRoles));
+            const randomRole = this.pickRandomRole(availablePowerfulVillagerRoles);
+            if (randomRole.minInGame) {
+                for (let j = 0; j < randomRole.minInGame; j++) {
+                    villagerRoles.push(randomRole);
+                }
+                i += randomRole.minInGame - 1;
+            } else {
+                villagerRoles.push(randomRole);
+            }
         }
     }
     return villagerRoles;
@@ -182,7 +199,7 @@ exports.pickRandomRole = roles => {
     const idx = Math.floor(Math.random() * roles.length);
     const role = JSON.parse(JSON.stringify(roles[idx]));
     roles[idx].maxInGame--;
-    if (!roles[idx].maxInGame) {
+    if (!roles[idx].maxInGame || roles[idx].minInGame) {
         roles.splice(idx, 1);
     }
     return role;
@@ -212,12 +229,12 @@ exports.getWerewolfRoles = players => {
     return werewolfRoles;
 };
 
-exports.getGameRepartition = async(req, res) => {
+exports.getGameRepartition = (req, res) => {
     try {
         const { query } = checkRequestData(req);
         this.checkUniqueNameInPlayers(query.players);
-        const werewolfRoles = await this.getWerewolfRoles(query.players);
-        const villagerRoles = await this.getVillagerRoles(query.players, werewolfRoles);
+        const werewolfRoles = this.getWerewolfRoles(query.players);
+        const villagerRoles = this.getVillagerRoles(query.players, werewolfRoles);
         this.assignRoleToPlayers(query.players, [...villagerRoles, ...werewolfRoles]);
         res.status(200).json({ players: query.players });
     } catch (e) {
@@ -322,30 +339,42 @@ exports.fillWaitingQueueWithDayActions = async game => {
     }
 };
 
-exports.isSourceAvailableInPlayers = (game, source) => {
+exports.isGroupCallableDuringTheNight = (game, group) => {
+    if (group === "lovers" && getPlayerWithRole("cupid", game)) {
+        return true;
+    }
+    const players = getPlayersWithGroup(group, game);
+    return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
+};
+
+exports.isRoleCallableDuringTheNight = async(game, role) => {
+    const player = getPlayerWithRole(role, game);
+    if (!player || game.tick === 1) {
+        return !!player;
+    }
+    if (role === "two-sisters") {
+        const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
+        const sisterPlayers = getPlayersWithRole("two-sisters", game);
+        return sisterPlayers.every(sister => sister.isAlive) && (!lastSistersPlay || game.turn - lastSistersPlay.turn >= 2);
+    }
+    return game.tick === 1 ? !!player : !!player && player.isAlive;
+};
+
+exports.isSourceCallableDuringTheNight = (game, source) => {
     if (source === "all" || source === "sheriff") {
         return true;
     }
     const sourceType = groupNames.includes(source) ? "group" : "role";
-    if (sourceType === "group") {
-        if (source === "lovers" && getPlayerWithRole("cupid", game)) {
-            return true;
-        }
-        const players = getPlayersWithGroup(source, game);
-        return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
-    } else if (sourceType === "role") {
-        const player = getPlayerWithRole(source, game);
-        return game.tick === 1 ? !!player : player && player.isAlive;
-    }
+    return sourceType === "group" ? this.isGroupCallableDuringTheNight(game, source) : this.isRoleCallableDuringTheNight(game, source);
 };
 
-exports.fillWaitingQueueWithNightActions = game => {
-    const actionsOrder = game.tick === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
+exports.fillWaitingQueueWithNightActions = async game => {
+    const actionsOrder = game.tick === 1 ? getGameTurNightActionsOrder() : getGameTurNightActionsOrder().filter(action => !action.isFirstNightOnly);
     if (!game.waiting) {
         game.waiting = [];
     }
     for (const { source, action } of actionsOrder) {
-        if (this.isSourceAvailableInPlayers(game, source)) {
+        if (await this.isSourceCallableDuringTheNight(game, source)) {
             game.waiting.push({ for: source, to: action });
         }
     }
@@ -366,16 +395,17 @@ exports.fillWaitingQueue = async game => {
 };
 
 exports.generatePlayMethods = () => ({
-    all: Player.allPlay,
-    seer: Player.seerPlays,
-    witch: Player.witchPlays,
-    guard: Player.guardPlays,
-    raven: Player.ravenPlays,
-    hunter: Player.hunterPlays,
-    werewolves: Player.werewolvesPlay,
-    sheriff: Player.sheriffPlays,
-    cupid: Player.cupidPlays,
-    lovers: () => undefined,
+    "all": Player.allPlay,
+    "seer": Player.seerPlays,
+    "witch": Player.witchPlays,
+    "guard": Player.guardPlays,
+    "raven": Player.ravenPlays,
+    "hunter": Player.hunterPlays,
+    "werewolves": Player.werewolvesPlay,
+    "sheriff": Player.sheriffPlays,
+    "cupid": Player.cupidPlays,
+    "lovers": () => undefined,
+    "two-sisters": () => undefined,
 });
 
 exports.generateGameHistoryEntry = (game, play) => ({
@@ -445,7 +475,7 @@ exports.resetGame = async(req, res) => {
         const resetData = { players: game.players.map(player => ({ name: player.name, role: player.role.original })) };
         await this.fillPlayersData(resetData.players);
         this.fillTickData(resetData);
-        this.fillWaitingQueueWithNightActions(resetData);
+        await this.fillWaitingQueueWithNightActions(resetData);
         game = await this.findOneAndUpdate({ _id: params.id }, resetData);
         res.status(200).json(game);
     } catch (e) {

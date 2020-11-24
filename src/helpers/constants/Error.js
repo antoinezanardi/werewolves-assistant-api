@@ -151,4 +151,8 @@ exports.errorMetadata = {
         code: 37,
         HTTPCode: 429,
     },
+    SISTERS_MUST_BE_TWO: {
+        code: 38,
+        HTTPCode: 400,
+    },
 };

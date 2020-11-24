@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#66](https://github.com/antoinezanardi/werewolves-assistant-api/issues/66) - Cupid role implemented.
+* [#67](https://github.com/antoinezanardi/werewolves-assistant-api/issues/67) - Two Sisters role implemented.
 
 ### ♻️ Refactoring
 

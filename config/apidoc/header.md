@@ -65,12 +65,14 @@
 
 ## <a id="role-class"></a>🃏 Role
 
-| Field                | Type     | Description                                                         |
-|----------------------|:--------:|---------------------------------------------------------------------|
-| _id                  | ObjectId | Role's ID.                                                          |
-| name                 | String   | Role's name.                                                        |
-| group                | String   | Role's group.                                                       |
-| maxInGame            | Number   | Maximum possible of this role in a game.                            |
+| Field                         | Type     | Description                                                                                             |
+|-------------------------------|:--------:|---------------------------------------------------------------------------------------------------------|
+| _id                           | ObjectId | Role's ID.                                                                                              |
+| name                          | String   | Role's name.                                                                                            |
+| group                         | String   | Role's group.                                                                                           |
+| **minInGame***                | Number   | If the role is chosen by at least one player, then minimum X players must choose it to start the game.  |
+| maxInGame                     | Number   | Maximum possible of this role in a game.                                                                |
+| **recommendedMinPlayers***    | Number   | It is recommended to have at least X players in game for choosing this role.                            |
 
 ## <a id="game-history-class"></a>📜 Game History
 

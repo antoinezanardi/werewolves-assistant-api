@@ -15,14 +15,12 @@ exports.populate = [
     { path: "history" },
 ];
 
-exports.turnPreNightActionsOrder = [
-    { source: "all", action: "elect-sheriff" },
-    { source: "cupid", action: "charm" },
-    { source: "lovers", action: "meet-each-other" },
-];
-
 exports.turnNightActionsOrder = [
+    { source: "all", action: "elect-sheriff", isFirstNightOnly: true },
+    { source: "cupid", action: "charm", isFirstNightOnly: true },
+    { source: "lovers", action: "meet-each-other", isFirstNightOnly: true },
     { source: "seer", action: "look" },
+    { source: "two-sisters", action: "meet-each-other" },
     { source: "raven", action: "mark" },
     { source: "guard", action: "protect" },
     { source: "werewolves", action: "eat" },

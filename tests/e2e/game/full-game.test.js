@@ -21,6 +21,8 @@ let players = [
     { name: "Dœg", role: "little-girl" },
     { name: "Dºg", role: "villager-villager" },
     { name: "Dêg", role: "cupid" },
+    { name: "Dæg", role: "two-sisters" },
+    { name: "D∂g", role: "two-sisters" },
 ];
 let token, game;
 
@@ -512,6 +514,43 @@ describe("B - Full game of 10 players with all roles", () => {
                 expect(game.players[0].attributes).to.deep.include({ attribute: "seen", source: "seer", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
+        done();
+    });
+    it("👭 The two sisters can't meet each other if play's source is not 'two-sisters' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "lovers", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("👭 The two sisters can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "two-sisters", action: "use-potion" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "two-sisters", action: "meet-each-other" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });
@@ -1403,6 +1442,21 @@ describe("B - Full game of 10 players with all roles", () => {
         expect(game.phase).to.equals("night");
         expect(game.turn).to.equals(3);
         done();
+    });
+    it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
+        done();
+    });
+    it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "two-sisters", action: "meet-each-other" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                done();
+            });
     });
     it("🎲 Game is waiting for 'raven' to 'mark'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
