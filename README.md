@@ -44,7 +44,7 @@ Two versions are available for testing this API:
 
 ## <a name="roles-available">🃏 Roles available</a>
 
-On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **11 different roles** are available to play:
+On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **12 different roles** are available to play:
 
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager**
@@ -56,6 +56,7 @@ On this current version [![GitHub release](https://img.shields.io/github/release
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/little-girl.png" width="25"/> The Little Girl**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="25"/> The Guard**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/two-sisters.png" width="25"/> The Two Sisters**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/three-brothers.png" width="25"/> The Three Brothers**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="25"/> The Raven**
 
 Please check the <a href="https://werewolves-assistant-api.antoinezanardi.fr/apidoc/#player-roles" target="_blank">**Player role section on API documentation**</a> for more details about each role.

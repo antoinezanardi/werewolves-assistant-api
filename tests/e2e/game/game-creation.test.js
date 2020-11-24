@@ -39,8 +39,12 @@ const playersWithOnlyOneSister = [
     { name: "Doug", role: "two-sisters" },
     { name: "Dag", role: "werewolf" },
     { name: "Dug", role: "werewolf" },
-    { name: "Dyg", role: "werewolf" },
-    { name: "Deg", role: "werewolf" },
+];
+const playersWithOnlyTwoBrothers = [
+    { name: "Dig", role: "three-brothers" },
+    { name: "Doug", role: "three-brothers" },
+    { name: "Dag", role: "werewolf" },
+    { name: "Dug", role: "werewolf" },
 ];
 let token, token2, game, game2, queryString;
 
@@ -149,6 +153,17 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("SISTERS_MUST_BE_TWO");
+                done();
+            });
+    });
+    it("👨‍👨‍👦 Can't create game a with only two brothers (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: playersWithOnlyTwoBrothers })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BROTHERS_MUST_BE_THREE");
                 done();
             });
     });

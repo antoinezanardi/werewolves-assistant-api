@@ -10,6 +10,7 @@ exports.roleNames = [
     "villager-villager",
     "cupid",
     "two-sisters",
+    "three-brothers",
 ];
 
 exports.groupNames = ["villagers", "werewolves", "lovers"];
@@ -25,5 +26,6 @@ exports.roles = [
     { name: "little-girl", group: "villagers", maxInGame: 1 },
     { name: "cupid", group: "villagers", maxInGame: 1, powers: [{ name: "charm" }] },
     { name: "two-sisters", group: "villagers", minInGame: 2, maxInGame: 2, recommendedMinPlayers: 12 },
+    { name: "three-brothers", group: "villagers", minInGame: 3, maxInGame: 3, recommendedMinPlayers: 15 },
     { name: "werewolf", group: "werewolves", maxInGame: 4, powers: [{ name: "eat" }] },
 ];

@@ -155,4 +155,8 @@ exports.errorMetadata = {
         code: 38,
         HTTPCode: 400,
     },
+    BROTHERS_MUST_BE_THREE: {
+        code: 39,
+        HTTPCode: 400,
+    },
 };

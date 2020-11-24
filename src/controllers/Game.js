@@ -63,6 +63,9 @@ exports.checkRolesCompatibility = players => {
     } else if (getPlayerWithRole("two-sisters", { players }) &&
         players.filter(({ role }) => role.current === "two-sisters").length !== 2) {
         throw generateError("SISTERS_MUST_BE_TWO", `There must be exactly two sisters in game composition if at least one is chosen by a player.`);
+    } else if (getPlayerWithRole("three-brothers", { players }) &&
+        players.filter(({ role }) => role.current === "three-brothers").length !== 3) {
+        throw generateError("BROTHERS_MUST_BE_THREE", `There must be exactly three brothers in game composition if at least one is chosen by a player.`);
     }
 };
 
@@ -356,6 +359,10 @@ exports.isRoleCallableDuringTheNight = async(game, role) => {
         const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
         const sisterPlayers = getPlayersWithRole("two-sisters", game);
         return sisterPlayers.every(sister => sister.isAlive) && (!lastSistersPlay || game.turn - lastSistersPlay.turn >= 2);
+    } else if (role === "three-brothers") {
+        const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
+        const brotherPlayers = getPlayersWithRole("three-brothers", game);
+        return brotherPlayers.filter(brother => brother.isAlive).length >= 2 && (!lastBrothersPlay || game.turn - lastBrothersPlay.turn >= 2);
     }
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };
@@ -406,6 +413,7 @@ exports.generatePlayMethods = () => ({
     "cupid": Player.cupidPlays,
     "lovers": () => undefined,
     "two-sisters": () => undefined,
+    "three-brothers": () => undefined,
 });
 
 exports.generateGameHistoryEntry = (game, play) => ({

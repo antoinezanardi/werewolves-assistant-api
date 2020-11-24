@@ -21,6 +21,7 @@ exports.turnNightActionsOrder = [
     { source: "lovers", action: "meet-each-other", isFirstNightOnly: true },
     { source: "seer", action: "look" },
     { source: "two-sisters", action: "meet-each-other" },
+    { source: "three-brothers", action: "meet-each-other" },
     { source: "raven", action: "mark" },
     { source: "guard", action: "protect" },
     { source: "werewolves", action: "eat" },
