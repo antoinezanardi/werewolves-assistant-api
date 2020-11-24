@@ -7,7 +7,7 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute, getPlayerWithRole,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute, getPlayerWithRole, getPlayersWithGroup,
 } = require("../helpers/functions/Game");
 const { populate: fullGamePopulate, turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
@@ -43,15 +43,16 @@ exports.findOne = async(search, projection, options = {}) => {
     return game;
 };
 
-exports.fillFirstWaiting = data => {
-    const firstWaiting = { for: "all", to: "elect-sheriff" };
-    data.waiting = [firstWaiting];
-};
-
 exports.checkUserCurrentGames = async userId => {
     if (await Game.countDocuments({ gameMaster: userId, status: "playing" })) {
         throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already game with status `playing`.");
     }
+};
+
+exports.fillTickData = game => {
+    game.tick = 1;
+    game.phase = "night";
+    game.turn = 1;
 };
 
 exports.checkRolesCompatibility = players => {
@@ -82,7 +83,8 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
-    this.fillFirstWaiting(data);
+    this.fillTickData(data);
+    this.fillWaitingQueueWithNightActions(data);
 };
 
 exports.create = async(data, options = {}) => {
@@ -320,56 +322,45 @@ exports.fillWaitingQueueWithDayActions = async game => {
     }
 };
 
-exports.isSourceAvailableInPlayers = (players, source) => {
-    if (source === "all" || source === "sheriff" || source === "lovers" && getPlayerWithRole("cupid", { players })) {
+exports.isSourceAvailableInPlayers = (game, source) => {
+    if (source === "all" || source === "sheriff") {
         return true;
     }
     const sourceType = groupNames.includes(source) ? "group" : "role";
-    for (const player of players) {
-        if (sourceType === "group" && player.role.group === source && player.isAlive ||
-            sourceType === "role" && player.role.current === source && player.isAlive) {
+    if (sourceType === "group") {
+        if (source === "lovers" && getPlayerWithRole("cupid", game)) {
             return true;
         }
+        const players = getPlayersWithGroup(source, game);
+        return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
+    } else if (sourceType === "role") {
+        const player = getPlayerWithRole(source, game);
+        return game.tick === 1 ? !!player : player && player.isAlive;
     }
-    return false;
 };
 
-exports.fillWaitingQueueWithNightActions = async(game, endOfDay = false) => {
-    const actionsOrder = game.turn === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
-    if (endOfDay) {
-        for (let i = 0; i < actionsOrder.length; i++) {
-            if (this.isSourceAvailableInPlayers(game.players, actionsOrder[i].source)) {
-                const nextGameNightAction = actionsOrder[i];
-                return game.waiting.push({ for: nextGameNightAction.source, to: nextGameNightAction.action });
-            }
-        }
-    } else {
-        let actionFound = false;
-        const lastNightPlay = await GameHistory.getLastNightPlay(game._id);
-        for (let i = 0; i < actionsOrder.length; i++) {
-            if (lastNightPlay && lastNightPlay.play.source === actionsOrder[i].source && lastNightPlay.play.action === actionsOrder[i].action) {
-                actionFound = true;
-            } else if (actionFound && this.isSourceAvailableInPlayers(game.players, actionsOrder[i].source)) {
-                const nextGameNightAction = actionsOrder[i];
-                return game.waiting.push({ for: nextGameNightAction.source, to: nextGameNightAction.action });
-            }
+exports.fillWaitingQueueWithNightActions = game => {
+    const actionsOrder = game.tick === 1 ? [...turnPreNightActionsOrder, ...turnNightActionsOrder] : [...turnNightActionsOrder];
+    if (!game.waiting) {
+        game.waiting = [];
+    }
+    for (const { source, action } of actionsOrder) {
+        if (this.isSourceAvailableInPlayers(game, source)) {
+            game.waiting.push({ for: source, to: action });
         }
     }
 };
 
 exports.fillWaitingQueue = async game => {
     if (game.phase === "night") {
-        await this.fillWaitingQueueWithNightActions(game);
-        if (!game.waiting || !game.waiting.length) {
-            game.phase = "day";
-            return this.fillWaitingQueueWithDayActions(game);
-        }
+        game.phase = "day";
+        return this.fillWaitingQueueWithDayActions(game);
     } else if (game.phase === "day") {
         await this.fillWaitingQueueWithDayActions(game);
         if (!game.waiting || !game.waiting.length) {
             game.phase = "night";
             game.turn++;
-            return this.fillWaitingQueueWithNightActions(game, true);
+            return this.fillWaitingQueueWithNightActions(game);
         }
     }
 };
@@ -451,15 +442,11 @@ exports.resetGame = async(req, res) => {
         await this.checkGameBeforeReset(params.id);
         await GameHistory.deleteMany({ gameId: params.id });
         let game = await this.findOne({ _id: params.id });
-        const players = game.players.map(player => ({ name: player.name, role: player.role.original }));
-        await this.fillPlayersData(players);
-        game = await this.findOneAndUpdate({ _id: params.id }, {
-            players,
-            turn: 1,
-            phase: "night",
-            tick: 1,
-            waiting: [{ for: "all", to: "elect-sheriff" }],
-        });
+        const resetData = { players: game.players.map(player => ({ name: player.name, role: player.role.original })) };
+        await this.fillPlayersData(resetData.players);
+        this.fillTickData(resetData);
+        this.fillWaitingQueueWithNightActions(resetData);
+        game = await this.findOneAndUpdate({ _id: params.id }, resetData);
         res.status(200).json(game);
     } catch (e) {
         sendError(res, e);

@@ -6,9 +6,14 @@
 
 * [#66](https://github.com/antoinezanardi/werewolves-assistant-api/issues/66) - Cupid role implemented.
 
+### ♻️ Refactoring
+
+* [#74](https://github.com/antoinezanardi/werewolves-assistant-api/issues/74) - During the night, all actions are pushed into the waiting queue instead of predicting them one by one.
+
 ### 📦 Packages
 
 * `@sentry/node` updated to version `5.27.6`.
+* `express-validator` updated to version `6.7.0`.
 
 ---
 

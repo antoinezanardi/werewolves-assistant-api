@@ -43,7 +43,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
-    "express-validator": "^6.6.1",
+    "express-validator": "^6.7.0",
     "jsonwebtoken": "^8.5.1",
     "migrate-mongo": "^8.1.4",
     "mongo-dot-notation": "^2.0.0",

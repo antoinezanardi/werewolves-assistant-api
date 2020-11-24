@@ -27,3 +27,5 @@ exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(play
 exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => hasAttribute(player, attributeName));
 
 exports.getPlayerWithRole = (roleName, game) => game.players.find(({ role }) => role.current === roleName);
+
+exports.getPlayersWithGroup = (groupName, game) => game.players.filter(({ role }) => role.group === groupName);
