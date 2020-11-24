@@ -179,6 +179,10 @@ describe("A - Game creation", () => {
                 expect(game.turn).to.equals(1);
                 expect(game.phase).to.equals("night");
                 expect(game.tick).to.equals(1);
+                expect(game.options.sistersWakingUpInterval).to.equals(2);
+                expect(game.options.brothersWakingUpInterval).to.equals(2);
+                expect(game.options.isSheriffVoteDoubled).to.equals(true);
+                expect(game.options.isSeerTalkative).to.equals(true);
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);

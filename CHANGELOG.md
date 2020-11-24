@@ -7,6 +7,7 @@
 * [#66](https://github.com/antoinezanardi/werewolves-assistant-api/issues/66) - Cupid role implemented.
 * [#67](https://github.com/antoinezanardi/werewolves-assistant-api/issues/67) - Two Sisters role implemented.
 * [#68](https://github.com/antoinezanardi/werewolves-assistant-api/issues/68) - Three Brothers role implemented.
+* [#69](https://github.com/antoinezanardi/werewolves-assistant-api/issues/69) - New game options with `sistersWakingUpInterval`, `brothersWakingUpInterval`, `isSheriffVoteDoubled` and `isSeerTalkative`.
 
 ### ♻️ Refactoring
 

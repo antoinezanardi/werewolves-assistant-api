@@ -3,6 +3,29 @@ const PlayerSchema = require("./Player");
 const { gameStatuses, waitingForPossibilities, gamePhases, wonByPossibilities } = require("../../helpers/constants/Game");
 const { playerActions } = require("../../helpers/constants/Player");
 
+const gameOptions = {
+    sistersWakingUpInterval: {
+        type: Number,
+        default: 2,
+        min: 0,
+        max: 5,
+    },
+    brothersWakingUpInterval: {
+        type: Number,
+        default: 2,
+        min: 0,
+        max: 5,
+    },
+    isSheriffVoteDoubled: {
+        type: Boolean,
+        default: true,
+    },
+    isSeerTalkative: {
+        type: Boolean,
+        default: true,
+    },
+};
+
 const WonSchema = new Schema({
     by: {
         type: String,
@@ -90,6 +113,15 @@ const GameSchema = new Schema({
         enum: gameStatuses,
         default: "playing",
         required: true,
+    },
+    options: {
+        type: gameOptions,
+        default: {
+            sistersWakingUpInterval: 2,
+            brothersWakingUpInterval: 2,
+            isSheriffVoteDoubled: true,
+            isSeerTalkative: true,
+        },
     },
     won: {
         type: WonSchema,

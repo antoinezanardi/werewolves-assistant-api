@@ -266,7 +266,7 @@ exports.postGame = async(req, res) => {
         const { body } = checkRequestData(req);
         const game = await this.create({
             gameMaster: new mongoose.Types.ObjectId(req.user._id),
-            players: body.players,
+            ...body,
         });
         res.status(200).json(game);
     } catch (e) {
@@ -349,20 +349,30 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
     const players = getPlayersWithGroup(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
 };
+exports.areThreeBrothersCallableDuringTheNight = async game => {
+    const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
+    const brotherPlayers = getPlayersWithRole("three-brothers", game);
+    const turnsSinceLastBrothersPlay = game.turn - lastBrothersPlay.turn;
+    return brotherPlayers.filter(brother => brother.isAlive).length >= 2 &&
+        (!lastBrothersPlay || turnsSinceLastBrothersPlay >= game.options.brothersWakingUpInterval && game.options.brothersWakingUpInterval);
+};
+exports.areTwoSistersCallableDuringTheNight = async game => {
+    const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
+    const sisterPlayers = getPlayersWithRole("two-sisters", game);
+    const turnsSinceLastSistersPlay = game.turn - lastSistersPlay.turn;
+    return sisterPlayers.every(({ isAlive }) => isAlive) &&
+        (!lastSistersPlay || turnsSinceLastSistersPlay >= game.options.sistersWakingUpInterval && game.options.sistersWakingUpInterval);
+};
 
-exports.isRoleCallableDuringTheNight = async(game, role) => {
+exports.isRoleCallableDuringTheNight = (game, role) => {
     const player = getPlayerWithRole(role, game);
     if (!player || game.tick === 1) {
         return !!player;
     }
     if (role === "two-sisters") {
-        const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
-        const sisterPlayers = getPlayersWithRole("two-sisters", game);
-        return sisterPlayers.every(sister => sister.isAlive) && (!lastSistersPlay || game.turn - lastSistersPlay.turn >= 2);
+        return this.areTwoSistersCallableDuringTheNight(game);
     } else if (role === "three-brothers") {
-        const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
-        const brotherPlayers = getPlayersWithRole("three-brothers", game);
-        return brotherPlayers.filter(brother => brother.isAlive).length >= 2 && (!lastBrothersPlay || game.turn - lastBrothersPlay.turn >= 2);
+        return this.areThreeBrothersCallableDuringTheNight(game);
     }
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };
