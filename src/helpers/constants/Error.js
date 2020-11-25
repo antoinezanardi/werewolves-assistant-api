@@ -159,4 +159,8 @@ exports.errorMetadata = {
         code: 39,
         HTTPCode: 400,
     },
+    WILD_CHILD_CANT_CHOOSE_HIMSELF: {
+        code: 40,
+        HTTPCode: 400,
+    },
 };

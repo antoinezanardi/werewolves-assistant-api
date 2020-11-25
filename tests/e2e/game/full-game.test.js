@@ -12,7 +12,7 @@ const { expect } = chai;
 const credentials = { email: "test@test.fr", password: "secret" };
 let players = [
     { name: "Dig", role: "witch" },
-    { name: "Doug", role: "seer" },
+    { name: "D∞g", role: "seer" },
     { name: "Dag", role: "guard" },
     { name: "Dug", role: "raven" },
     { name: "Dyg", role: "hunter" },
@@ -26,10 +26,11 @@ let players = [
     { name: "D®g", role: "three-brothers" },
     { name: "D†g", role: "three-brothers" },
     { name: "Dπg", role: "three-brothers" },
+    { name: "D¬g", role: "wild-child" },
 ];
 let token, game;
 
-describe("B - Full game of 10 players with all roles", () => {
+describe("B - Full game of 16 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -417,6 +418,109 @@ describe("B - Full game of 10 players with all roles", () => {
                 done();
             });
     });
+    it("🎲 Game is waiting for 'wild-child' to 'choose-model'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "wild-child", to: "choose-model" });
+        done();
+    });
+    it("🐒 Wild child can't choose model if play's source is not 'wild-child' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "little-girl", action: "choose-model" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🐒 Wild child can't choose model if play's action is not 'choose-model' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "wild-child", action: "use-potion" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🐒 Wild child can't choose model if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "wild-child", action: "choose-model" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("🐒 Wild child can't choose model if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "wild-child", action: "choose-model", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("🐒 Wild child can't choose multiple models (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "wild-child", action: "choose-model", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🐒 Wild child can't choose an unknown model (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "wild-child", action: "choose-model", targets: [{ player: new mongoose.Types.ObjectId() }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🐒 Wild child can't choose himself as a model (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "wild-child", action: "choose-model", targets: [{ player: players[15]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("WILD_CHILD_CANT_CHOOSE_HIMSELF");
+                done();
+            });
+    });
+    it("🐒 Wild child chooses the werewolf as a model (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "wild-child", action: "choose-model", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].attributes).to.deep.include({ attribute: "worshiped", source: "wild-child" });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[5]._id);
+                done();
+            });
+    });
     it("🎲 Game is waiting for 'seer' to 'look'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "seer", to: "look" });
         done();
@@ -557,7 +661,7 @@ describe("B - Full game of 10 players with all roles", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other'", done => {
+    it("🎲 Game is waiting for 'three-brothers' to 'meet-each-other'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "three-brothers", to: "meet-each-other" });
         done();
     });
@@ -1823,6 +1927,120 @@ describe("B - Full game of 10 players with all roles", () => {
                 expect(game.players[5].murdered).to.deep.equals({ by: "hunter", of: "shoot" });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[5]._id);
+                done();
+            });
+    });
+    it("🐒 Wild child changed his side to `werewolves` because his model (the werewolf) just died", done => {
+        expect(game.players[5].role.group).to.equals("werewolves");
+        done();
+    });
+    it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
+        done();
+    });
+    it("🎖 Sheriff delegates to the wild child (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[15]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[4].attributes).to.not.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.players[15].attributes).to.deep.include({ attribute: "sheriff", source: "sheriff" });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[15]._id);
+                done();
+            });
+    });
+    it("🌙 Night falls", done => {
+        expect(game.phase).to.equals("night");
+        expect(game.turn).to.equals(4);
+        done();
+    });
+    it("🪶 Raven skips (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "raven", action: "mark" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("🛡 Guard protects himself (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].attributes).to.deep.include({ attribute: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                done();
+            });
+    });
+    it("🐺 Werewolves can't eat the wild child because he is a fresh new werewolf (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[15]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("CANT_EAT_EACH_OTHER");
+                done();
+            });
+    });
+    it("🐺 Werewolves eat the witch (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].attributes).to.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                done();
+            });
+    });
+    it("🪄 Witch skips (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("☀️ Sun is rising", done => {
+        expect(game.phase).to.equals("day");
+        expect(game.players[0].isAlive).to.equals(false);
+        done();
+    });
+    it("👪 All vote for wild child (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[15]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[15].isAlive).to.equals(false);
+                expect(game.players[8].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
     });

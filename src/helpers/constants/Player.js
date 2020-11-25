@@ -7,6 +7,7 @@ exports.playerAttributes = [
     { attribute: "protected", source: "guard", remainingPhases: 1 },
     { attribute: "raven-marked", source: "raven", remainingPhases: 1 },
     { attribute: "in-love", source: "cupid" },
+    { attribute: "worshiped", source: "wild-child" },
 ];
 
 exports.playerActions = [
@@ -22,6 +23,7 @@ exports.playerActions = [
     "vote",
     "charm",
     "meet-each-other",
+    "choose-model",
 ];
 
 exports.murderedPossibilities = [

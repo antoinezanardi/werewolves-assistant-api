@@ -424,6 +424,7 @@ exports.generatePlayMethods = () => ({
     "lovers": () => undefined,
     "two-sisters": () => undefined,
     "three-brothers": () => undefined,
+    "wild-child": Player.wildChildPlays,
 });
 
 exports.generateGameHistoryEntry = (game, play) => ({

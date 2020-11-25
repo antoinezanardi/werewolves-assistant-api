@@ -1,6 +1,6 @@
 const GameHistory = require("./GameHistory");
 const { canBeEaten, hasAttribute } = require("../helpers/functions/Player");
-const { getPlayerWithAttribute } = require("../helpers/functions/Game");
+const { getPlayerWithAttribute, getPlayerWithRole } = require("../helpers/functions/Game");
 const { getPlayerAttribute, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
 const { generateError } = require("../helpers/functions/Error");
 
@@ -40,6 +40,8 @@ exports.checkTargetDependingOnAction = async(target, game, action) => {
         if (lastVotePlay && !lastVotePlay.play.targets.find(({ player }) => player._id.toString() === target.player._id.toString())) {
             throw generateError("CANT_BE_CHOSEN_AS_TIEBREAKER", `Player with id "${target.player._id}" is not part of the tiebreaker choice for the sheriff.`);
         }
+    } else if (action === "choose-model" && target.player.role.current === "wild-child") {
+        throw generateError("WILD_CHILD_CANT_CHOOSE_HIMSELF", `Wild child can't choose himself as a model.`);
     }
 };
 
@@ -95,6 +97,31 @@ exports.checkAndFillTargets = async(targets, game, options) => {
     await this.checkAllTargetsDependingOnAction(targets, game, options.action);
 };
 
+exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game) => {
+    if (hasAttribute(player, "sheriff")) {
+        this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
+    }
+    if (hasAttribute(player, "in-love")) {
+        const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== player._id.toString() &&
+            isAlive && hasAttribute({ attributes }, "in-love"));
+        if (otherLoverPlayer) {
+            this.killPlayer(otherLoverPlayer._id, { action: "charm" }, game);
+        }
+    }
+    if (hasAttribute(player, "worshiped")) {
+        const wildChildPlayer = getPlayerWithRole("wild-child", game);
+        if (wildChildPlayer && wildChildPlayer.isAlive) {
+            wildChildPlayer.role.group = "werewolves";
+        }
+    }
+};
+
+exports.applyConsequencesDependingOnKilledPlayerRole = (player, game) => {
+    if (player.role.current === "hunter") {
+        this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
+    }
+};
+
 exports.insertActionBeforeAllVote = (game, waiting) => {
     const waitingForAllToVoteIdx = game.waiting.findIndex(({ to }) => to === "vote");
     if (waitingForAllToVoteIdx !== -1 && waitingForAllToVoteIdx !== 0) {
@@ -111,20 +138,9 @@ exports.killPlayer = (playerId, { action }, game) => {
         const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
         if (murdered) {
             player.murdered = murdered;
-            if (player.role.current === "hunter") {
-                this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
-            }
-            if (hasAttribute(player, "sheriff")) {
-                this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
-            }
         }
-        if (hasAttribute(player, "in-love")) {
-            const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== playerId.toString() &&
-                isAlive && hasAttribute({ attributes }, "in-love"));
-            if (otherLoverPlayer) {
-                this.killPlayer(otherLoverPlayer._id, { action: "charm" }, game);
-            }
-        }
+        this.applyConsequencesDependingOnKilledPlayerRole(player, game);
+        this.applyConsequencesDependingOnKilledPlayerAttributes(player, game);
     }
 };
 
@@ -241,6 +257,12 @@ exports.checkAndFillVotes = (votes, game, options) => {
         votes[i].from = game.players.find(player => player._id.toString() === votes[i].from);
         votes[i].for = game.players.find(player => player._id.toString() === votes[i].for);
     }
+};
+
+exports.wildChildPlays = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    this.addPlayerAttribute(targets[0].player._id, "worshiped", game);
 };
 
 exports.cupidPlays = async(play, game) => {
