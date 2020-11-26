@@ -9,6 +9,7 @@
 * [#68](https://github.com/antoinezanardi/werewolves-assistant-api/issues/68) - Three Brothers role implemented.
 * [#69](https://github.com/antoinezanardi/werewolves-assistant-api/issues/69) - New game options with `sistersWakingUpInterval`, `brothersWakingUpInterval`, `isSheriffVoteDoubled` and `isSeerTalkative`.
 * [#70](https://github.com/antoinezanardi/werewolves-assistant-api/issues/70) - Wild Child role implemented.
+* [#71](https://github.com/antoinezanardi/werewolves-assistant-api/issues/71) - Dog-Wolf role implemented.
 
 ### ♻️ Refactoring
 

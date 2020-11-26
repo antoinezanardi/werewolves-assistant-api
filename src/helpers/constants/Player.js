@@ -24,6 +24,7 @@ exports.playerActions = [
     "charm",
     "meet-each-other",
     "choose-model",
+    "choose-side",
 ];
 
 exports.murderedPossibilities = [

@@ -163,4 +163,8 @@ exports.errorMetadata = {
         code: 40,
         HTTPCode: 400,
     },
+    DOG_WOLF_MUST_CHOOSE_SIDE: {
+        code: 41,
+        HTTPCode: 400,
+    },
 };

@@ -259,6 +259,17 @@ exports.checkAndFillVotes = (votes, game, options) => {
     }
 };
 
+exports.dogWolfPlays = (play, game) => {
+    if (!play.side) {
+        throw generateError("DOG_WOLF_MUST_CHOOSE_SIDE", "Dog-wolf must choose a side between `villagers` and `werewolves`.");
+    } else if (play.side === "werewolves") {
+        const dogWolfPlayer = getPlayerWithRole("dog-wolf", game);
+        if (dogWolfPlayer) {
+            dogWolfPlayer.role.group = "werewolves";
+        }
+    }
+};
+
 exports.wildChildPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });

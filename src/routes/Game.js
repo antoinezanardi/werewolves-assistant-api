@@ -1,7 +1,7 @@
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
-const { getPlayerRoles } = require("../helpers/functions/Role");
+const { getPlayerRoles, getSideNames } = require("../helpers/functions/Role");
 const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
 const { basicLimiter } = require("../helpers/constants/Route");
@@ -202,12 +202,13 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
      * @apiParam (Request Body Parameters) {Object[]} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets.player Player's id.
-     * @apiParam (Request Body Parameters) {Object} [targets.potion]
+     * @apiParam (Request Body Parameters) {Object} [targets.potion] Only for the `witch` actions.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life from werewolves meal.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
      * @apiParam (Request Body Parameters) {Object[]} [votes] Required when **action** is `elect-sheriff` or `vote`.
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
+     * @apiParam (Request Body Parameters) {String={"villagers","werewolves"}} [side] Side chosen by the dog-wolf. Required when **action** is `choose-side`.
      * @apiUse GameResponse
      */
     app.post("/games/:id/play", basicLimiter, passport.authenticate("jwt", { session: false }), [
@@ -237,5 +238,9 @@ module.exports = app => {
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("votes.*.for")
             .isMongoId().withMessage("Must be a valid MongoId"),
+        body("side")
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .isIn(getSideNames()).withMessage(`Must be equal to one of the following values: ${getSideNames()}`),
     ], Game.postPlay);
 };
