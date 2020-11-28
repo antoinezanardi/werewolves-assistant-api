@@ -173,7 +173,6 @@ describe("A - Game creation", () => {
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
             .end((err, res) => {
-                console.log(res.body);
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.status).to.equals("playing");
