@@ -40,6 +40,12 @@ Two versions are available for testing this API:
 
 **Sandbox API** may contains some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
 
+Both APIs are running on a server with the following configuration:
+- **OS**: `Debian GNU/Linux 9.13 (stretch)` 
+- **NodeJS**: `v10.23.0`
+- **NPM**: `v6.14.9`
+- **MongoDB shell version**: `v4.2.11` 
+
 #### 🚀🧑‍🚀 Fan of Postman ? Try out the [**official public collection**](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
 ## <a name="roles-available">🃏 Roles available</a>

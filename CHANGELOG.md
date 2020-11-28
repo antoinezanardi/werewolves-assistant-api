@@ -16,6 +16,10 @@
 
 * [#74](https://github.com/antoinezanardi/werewolves-assistant-api/issues/74) - During the night, all actions are pushed into the waiting queue instead of predicting them one by one.
 
+### 📚 Documentation
+
+* [#75](https://github.com/antoinezanardi/werewolves-assistant-api/issues/75) - Server configuration added in `REAMDE.md`.
+
 ### 📦 Packages
 
 * `@sentry/node` updated to version `5.27.6`.
