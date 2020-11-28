@@ -27,7 +27,7 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
     if (action === "look" && target.player.role.current === "seer") {
         throw generateError("CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
     } else if (action === "eat") {
-        if (target.player.role.group === "werewolves") {
+        if (target.player.side === "werewolves") {
             throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with group "werewolves".`);
         }
         if (source === "big-bad-wolf" && doesPlayerHaveAttribute(target.player, "eaten")) {
@@ -116,7 +116,7 @@ exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game) => {
     if (doesPlayerHaveAttribute(player, "worshiped")) {
         const wildChildPlayer = getPlayerWithRole("wild-child", game);
         if (wildChildPlayer && wildChildPlayer.isAlive) {
-            wildChildPlayer.role.group = "werewolves";
+            wildChildPlayer.side = "werewolves";
         }
     }
 };
@@ -279,7 +279,7 @@ exports.dogWolfPlays = (play, game) => {
     } else if (play.side === "werewolves") {
         const dogWolfPlayer = getPlayerWithRole("dog-wolf", game);
         if (dogWolfPlayer) {
-            dogWolfPlayer.role.group = "werewolves";
+            dogWolfPlayer.side = "werewolves";
         }
     }
 };

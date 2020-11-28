@@ -7,12 +7,11 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithGroup, areAllWerewolvesAlive, getAlivePlayers,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute } = require("../helpers/functions/Player");
-const { getPlayerRoles } = require("../helpers/functions/Role");
+const { getRoles, getGroupNames } = require("../helpers/functions/Role");
 const { populate: fullGamePopulate } = require("../helpers/constants/Game");
-const { groupNames } = require("../helpers/constants/Role");
 const { filterOutHTMLTags } = require("../helpers/functions/String");
 
 exports.getFindPopulate = projection => {
@@ -57,9 +56,9 @@ exports.fillTickData = game => {
 };
 
 exports.checkRolesCompatibility = players => {
-    if (!players.filter(player => player.role.group === "werewolves").length) {
+    if (!players.filter(player => player.side === "werewolves").length) {
         throw generateError("NO_WEREWOLF_IN_GAME_COMPOSITION", "No player has the `werewolf` role in game composition.");
-    } else if (!players.filter(player => player.role.group === "villagers").length) {
+    } else if (!players.filter(player => player.side === "villagers").length) {
         throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
     } else if (getPlayerWithRole("two-sisters", { players }) &&
         players.filter(({ role }) => role.current === "two-sisters").length !== 2) {
@@ -73,8 +72,9 @@ exports.checkRolesCompatibility = players => {
 exports.fillPlayersData = players => {
     for (const player of players) {
         player.name = filterOutHTMLTags(player.name);
-        const role = getPlayerRoles().find(playerRole => playerRole.name === player.role);
-        player.role = { original: role.name, current: role.name, group: role.group };
+        const role = getRoles().find(playerRole => playerRole.name === player.role);
+        player.role = { original: role.name, current: role.name };
+        player.side = role.side;
     }
 };
 
@@ -169,15 +169,15 @@ exports.assignRoleToPlayers = (players, roles) => {
     return players;
 };
 
-exports.filterAvailablePowerfulVillagerRoles = (roles, players, leftToPick) => roles.filter(role => role.group === "villagers" &&
+exports.filterAvailablePowerfulVillagerRoles = (roles, players, leftToPick) => roles.filter(role => role.side === "villagers" &&
     role.name !== "villager" && (!role.recommendedMinPlayers || role.recommendedMinPlayers <= players.length) &&
     (!role.minInGame || role.minInGame <= leftToPick));
 
 exports.getVillagerRoles = (players, werewolfRoles) => {
     const villagerRoles = [];
     const villagerCount = players.length - werewolfRoles.length;
-    const villagerRole = getPlayerRoles().find(role => role.name === "villager");
-    let availablePowerfulVillagerRoles = getPlayerRoles();
+    const villagerRole = getRoles().find(role => role.name === "villager");
+    let availablePowerfulVillagerRoles = getRoles();
     for (let i = 0; i < villagerCount; i++) {
         const leftToPick = villagerCount - i;
         availablePowerfulVillagerRoles = this.filterAvailablePowerfulVillagerRoles(availablePowerfulVillagerRoles, players, leftToPick);
@@ -226,7 +226,7 @@ exports.getWerewolfCount = players => {
 exports.getWerewolfRoles = players => {
     const werewolfRoles = [];
     const werewolfCount = this.getWerewolfCount(players);
-    const availableWerewolfRoles = getPlayerRoles().filter(role => role.group === "werewolves");
+    const availableWerewolfRoles = getRoles().filter(role => role.side === "werewolves");
     for (let i = 0; i < werewolfCount; i++) {
         werewolfRoles.push(this.pickRandomRole(availableWerewolfRoles));
     }
@@ -301,9 +301,9 @@ exports.checkGameWinners = game => {
         } else if (areLoversTheOnlyAlive(game)) {
             game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
         } else if (!isVillagerSideAlive(game)) {
-            game.won = { by: "werewolves", players: game.players.filter(player => player.role.group === "werewolves") };
+            game.won = { by: "werewolves", players: game.players.filter(player => player.side === "werewolves") };
         } else if (!isWerewolfSideAlive(game)) {
-            game.won = { by: "villagers", players: game.players.filter(player => player.role.group === "villagers") };
+            game.won = { by: "villagers", players: game.players.filter(player => player.side === "villagers") };
         }
         game.status = "done";
     }
@@ -351,7 +351,7 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
     if (group === "lovers" && getPlayerWithRole("cupid", game)) {
         return true;
     }
-    const players = getPlayersWithGroup(group, game);
+    const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
 };
 exports.areThreeBrothersCallableDuringTheNight = async game => {
@@ -388,7 +388,7 @@ exports.isSourceCallableDuringTheNight = (game, source) => {
     if (source === "all" || source === "sheriff") {
         return true;
     }
-    const sourceType = groupNames.includes(source) ? "group" : "role";
+    const sourceType = getGroupNames().includes(source) ? "group" : "role";
     return sourceType === "group" ? this.isGroupCallableDuringTheNight(game, source) : this.isRoleCallableDuringTheNight(game, source);
 };
 

@@ -15,6 +15,7 @@
 ### ♻️ Refactoring
 
 * [#74](https://github.com/antoinezanardi/werewolves-assistant-api/issues/74) - During the night, all actions are pushed into the waiting queue instead of predicting them one by one.
+* [#76](https://github.com/antoinezanardi/werewolves-assistant-api/issues/76) - Changed `player.role.group` to `player.side`.
 
 ### 📚 Documentation
 

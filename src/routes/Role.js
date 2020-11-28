@@ -1,4 +1,4 @@
-const { getPlayerRoles } = require("../helpers/functions/Role");
+const { getRoles } = require("../helpers/functions/Role");
 
 /**
  * @apiDefine RoleResponse
@@ -16,6 +16,6 @@ module.exports = app => {
      * @apiUse RoleResponse
      */
     app.get("/roles", (req, res) => {
-        res.status(200).json(getPlayerRoles());
+        res.status(200).json(getRoles());
     });
 };

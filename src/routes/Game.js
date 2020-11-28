@@ -1,7 +1,7 @@
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
-const { getPlayerRoles, getSideNames } = require("../helpers/functions/Role");
+const { getRoles, getSideNames } = require("../helpers/functions/Role");
 const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
 const { basicLimiter } = require("../helpers/constants/Route");
@@ -26,7 +26,7 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.isSeerTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
      * @apiSuccess {Object} [won] Winners of the game when status is `done`.
-     * @apiSuccess {String={"werewolves", "villagers", null}} won.by Can be either a group or a role. (_Possibilities: `werewolves`, `villagers` or null if nobody won_)
+     * @apiSuccess {String={"werewolves", "villagers", "lovers", null}} won.by Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers` or null if nobody won_)
      * @apiSuccess {Player[]} [won.players] List of player(s) who won. (_See: [Classes - Player](#player-class)_)
      * @apiSuccess {Date} createdAt When the game was created.
      * @apiSuccess {Date} updatedAt When the game was updated.
@@ -123,7 +123,7 @@ module.exports = app => {
             .isLength({ min: 1, max: 30 }).withMessage("Must be between 1 and 30 characters long"),
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
-            .isIn(getPlayerRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getPlayerRoles().map(({ name }) => name)}`),
+            .isIn(getRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getRoles().map(({ name }) => name)}`),
         body("options.sistersWakingUpInterval")
             .optional()
             .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")

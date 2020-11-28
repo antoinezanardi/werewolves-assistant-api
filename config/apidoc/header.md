@@ -40,7 +40,7 @@
 | &emsp;&emsp;isSeerTalkative           | Boolean                               | If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.                                 |
 | history                               | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History](#game-history-class)_)                                                                                                                        |
 | **won***                              | Object                                | Winner(s) of the game when status is `done`.                                                                                                                                                  |
-| &emsp;&emsp;by                        | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers` or null if nobody won_)                                                                                           |
+| &emsp;&emsp;by                        | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers` or null if nobody won_)                                                                                           |
 | **&emsp;&emsp;players***              | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                                                                                         |
 | **review***                           | Object                                | Game master can attach a game review only if its status is set to `canceled` or `done`.                                                                                                       |
 | &emsp;&emsp;rating                    | Number                                | Review's rating, from 0 to 5.                                                                                                                                                                 |
@@ -58,7 +58,7 @@
 | role                             | Object   |                                                                                                                                                                         |
 | &emsp;&emsp;original             | String   | Player's Original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                                            |
 | &emsp;&emsp;current              | String   | Player's current role. (_See: [Codes - Player Roles](#player-roles)_)                                                                                                   |
-| &emsp;&emsp;group                | String   | Player's current group. (_Possibilities: [Codes - Player Groups](#player-groups)_)                                                                                      |
+| side                             | String   | Player's current side. (_Possibilities: [Codes - Player Groups](#player-sides)_)                                                                                        |
 | attributes                       | Object[] | An attribute is an effect or a status on a player.                                                                                                                      |
 | &emsp;&emsp;attribute            | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                                      |
 | &emsp;&emsp;source               | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `sheriff`_) |
@@ -74,14 +74,14 @@
 |-------------------------------|:--------:|---------------------------------------------------------------------------------------------------------|
 | _id                           | ObjectId | Role's ID.                                                                                              |
 | name                          | String   | Role's name.                                                                                            |
-| group                         | String   | Role's group.                                                                                           |
+| side                          | String   | Role's original side.                                                                                   |
 | **minInGame***                | Number   | If the role is chosen by at least one player, then minimum X players must choose it to start the game.  |
 | maxInGame                     | Number   | Maximum possible of this role in a game.                                                                |
 | **recommendedMinPlayers***    | Number   | It is recommended to have at least X players in game for choosing this role.                            |
 
 ## <a id="game-history-class"></a>📜 Game History
 
-Each time a play is done by anyone or any group, an entry in game's history is saved. Each entry has the following structure:
+Each time a play is done by anyone, any group or any side, an entry in game's history is saved. Each entry has the following structure:
 
 | Field                            | Type                      | Description                                                            |
 |----------------------------------|:-------------------------:|------------------------------------------------------------------------|
