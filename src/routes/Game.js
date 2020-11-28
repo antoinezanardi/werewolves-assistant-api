@@ -97,7 +97,7 @@ module.exports = app => {
     ], Game.getGame);
 
     /**
-     * @api {POST} /games E] Create a game
+     * @api {POST} /games D] Create a game
      * @apiName CreateGame
      * @apiGroup Games 🎲
      *
@@ -143,7 +143,7 @@ module.exports = app => {
     ], Game.postGame);
 
     /**
-     * @api {PATCH} /games/:id/reset H] Reset a game
+     * @api {PATCH} /games/:id/reset E] Reset a game
      * @apiName ResetGame
      * @apiGroup Games 🎲
      *

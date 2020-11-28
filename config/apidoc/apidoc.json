@@ -1,7 +1,7 @@
 {
   "name": "\uD83D\uDC3A Werewolves Assistant API",
   "version": "0.8.0",
-  "description": "Werewolves Assistant API provides over HTTP requests a way of manage Werewolves games in order to help the game master in his task.",
+  "description": "Werewolves Assistant API provides over HTTP requests a way of manage The Werewolves of Millers Hollow games in order to help the game master in his task.",
   "header": {
     "title": "Classes",
     "filename": "./config/apidoc/header.md"

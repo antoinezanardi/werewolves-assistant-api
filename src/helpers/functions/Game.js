@@ -1,11 +1,11 @@
 const { patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder } = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
 
-exports.isWerewolfSideAlive = game => game.players.some(player => player.side === "werewolves" && player.isAlive);
+exports.isWerewolfSideAlive = game => game.players.some(player => player.side.current === "werewolves" && player.isAlive);
 
 exports.areAllWerewolvesAlive = game => this.getPlayersWithSide("werewolves", game).every(({ isAlive }) => isAlive);
 
-exports.isVillagerSideAlive = game => game.players.some(player => player.side === "villagers" && player.isAlive);
+exports.isVillagerSideAlive = game => game.players.some(player => player.side.current === "villagers" && player.isAlive);
 
 exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive);
 
@@ -34,6 +34,6 @@ exports.getPlayerWithRole = (roleName, game) => game.players.find(({ role }) => 
 
 exports.getPlayersWithRole = (roleName, game) => game.players.filter(({ role }) => role.current === roleName);
 
-exports.getPlayersWithSide = (sideName, game) => game.players.filter(({ side }) => side === sideName);
+exports.getPlayersWithSide = (sideName, game) => game.players.filter(({ side }) => side.current === sideName);
 
 exports.getAlivePlayers = game => game.players.filter(({ isAlive }) => isAlive);

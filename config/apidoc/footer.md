@@ -7,6 +7,14 @@
 | done              | The game is finished, no more actions are required to proceed.             |
 | canceled          | The game has been canceled by game master and cannot be played any longer. |
 
+## <a id="player-sides"></a>🧑‍🌾⚡🐺 Player Sides
+| Group                |                 Description                                                                                                              |
+|:--------------------:|------------------------------------------------------------------------------------------------------------------------------------------|
+| 👪<br/>all           | All players alive.                                                                                                                       |
+| 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game.                                                       |
+| 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game.                                                      |
+| 💕<br/>lovers        | They are teaming up against `all` but themselves and need to be the last survivors to win the game despite their current group and role. |
+
 ## <a id="player-groups"></a>👪 Player Groups
 | Group                |                 Description                                                                                                              |
 |:--------------------:|------------------------------------------------------------------------------------------------------------------------------------------|

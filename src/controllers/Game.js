@@ -56,9 +56,9 @@ exports.fillTickData = game => {
 };
 
 exports.checkRolesCompatibility = players => {
-    if (!players.filter(player => player.side === "werewolves").length) {
+    if (!players.filter(({ side }) => side.current === "werewolves").length) {
         throw generateError("NO_WEREWOLF_IN_GAME_COMPOSITION", "No player has the `werewolf` role in game composition.");
-    } else if (!players.filter(player => player.side === "villagers").length) {
+    } else if (!players.filter(({ side }) => side.current === "villagers").length) {
         throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
     } else if (getPlayerWithRole("two-sisters", { players }) &&
         players.filter(({ role }) => role.current === "two-sisters").length !== 2) {
@@ -74,7 +74,7 @@ exports.fillPlayersData = players => {
         player.name = filterOutHTMLTags(player.name);
         const role = getRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name };
-        player.side = role.side;
+        player.side = { original: role.side, current: role.side };
     }
 };
 
@@ -301,9 +301,9 @@ exports.checkGameWinners = game => {
         } else if (areLoversTheOnlyAlive(game)) {
             game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
         } else if (!isVillagerSideAlive(game)) {
-            game.won = { by: "werewolves", players: game.players.filter(player => player.side === "werewolves") };
+            game.won = { by: "werewolves", players: getPlayersWithSide("werewolves", game) };
         } else if (!isWerewolfSideAlive(game)) {
-            game.won = { by: "villagers", players: game.players.filter(player => player.side === "villagers") };
+            game.won = { by: "villagers", players: getPlayersWithSide("villagers", game) };
         }
         game.status = "done";
     }

@@ -71,9 +71,16 @@ const PlayerSchema = new Schema({
         },
     },
     side: {
-        type: String,
-        enum: sideNames,
-        required: true,
+        original: {
+            type: String,
+            enum: sideNames,
+            required: true,
+        },
+        current: {
+            type: String,
+            enum: sideNames,
+            required: true,
+        },
     },
     attributes: {
         type: [PlayerAttributeSchema],

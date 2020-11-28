@@ -1,8 +1,13 @@
 ---
 
-*This API is proudly coded and provided by Antoine ZANARDI with ❤️*
+#### If you are not familiar with the game **The Werewolves of Millers Hollow**, please check out <a href="https://en.wikipedia.org/wiki/The_Werewolves_of_Millers_Hollow" target="_blank">the Wikipedia page for general rules</a>.
+
+#### ⚠️ **Warning**: Rules explained on this page DO NOT follow strictly the original game's rules.
+
+*~ This API is proudly coded and provided by <a href="https://antoinezanardi.fr" target="_blank">Antoine ZANARDI</a> with ❤️ and open source on <a href="https://github.com/antoinezanardi/werewolves-assistant-api" target="_blank">GitHub<a/> ~️*
 
 <a href="https://github.com/antoinezanardi" target="_blank"><img src="https://img.shields.io/github/followers/antoinezanardi.svg?style=social&amp;label=Follow%20me%20%3A%29" alt="GitHub followers"/></a>
+<a href="https://github.com/antoinezanardi/werewolves-assistant-api" target="_blank"><img src="https://img.shields.io/github/stars/antoinezanardi/werewolves-assistant-api.svg?style=social&label=Feel%20free%20to%20leave%20a%20star" alt="GitHub stars"/></a>
 
 ---
 
@@ -12,6 +17,8 @@
 
 ## <a id="user-class"></a>👤 User
 
+In order to log in and create games, a user must be created (aka the future game master). 
+
 | Field                | Type     | Description                                                         |
 |----------------------|:--------:|---------------------------------------------------------------------|
 | _id                  | ObjectId | User's ID.                                                          |
@@ -20,6 +27,25 @@
 | updatedAt            | Date     | When the user updated his account.                                  |
 
 ## <a id="game-class"></a>🎲 Game
+
+A user can create as many games as he wants as long as he doesn't have a game with the status `playing`.
+
+A game must contain at least **4 players** and can be customized by setting different `options`.
+
+During the game, the `waiting` queue tells the game master what are the upcoming actions and players involved.
+
+Each time a play is performed, `tick` increments and `phase` is set according to the current state. Game's `turn` increases after each succession of a `night` and a `day`.
+
+Game ends when one of the following conditions is met:
+
+- All players on `villagers` side are dead. 
+- All players on `werewolves` side are dead. 
+- Players with the `lovers` attribute are the only survivors.
+- All players are dead. 
+
+At the end of the game, winner(s) are set in the `won` property.
+
+When game's status is `done` or `canceled`, it can be reviewed by the game master.
 
 | Field                                 | Type                                  | Description                                                                                                                                                                                   |
 |---------------------------------------|:-------------------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -51,14 +77,26 @@
 
 ## <a id="player-class"></a>🐺⚡🧙 Player
 
+At the start of the game, each player is either on the `side` of the `werewolves` or on the `side` of the `villagers` and must win with his `side`.
+
+Each player has a `role` which can give him powers during the game. All roles are described in the [dedicated Player Roles section](#player-roles).
+
+Due to some actions, players `role` and `side` can change during the game.
+
+During the game, players can apply to each other `attributes` with many effects and duration. All attributes are described in the [dedicated Player Attributes section](#player-attributes).
+
+When a player is killed, `isAlive` is set to `false` and `murdered` object is filled to tell the game master the source and cause of murder.
+
 | Field                            | Type     | Description                                                                                                                                                             |
 |----------------------------------|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | _id                              | ObjectId | Player's ID.                                                                                                                                                            |
 | name                             | String   | Player's name.                                                                                                                                                          |
 | role                             | Object   |                                                                                                                                                                         |
-| &emsp;&emsp;original             | String   | Player's Original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                                            |
+| &emsp;&emsp;original             | String   | Player's original role when the game started. (_See: [Codes - Player Roles](#player-roles)_)                                                                            |
 | &emsp;&emsp;current              | String   | Player's current role. (_See: [Codes - Player Roles](#player-roles)_)                                                                                                   |
-| side                             | String   | Player's current side. (_Possibilities: [Codes - Player Groups](#player-sides)_)                                                                                        |
+| side                             | Object   | Player's current side.                                                                                                                                                  |
+| &emsp;&emsp;original             | String   | Player's original side when the game started. (_See: [Codes - Player Sides](#player-sides)_)                                                                            |
+| &emsp;&emsp;current              | String   | Player's current side. (_See: [Codes - Player Sides](#player-sides)_)                                                                                                   |
 | attributes                       | Object[] | An attribute is an effect or a status on a player.                                                                                                                      |
 | &emsp;&emsp;attribute            | String   | Attribute's name on the player. (_Possibilities: [Codes - Player Attributes](#player-attributes)_)                                                                      |
 | &emsp;&emsp;source               | String   | Which role or group gave this attribute to the player. (_Possibilities: [Codes - Player Roles](#player-roles) or [Codes - Player Groups](#player-groups) or `sheriff`_) |
@@ -69,6 +107,10 @@
 | &emsp;&emsp;of                   | String   | What action killed the player. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                                             |
 
 ## <a id="role-class"></a>🃏 Role
+
+All available roles of this version can be gathered on the [route GET /roles](#api-Roles_🃏-GetRoles).
+
+⚠️ **Warning**: Don't mix up the `Role class` (below) and the player `role` attribute, they don't have the same structure.
 
 | Field                         | Type     | Description                                                                                             |
 |-------------------------------|:--------:|---------------------------------------------------------------------------------------------------------|
@@ -93,6 +135,7 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 | **play***                        | [Play](#play-class)       | Game's play.                                                           |
 
 ## <a id="play-class"></a>🕹 Play
+
 | Field                                  | Type                      | Description                                                                                                                                  |
 |----------------------------------------|:-------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------|
 | source                                 | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)         |

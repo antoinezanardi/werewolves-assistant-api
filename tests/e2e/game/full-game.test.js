@@ -295,7 +295,8 @@ describe("B - Full game of 18 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[16].side).to.deep.equals("werewolves");
+                expect(game.players[16].side.original).to.equals("villagers");
+                expect(game.players[16].side.current).to.equals("werewolves");
                 done();
             });
     });
@@ -2158,7 +2159,8 @@ describe("B - Full game of 18 players with all roles", () => {
             });
     });
     it("🐒 Wild child changed his side to `werewolves` because his model (the werewolf) just died", done => {
-        expect(game.players[5].side).to.equals("werewolves");
+        expect(game.players[15].side.original).to.equals("villagers");
+        expect(game.players[15].side.current).to.equals("werewolves");
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
