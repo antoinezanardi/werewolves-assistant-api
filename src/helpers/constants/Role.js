@@ -13,6 +13,7 @@ exports.roleNames = [
     "three-brothers",
     "wild-child",
     "dog-wolf",
+    "big-bad-wolf",
 ];
 
 exports.sideNames = ["villagers", "werewolves"];
@@ -34,4 +35,5 @@ exports.roles = [
     { name: "wild-child", group: "villagers", maxInGame: 1 },
     { name: "dog-wolf", group: "villagers", maxInGame: 1 },
     { name: "werewolf", group: "werewolves", maxInGame: 4, powers: [{ name: "eat" }] },
+    { name: "big-bad-wolf", group: "werewolves", maxInGame: 1, powers: [{ name: "eat" }], recommendedMinPlayers: 12 },
 ];

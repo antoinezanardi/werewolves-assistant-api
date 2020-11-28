@@ -167,4 +167,8 @@ exports.errorMetadata = {
         code: 41,
         HTTPCode: 400,
     },
+    TARGET_ALREADY_EATEN: {
+        code: 42,
+        HTTPCode: 400,
+    },
 };

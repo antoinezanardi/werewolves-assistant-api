@@ -27,5 +27,6 @@ exports.turnNightActionsOrder = [
     { source: "raven", action: "mark" },
     { source: "guard", action: "protect" },
     { source: "werewolves", action: "eat" },
+    { source: "big-bad-wolf", action: "eat" },
     { source: "witch", action: "use-potion" },
 ];

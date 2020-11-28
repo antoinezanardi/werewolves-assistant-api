@@ -1,7 +1,7 @@
 const GameHistory = require("./GameHistory");
-const { canBeEaten, hasAttribute } = require("../helpers/functions/Player");
+const { canBeEaten, doesPlayerHaveAttribute } = require("../helpers/functions/Player");
 const { getPlayerWithAttribute, getPlayerWithRole } = require("../helpers/functions/Game");
-const { getPlayerAttribute, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
+const { getAttribute, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -23,12 +23,17 @@ exports.checkUniqueTargets = targets => {
     }
 };
 
-exports.checkTargetDependingOnAction = async(target, game, action) => {
+exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => {
     if (action === "look" && target.player.role.current === "seer") {
         throw generateError("CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
-    } else if (action === "eat" && target.player.role.group === "werewolves") {
-        throw generateError("CANT_EAT_EACH_OTHER", `Werewolves's target can't be a player with group "werewolves".`);
-    } else if (action === "use-potion" && target.potion.life && !hasAttribute(target.player, "eaten")) {
+    } else if (action === "eat") {
+        if (target.player.role.group === "werewolves") {
+            throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with group "werewolves".`);
+        }
+        if (source === "big-bad-wolf" && doesPlayerHaveAttribute(target.player, "eaten")) {
+            throw generateError("TARGET_ALREADY_EATEN", `This target is already planned to be eaten by the "werewolves", the big bad wolf can't eat it.`);
+        }
+    } else if (action === "use-potion" && target.potion.life && !doesPlayerHaveAttribute(target.player, "eaten")) {
         throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by werewolves.`);
     } else if (action === "protect") {
         const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
@@ -89,26 +94,26 @@ exports.checkAndFillTargets = async(targets, game, options) => {
         return;
     }
     for (let i = 0; i < targets.length; i++) {
-        this.checkTargetStructure(targets[i], options.action);
+        this.checkTargetStructure(targets[i], options.play.action);
         this.checkAndFillPlayerTarget(targets[i], game);
-        await this.checkTargetDependingOnAction(targets[i], game, options.action);
+        await this.checkTargetDependingOnPlay(targets[i], game, options.play);
     }
     this.checkUniqueTargets(targets);
-    await this.checkAllTargetsDependingOnAction(targets, game, options.action);
+    await this.checkAllTargetsDependingOnAction(targets, game, options.play.action);
 };
 
 exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game) => {
-    if (hasAttribute(player, "sheriff")) {
+    if (doesPlayerHaveAttribute(player, "sheriff")) {
         this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
     }
-    if (hasAttribute(player, "in-love")) {
+    if (doesPlayerHaveAttribute(player, "in-love")) {
         const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== player._id.toString() &&
-            isAlive && hasAttribute({ attributes }, "in-love"));
+            isAlive && doesPlayerHaveAttribute({ attributes }, "in-love"));
         if (otherLoverPlayer) {
             this.killPlayer(otherLoverPlayer._id, { action: "charm" }, game);
         }
     }
-    if (hasAttribute(player, "worshiped")) {
+    if (doesPlayerHaveAttribute(player, "worshiped")) {
         const wildChildPlayer = getPlayerWithRole("wild-child", game);
         if (wildChildPlayer && wildChildPlayer.isAlive) {
             wildChildPlayer.role.group = "werewolves";
@@ -131,13 +136,16 @@ exports.insertActionBeforeAllVote = (game, waiting) => {
     }
 };
 
-exports.killPlayer = (playerId, { action }, game) => {
+exports.killPlayer = (playerId, { action }, game, forcedSource) => {
     const player = game.players.find(({ _id, isAlive }) => _id.toString() === playerId.toString() && isAlive);
     if (player && (action === "eat" && canBeEaten(player) || action !== "eat")) {
         player.isAlive = false;
         const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
         if (murdered) {
             player.murdered = murdered;
+            if (forcedSource) {
+                player.murdered.by = forcedSource;
+            }
         }
         this.applyConsequencesDependingOnKilledPlayerRole(player, game);
         this.applyConsequencesDependingOnKilledPlayerAttributes(player, game);
@@ -146,7 +154,7 @@ exports.killPlayer = (playerId, { action }, game) => {
 
 exports.addPlayerAttribute = (playerId, attribute, game, forcedSource) => {
     const player = game.players.find(({ _id }) => _id.toString() === playerId.toString());
-    const playerAttribute = getPlayerAttribute(attribute);
+    const playerAttribute = getAttribute(attribute);
     if (player && playerAttribute) {
         if (forcedSource) {
             playerAttribute.source = forcedSource;
@@ -259,6 +267,12 @@ exports.checkAndFillVotes = (votes, game, options) => {
     }
 };
 
+exports.bigBadWolfPlays = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
+    this.addPlayerAttribute(targets[0].player._id, "eaten", game, "big-bad-wolf");
+};
+
 exports.dogWolfPlays = (play, game) => {
     if (!play.side) {
         throw generateError("DOG_WOLF_MUST_CHOOSE_SIDE", "Dog-wolf must choose a side between `villagers` and `werewolves`.");
@@ -272,27 +286,27 @@ exports.dogWolfPlays = (play, game) => {
 
 exports.wildChildPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.addPlayerAttribute(targets[0].player._id, "worshiped", game);
 };
 
 exports.cupidPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 2, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 2, play });
     this.addPlayerAttribute(targets[0].player._id, "in-love", game);
     this.addPlayerAttribute(targets[1].player._id, "in-love", game);
 };
 
 exports.sheriffDelegates = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.removeAttributeFromAllPlayers("sheriff", game);
     this.addPlayerAttribute(targets[0].player._id, "sheriff", game, "sheriff");
 };
 
 exports.sheriffSettlesVotes = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.killPlayer(targets[0].player._id, play, game);
 };
 
@@ -306,19 +320,19 @@ exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
 
 exports.werewolvesPlay = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.addPlayerAttribute(targets[0].player._id, "eaten", game);
 };
 
 exports.hunterPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.killPlayer(targets[0].player._id, play, game);
 };
 
 exports.ravenPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, play });
     if (targets && targets.length) {
         this.addPlayerAttribute(targets[0].player._id, "raven-marked", game);
     }
@@ -326,13 +340,13 @@ exports.ravenPlays = async(play, game) => {
 
 exports.guardPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.addPlayerAttribute(targets[0].player._id, "protected", game);
 };
 
 exports.witchPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, action: play.action });
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, play });
     for (const target of targets) {
         if (target.potion.life) {
             this.addPlayerAttribute(target.player._id, "drank-life-potion", game);
@@ -344,7 +358,7 @@ exports.witchPlays = async(play, game) => {
 
 exports.seerPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, action: play.action });
+    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     this.addPlayerAttribute(targets[0].player._id, "seen", game);
 };
 
@@ -376,9 +390,9 @@ exports.allPlay = async(play, game, gameHistoryEntry) => {
     await allActions[play.action](play, game, gameHistoryEntry);
 };
 
-exports.eaten = game => {
+exports.eaten = (game, { source }) => {
     const eatenPlayer = getPlayerWithAttribute("eaten", game);
-    this.killPlayer(eatenPlayer._id, { action: "eat" }, game);
+    this.killPlayer(eatenPlayer._id, { action: "eat" }, game, source);
     this.removePlayerAttribute(eatenPlayer._id, "eaten", game);
 };
 

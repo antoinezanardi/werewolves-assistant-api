@@ -7,11 +7,12 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithAttribute, getPlayerWithRole, getPlayersWithGroup,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithGroup, areAllWerewolvesAlive, getAlivePlayers,
 } = require("../helpers/functions/Game");
+const { getPlayerAttribute } = require("../helpers/functions/Player");
+const { getPlayerRoles } = require("../helpers/functions/Role");
 const { populate: fullGamePopulate } = require("../helpers/constants/Game");
 const { groupNames } = require("../helpers/constants/Role");
-const { getPlayerRoles } = require("../helpers/functions/Role");
 const { filterOutHTMLTags } = require("../helpers/functions/String");
 
 exports.getFindPopulate = projection => {
@@ -331,9 +332,13 @@ exports.fillWaitingQueueWithDayActions = async game => {
         { attribute: "eaten", trigger: Player.eaten },
         { attribute: "drank-death-potion", trigger: Player.drankDeathPotion },
     ];
-    for (const { attribute, trigger } of playerAttributeMethods) {
-        if (getPlayerWithAttribute(attribute, game)) {
-            trigger(game);
+    const alivePlayers = getAlivePlayers(game);
+    for (const player of alivePlayers) {
+        for (const { attribute, trigger } of playerAttributeMethods) {
+            const playerAttribute = getPlayerAttribute(player, attribute);
+            if (playerAttribute) {
+                trigger(game, playerAttribute);
+            }
         }
     }
     this.purgeAttributesAfterSunRising(game);
@@ -373,6 +378,8 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
         return this.areTwoSistersCallableDuringTheNight(game);
     } else if (role === "three-brothers") {
         return this.areThreeBrothersCallableDuringTheNight(game);
+    } else if (role === "big-bad-wolf") {
+        return player.isAlive && areAllWerewolvesAlive(game);
     }
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };
@@ -426,6 +433,7 @@ exports.generatePlayMethods = () => ({
     "three-brothers": () => undefined,
     "wild-child": Player.wildChildPlays,
     "dog-wolf": Player.dogWolfPlays,
+    "big-bad-wolf": Player.bigBadWolfPlays,
 });
 
 exports.generateGameHistoryEntry = (game, play) => ({
