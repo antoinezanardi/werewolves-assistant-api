@@ -297,6 +297,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 game = res.body;
                 expect(game.players[16].side.original).to.equals("villagers");
                 expect(game.players[16].side.current).to.equals("werewolves");
+                expect(game.history[0].play.side).to.equals("werewolves");
                 done();
             });
     });

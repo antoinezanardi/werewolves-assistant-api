@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.8.0 (2020-11-??)
+## 0.8.0 (2020-12-??)
 
 ### 🚀 New features
 
@@ -20,12 +20,13 @@
 ### 📚 Documentation
 
 * [#75](https://github.com/antoinezanardi/werewolves-assistant-api/issues/75) - Server configuration added in `REAMDE.md`.
+* [#77](https://github.com/antoinezanardi/werewolves-assistant-api/issues/77) - Improve APIDoc documentation.
 
 ### 📦 Packages
 
-* `@sentry/node` updated to version `5.27.6`.
+* `@sentry/node` updated to version `5.28.0`.
 * `express-validator` updated to version `6.7.0`.
-* `mongoose` updated to version `5.10.16`.
+* `mongoose` updated to version `5.11.1`.
 
 ---
 

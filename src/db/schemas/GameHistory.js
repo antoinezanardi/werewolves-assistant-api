@@ -2,6 +2,7 @@ const { Schema } = require("mongoose");
 const Player = require("./Player");
 const { gamePhases, waitingForPossibilities } = require("../../helpers/constants/Game");
 const { playerActions } = require("../../helpers/constants/Player");
+const { getSideNames } = require("../../helpers/functions/Role");
 
 const playSchema = new Schema({
     action: {
@@ -45,6 +46,10 @@ const playSchema = new Schema({
         ],
         _id: false,
         default: undefined,
+    },
+    side: {
+        type: String,
+        enum: getSideNames(),
     },
 }, {
     _id: false,

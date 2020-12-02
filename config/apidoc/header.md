@@ -64,9 +64,9 @@ When game's status is `done` or `canceled`, it can be reviewed by the game maste
 | &emsp;&emsp;brothersWakingUpInterval  | Number                                | Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.|
 | &emsp;&emsp;isSheriffVoteDoubled      | Boolean                               | If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote. Default is `true`.                                                                     |
 | &emsp;&emsp;isSeerTalkative           | Boolean                               | If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.                                 |
-| history                               | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History](#game-history-class)_)                                                                                                                        |
+| history                               | [GameHistory[]](#game-history-class)  | Game's history. (_See: [Classes - Game History Entry](#game-history-class)_)                                                                                                                  |
 | **won***                              | Object                                | Winner(s) of the game when status is `done`.                                                                                                                                                  |
-| &emsp;&emsp;by                        | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers` or null if nobody won_)                                                                                           |
+| &emsp;&emsp;by                        | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers` or null if nobody won_)                                                                                 |
 | **&emsp;&emsp;players***              | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                                                                                         |
 | **review***                           | Object                                | Game master can attach a game review only if its status is set to `canceled` or `done`.                                                                                                       |
 | &emsp;&emsp;rating                    | Number                                | Review's rating, from 0 to 5.                                                                                                                                                                 |
@@ -121,7 +121,7 @@ All available roles of this version can be gathered on the [route GET /roles](#a
 | maxInGame                     | Number   | Maximum possible of this role in a game.                                                                |
 | **recommendedMinPlayers***    | Number   | It is recommended to have at least X players in game for choosing this role.                            |
 
-## <a id="game-history-class"></a>📜 Game History
+## <a id="game-history-class"></a>📜 Game History Entry
 
 Each time a play is done by anyone, any group or any side, an entry in game's history is saved. Each entry has the following structure:
 
@@ -132,7 +132,7 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 | turn                             | Number                    | Game's turn.                                                           |
 | phase                            | Number                    | Game's phase.                                                          |
 | tick                             | Number                    | Game's tick.                                                           |
-| **play***                        | [Play](#play-class)       | Game's play.                                                           |
+| **play***                        | [Play](#play-class)       | Game's play. (_See: [Classes - Play](#play-class)_)                    |
 
 ## <a id="play-class"></a>🕹 Play
 
@@ -148,6 +148,7 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 | **votes***                             | Object[]                  | Votes of the play.                                                                                                                           |
 | &emsp;&emsp;from                       | [Player](#player-class)   | Vote's source.                                                                                                                               |
 | &emsp;&emsp;for                        | [Player](#player-class)   | Vote's target.                                                                                                                               |
+| **side**                               | String                    | Only available for the `dog-wolf`. Is equal to `villagers` or `werewolves` depending on the chosen side.                                     |
 
 ## <a id="error-class"></a>⚠️ API Error
 

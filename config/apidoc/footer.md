@@ -1,6 +1,9 @@
 # Codes & Values
 
 ## <a id="game-statuses"></a>🎲 Game Statuses
+
+Games have a `status` property which changes through game's lifecycle.
+
 | Status            |                                    Description                             |
 |:-----------------:|----------------------------------------------------------------------------|
 | playing           | The game is currently playing.                                             |
@@ -8,25 +11,31 @@
 | canceled          | The game has been canceled by game master and cannot be played any longer. |
 
 ## <a id="player-sides"></a>🧑‍🌾⚡🐺 Player Sides
-| Group                |                 Description                                                                                                              |
+
+Each player has a `side` property depending on the role chosen. The main goal of each player is to kill players of the other side.
+
+| Side                 |                 Description                                                                                                              |
 |:--------------------:|------------------------------------------------------------------------------------------------------------------------------------------|
-| 👪<br/>all           | All players alive.                                                                                                                       |
 | 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game.                                                       |
 | 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game.                                                      |
-| 💕<br/>lovers        | They are teaming up against `all` but themselves and need to be the last survivors to win the game despite their current group and role. |
 
 ## <a id="player-groups"></a>👪 Player Groups
-| Group                |                 Description                                                                                                              |
-|:--------------------:|------------------------------------------------------------------------------------------------------------------------------------------|
-| 👪<br/>all           | All players alive.                                                                                                                       |
-| 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game.                                                       |
-| 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game.                                                      |
-| 💕<br/>lovers        | They are teaming up against `all` but themselves and need to be the last survivors to win the game despite their current group and role. |
+
+Among all players, groups are defined depending on players properties. Some groups need to win by themselves to win the game like the `lovers`.
+
+| Group                |                 Description                                                                                                                                          |
+|:--------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 👪<br/>all           | All players alive. Has `isAlive` property set to `true`.                                                                                                             |
+| 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game. Has `side.current` property set to `werewolves`.                                  |
+| 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game. Has `side.current` property set to `villagers`.                                  |
+| 💕<br/>lovers        | They are teaming up against `all` but themselves and need to be the last survivors to win the game despite their current side and role. Has the `in-love` attribute. |
 
 ## <a id="player-roles"></a>🃏 Player Roles
 
-| Role                          | Card                                                                                                         | [Group](#player-groups) |                 Description                                                                                                                                                   |
-|:-----------------------------:|:------------------------------------------------------------------------------------------------------------:|:-----------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+Each player in a game has a role. It defines the original player's side and powers.
+
+| Role                          | Card                                                                                                         | [Side](#player-sides)  |                 Description                                                                                                                                                   |
+|:-----------------------------:|:------------------------------------------------------------------------------------------------------------:|:-----------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🐺<br/>werewolf               | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="50"/>            | werewolves              | Each night, his group eats a villager chosen by the majority.                                                                                                                 |
 | 🐺<br/>big-bad-wolf           | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/big-bad-wolf.png" width="50"/>        | werewolves              | Each night until no player in the `werewolves` side has died, he eats another villager all by himself after the `werewolves` turn.                                            |
 | 🧑‍🌾<br/>villager               | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="50"/>            | villagers               | Has no powers, can only count on his speech skills.                                                                                                                           |
@@ -45,6 +54,8 @@
 
 ## <a id="player-actions"></a>🔪 Player Actions
 
+Actions can be performed by a group, a role or a player which has a specific attribute.
+
 | Action            | [Role](#player-roles)             | [Group](#player-groups) | [Attribute](#player-attributes)  |              When - Use and Limits                                                                                                                               |
 |:-----------------:|:---------------------------------:|:-----------------------:|:--------------------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | eat               | 🐺<br/>werewolf                   | 🐺<br/>werewolves        | -                                | Each night - Eat a villager chosen by majority.                                                                                                                  |
@@ -61,23 +72,25 @@
 | choose-side       | 🐕<br/>dog-wolf                   | 🧑‍🌾<br/>villagers         | -                                | First night - The dog-wolf chooses his side between `villagers` and `werewolves` and must win with the chosen side.                                              |
 | elect-sheriff     | -                                 | 👪<br/>all               | -                                | During the first phase (`night`) - Anyone can be elected as a sheriff.                                                                                           |
 | vote              | -                                 | 👪<br/>all               | -                                | Each day - All alive players vote for someone to kill.                                                                                                           |
-| delegate          | -                                 | -                       | 🎖 sheriff                        | When sheriff dies - The dying sheriff chooses the next one in among the living.                                                                                  |
-| settle-votes      | -                                 | -                       | 🎖 sheriff                        | When there is a tie in the votes during the `day` - Choose which one will be executed.                                                                           |
-| meet-each-other   | -                                 | -                       | 💕 in-love                        | Right after Cupid chose his targets, lovers wake up and meet each other.                                                                                         |
+| delegate          | -                                 | -                       | 🎖<br/>sheriff                    | When sheriff dies - The dying sheriff chooses the next one in among the living.                                                                                  |
+| settle-votes      | -                                 | -                       | 🎖<br/>sheriff                    | When there is a tie in the votes during the `day` - Choose which one will be executed.                                                                           |
+| meet-each-other   | -                                 | -                       | 💕<br/>in-love                    | Right after Cupid chose his targets, lovers wake up and meet each other.                                                                                         |
 
 ## <a id="player-attributes"></a>🎖️ Player Attributes
 
-| Attribute             |                Description                                                                                                      |
-|:---------------------:|---------------------------------------------------------------------------------------------------------------------------------|
-| 🎖️ sheriff             | Elected by all alive players, has the doubled vote. When dying, this attribute is transferred to someone chosen by the player.  |
-| 👀 seen                | The seer looked at this player during the night. The player's role is revealed to the seer.                                     |
-| 🍽️ eaten               | Werewolves decided to eat this player during the night. The player will die the next phase (`day`) if he has no protection.     |
-| 🧪 drank-life-potion   | The witch gave this potion during the night. It prevents from dying until the next phase (`day`).                               |
-| ☠️ drank-death-potion  | The witch gave this potion during the night. The player will die the next phase (`day`) if he has no protection.                |
-| 🛡 protected           | The guard protected this player during the night. He prevents from dying until the next phase (`day`).                          |
-| 🪶 raven-marked        | The raven marked the player during the night. During the next phase (`day`), this player will have two votes against himself.   |
-| 💕 in-love             | Shot by the Cupid arrow, players with this attribute must win together the game. If one dies, the other one dies too.           |
-| 🙇 worshiped           | The wild child chose the player during the first night. If the player dies, the wild child changes his side to `werewolves`.    |
+Attributes are consequences of actions and hold by players. Each attribute has special effects and can also have consequences, like death. 
+
+| Attribute                  |                Description                                                                                                                                                                                        |
+|:--------------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🎖️<br/>sheriff             | Elected by all alive players, has the doubled vote. When dying, this attribute is transferred to someone chosen by the player. If there is a tie in the votes during the `day`, the sheriff must settle them.    |
+| 👀<br/>seen                | The seer looked at this player during the night. The player's role is revealed to the seer.                                                                                                                      |
+| 🍽️<br/>eaten               | Werewolves decided to eat this player during the night. The player will die the next phase (`day`) if he is the `little-girl` or doesn't have the `protected` or `drank-life-potion` attribute.                  |
+| 🧪<br/>drank-life-potion   | The witch gave this potion during the night. It prevents from dying of the `eaten` attribute until the next phase (`day`).                                                                                       |
+| ☠️<br/>drank-death-potion  | The witch gave this potion during the night. The player will die the next phase (`day`).                                                                                                                         |
+| 🛡<br/>protected           | The guard protected this player during the night. He prevents from dying of the `eaten` attribute until the next phase (`day`).                                                                                  |
+| 🪶<br/>raven-marked        | The raven marked the player during the night. During the next phase (`day`), this player will have two votes against himself.                                                                                    |
+| 💕<br/>in-love             | Shot by the Cupid arrow, players with this attribute must win together the game. If one dies, the other one dies too.                                                                                            |
+| 🙇<br/>worshiped           | The wild child chose the player during the first night. If the player dies, the wild child changes his side to `werewolves`.                                                                                     |
 
 ## <a id="errors"></a>⚠️ Errors
 
