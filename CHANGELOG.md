@@ -11,6 +11,7 @@
 * [#70](https://github.com/antoinezanardi/werewolves-assistant-api/issues/70) - Wild Child role implemented.
 * [#71](https://github.com/antoinezanardi/werewolves-assistant-api/issues/71) - Dog-Wolf role implemented.
 * [#72](https://github.com/antoinezanardi/werewolves-assistant-api/issues/72) - Big Bad Wolf role implemented.
+* [#82](https://github.com/antoinezanardi/werewolves-assistant-api/issues/82) - MongoDB authentication added for `mongoose` config.
 
 ### ♻️ Refactoring
 
@@ -24,9 +25,11 @@
 
 ### 📦 Packages
 
-* `@sentry/node` updated to version `5.28.0`.
-* `express-validator` updated to version `6.7.0`.
-* `mongoose` updated to version `5.11.1`.
+* `@sentry/node` updated to version `5.29.0`.
+* `eslint` updated to version `7.15.0`.
+* `express-validator` updated to version `6.8.0`.
+* `mongoose` updated to version `5.11.7`.
+* `validator` updated to version `13.5.2`.
 
 ---
 

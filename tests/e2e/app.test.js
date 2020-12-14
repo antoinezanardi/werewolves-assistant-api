@@ -1,12 +1,14 @@
-const app = require("../../app");
+const { connection } = require("mongoose");
 const chai = require("chai");
-const { describe, it } = require("mocha");
+const app = require("../../app");
+const { describe, it, before } = require("mocha");
 const chaiHttp = require("chai-http");
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("Testing main route", () => {
+    before(done => connection.once("open", done));
     it("👋 Welcomes user with API name", done => {
         chai.request(app)
             .get("/")

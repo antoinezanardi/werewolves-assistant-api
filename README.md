@@ -46,6 +46,8 @@ Both APIs are running on a server with the following configuration:
 - **NPM**: `v6.14.9`
 - **MongoDB shell version**: `v4.4.2` 
 
+The MongoDB database is protected under username and password authentication.
+
 #### 🚀🧑‍🚀 Fan of Postman ? Try out the [**official public collection**](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
 ## <a name="roles-available">🃏 Roles available</a>
@@ -100,6 +102,10 @@ Complete list of all enabled rules is available in the **[.eslintrc.js file](htt
 1. Install dependencies with `npm install` (add `--production` to omit dev dependencies).
 2. Copy `.env.example` and paste it as `.env`.
 3. Replace environment values in the fresh new `.env` file if necessary (When **⚠️️ Required** is specified):
+    * **DB_USER**: User for authenticating into the MongoDB database.
+      - _**⚠️ Required if MongoDB auth is enabled**_
+    * **DB_PASSWORD**: Password for authenticating into the MongoDB database.
+      - _**⚠️ Required if MongoDB auth is enabled**_
     * **DB_NAME**: Name of the MongoDB database. 
       - _**Not required - Default value**: `werewolves-assistant`_
     * **BASIC_USERNAME**: Username for basic authentication. 
