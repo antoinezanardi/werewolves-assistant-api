@@ -30,6 +30,7 @@ connectDatabase().then(() => {
     app.listen(Config.app.port);
     console.log(`${bold("🐺 Werewolves Assistant API")} server started on port ${bold.blue(Config.app.port)} and running on database ${bold.green(Config.db.name)}.`);
     console.log(`${bold("📚 API Documentation:")} http://localhost:${Config.app.port}/apidoc`);
+    app.emit("ready");
 });
 
 module.exports = app;

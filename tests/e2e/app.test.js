@@ -1,4 +1,3 @@
-const { connection } = require("mongoose");
 const chai = require("chai");
 const app = require("../../app");
 const { describe, it, before } = require("mocha");
@@ -8,7 +7,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("Testing main route", () => {
-    before(done => connection.readyState === 1 ? done() : connection.once("open", done));
+    before(done => app.on("ready", done));
     it("👋 Welcomes user with API name", done => {
         chai.request(app)
             .get("/")
