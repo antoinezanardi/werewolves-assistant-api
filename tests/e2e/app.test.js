@@ -8,7 +8,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("Testing main route", () => {
-    before(done => connection.once("open", done));
+    before(done => connection.readyState === 1 ? done() : connection.once("open", done));
     it("👋 Welcomes user with API name", done => {
         chai.request(app)
             .get("/")
