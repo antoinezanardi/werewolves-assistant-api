@@ -7,7 +7,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("Testing main route", () => {
-    before(done => app.on("ready", done));
+    before(done => !app.isReady ? app.on("ready", done) : done);
     it("👋 Welcomes user with API name", done => {
         chai.request(app)
             .get("/")
