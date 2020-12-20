@@ -4,9 +4,7 @@ services: mongodb
 language: node_js
 node_js: 14
 env:
-    - DB_NAME=werewolves-assistant
-    - DB_USER=travis
-    - DB_PASSWORD=test
+    - DB_NAME=werewolves-assistant DB_USER=travis DB_PASSWORD=test
 before_script:
     - sleep 15
     - mongo werewolves-assistant --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
