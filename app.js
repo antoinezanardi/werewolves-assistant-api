@@ -13,6 +13,7 @@ if (Config.sentry.enabled) {
     const Sentry = require("@sentry/node");
     Sentry.init({ dsn: `https://${Config.sentry.key}@sentry.io/${Config.sentry.projectID}` });
 }
+console.log("Starting the application...");
 connectDatabase().then(() => {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
