@@ -7,6 +7,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("Testing main route", () => {
+    this.timeout(10000);
     before(done => !app.isReady ? app.on("ready", done) : done);
     it("👋 Welcomes user with API name", done => {
         chai.request(app)
@@ -16,5 +17,5 @@ describe("Testing main route", () => {
                 expect(res.body.name).to.equals("🐺 Werewolves Assistant API");
                 done();
             });
-    }).timeout(10000);
+    });
 });
