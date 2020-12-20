@@ -25,10 +25,10 @@
 
 ### 📦 Packages
 
-* `@sentry/node` updated to version `5.29.0`.
-* `eslint` updated to version `7.15.0`.
+* `@sentry/node` updated to version `5.29.2`.
+* `eslint` updated to version `7.16.0`.
 * `express-validator` updated to version `6.8.0`.
-* `mongoose` updated to version `5.11.7`.
+* `mongoose` updated to version `5.11.8`.
 * `validator` updated to version `13.5.2`.
 
 ---
