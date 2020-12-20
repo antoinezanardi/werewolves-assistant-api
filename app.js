@@ -15,7 +15,7 @@ if (Config.sentry.enabled) {
 }
 console.log("Starting the application...");
 connectDatabase().then(() => {
-    console.log("✅ Connection to database set.");
+    console.log("✅ Connected to database.");
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(cors({ origin: "*" }));
