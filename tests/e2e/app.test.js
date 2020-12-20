@@ -17,4 +17,4 @@ describe("Testing main route", () => {
                 done();
             });
     });
-}).timeout(10000);
+});
