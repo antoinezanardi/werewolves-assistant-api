@@ -7,7 +7,7 @@ env:
     - DB_NAME=werewolves-assistant DB_USER=travis DB_PASSWORD=test
 before_script:
     - sleep 15
-    - mongo werewolves-assistant --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+    - mongo --eval 'db.createUser({ user:"travis", pwd:"test", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"] });'
 install:
     - npm install
     - npm run lint
