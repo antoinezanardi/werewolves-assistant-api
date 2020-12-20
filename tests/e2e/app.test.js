@@ -9,7 +9,6 @@ const { expect } = chai;
 describe("Testing main route", () => {
     before(done => !app.isReady ? app.on("ready", done) : done);
     it("👋 Welcomes user with API name", done => {
-        this.timeout(10000);
         chai.request(app)
             .get("/")
             .end((err, res) => {
@@ -17,5 +16,5 @@ describe("Testing main route", () => {
                 expect(res.body.name).to.equals("🐺 Werewolves Assistant API");
                 done();
             });
-    });
+    }).timeout(10000);
 });
