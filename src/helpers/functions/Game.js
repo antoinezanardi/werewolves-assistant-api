@@ -1,14 +1,20 @@
-const { patchableGameStatuses, waitingForPossibilities, gameStatuses } = require("../constants/Game");
-const { hasAttribute } = require("./Player");
+const { patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder } = require("../constants/Game");
+const { doesPlayerHaveAttribute } = require("./Player");
 
-exports.isWerewolfSideAlive = game => game.players.some(player => player.role.group === "werewolves" && player.isAlive);
+exports.isWerewolfSideAlive = game => game.players.some(player => player.side.current === "werewolves" && player.isAlive);
 
-exports.isVillagerSideAlive = game => game.players.some(player => player.role.group === "villagers" && player.isAlive);
+exports.areAllWerewolvesAlive = game => this.getPlayersWithSide("werewolves", game).every(({ isAlive }) => isAlive);
+
+exports.isVillagerSideAlive = game => game.players.some(player => player.side.current === "villagers" && player.isAlive);
 
 exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive);
 
+exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
+                                    game.players.every(player => doesPlayerHaveAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
+
 exports.isGameDone = game => this.areAllPlayersDead(game) ||
-                            (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game)) && !this.isActionInWaitingQueue(game, "shoot");
+                            (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game)) &&
+                            !this.isActionInWaitingQueue(game, "shoot");
 
 exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) => to === action);
 
@@ -18,6 +24,16 @@ exports.getWaitingForPossibilities = () => JSON.parse(JSON.stringify(waitingForP
 
 exports.getGameStatuses = () => JSON.parse(JSON.stringify(gameStatuses));
 
-exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(player => hasAttribute(player, attributeName));
+exports.getGameTurNightActionsOrder = () => JSON.parse(JSON.stringify(turnNightActionsOrder));
 
-exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => hasAttribute(player, attributeName));
+exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(player => doesPlayerHaveAttribute(player, attributeName));
+
+exports.getPlayersWithAttribute = (attributeName, game) => game.players.filter(player => doesPlayerHaveAttribute(player, attributeName));
+
+exports.getPlayerWithRole = (roleName, game) => game.players.find(({ role }) => role.current === roleName);
+
+exports.getPlayersWithRole = (roleName, game) => game.players.filter(({ role }) => role.current === roleName);
+
+exports.getPlayersWithSide = (sideName, game) => game.players.filter(({ side }) => side.current === sideName);
+
+exports.getAlivePlayers = game => game.players.filter(({ isAlive }) => isAlive);

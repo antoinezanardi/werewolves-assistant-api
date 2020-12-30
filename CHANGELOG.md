@@ -1,5 +1,38 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.8.0 (2020-12-30)
+
+### 🚀 New features
+
+* [#66](https://github.com/antoinezanardi/werewolves-assistant-api/issues/66) - Cupid role implemented.
+* [#67](https://github.com/antoinezanardi/werewolves-assistant-api/issues/67) - Two Sisters role implemented.
+* [#68](https://github.com/antoinezanardi/werewolves-assistant-api/issues/68) - Three Brothers role implemented.
+* [#69](https://github.com/antoinezanardi/werewolves-assistant-api/issues/69) - New game options with `sistersWakingUpInterval`, `brothersWakingUpInterval`, `isSheriffVoteDoubled` and `isSeerTalkative`.
+* [#70](https://github.com/antoinezanardi/werewolves-assistant-api/issues/70) - Wild Child role implemented.
+* [#71](https://github.com/antoinezanardi/werewolves-assistant-api/issues/71) - Dog-Wolf role implemented.
+* [#72](https://github.com/antoinezanardi/werewolves-assistant-api/issues/72) - Big Bad Wolf role implemented.
+* [#82](https://github.com/antoinezanardi/werewolves-assistant-api/issues/82) - MongoDB authentication added for `mongoose` config.
+
+### ♻️ Refactoring
+
+* [#74](https://github.com/antoinezanardi/werewolves-assistant-api/issues/74) - During the night, all actions are pushed into the waiting queue instead of predicting them one by one.
+* [#76](https://github.com/antoinezanardi/werewolves-assistant-api/issues/76) - Changed `player.role.group` to `player.side`.
+
+### 📚 Documentation
+
+* [#75](https://github.com/antoinezanardi/werewolves-assistant-api/issues/75) - Server configuration added in `REAMDE.md`.
+* [#77](https://github.com/antoinezanardi/werewolves-assistant-api/issues/77) - Improve APIDoc documentation.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `5.29.2`.
+* `eslint` updated to version `7.16.0`.
+* `express-validator` updated to version `6.9.0`.
+* `mongoose` updated to version `5.11.9`.
+* `validator` updated to version `13.5.2`.
+
+---
+
 ## 0.7.0 (2020-11-21)
 
 ### 🚀 New features

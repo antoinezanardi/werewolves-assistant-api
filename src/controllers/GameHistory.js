@@ -81,3 +81,7 @@ exports.getLastProtectedPlayer = async gameId => {
 };
 
 exports.getLastVotePlay = gameId => this.findOne({ gameId, "play.action": "vote" }, null, { sort: { createdAt: -1 } });
+
+exports.getLastSistersPlay = gameId => this.findOne({ gameId, "play.source": "two-sisters" }, null, { sort: { createdAt: -1 } });
+
+exports.getLastBrothersPlay = gameId => this.findOne({ gameId, "play.source": "three-brothers" }, null, { sort: { createdAt: -1 } });

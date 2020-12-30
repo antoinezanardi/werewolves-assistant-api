@@ -3,26 +3,30 @@ dist: xenial
 services: mongodb
 language: node_js
 node_js: 14
+env:
+    - DB_NAME=werewolves-assistant DB_USER=travis DB_PASSWORD=test
 install:
-- npm install
-- npm run lint
-- npm run test
+    - npm install
+    - npm run lint
+    - npm run test
 addons:
-  ssh_known_hosts: vps514431.ovh.net
+    ssh_known_hosts: vps514431.ovh.net
 deploy:
-- provider: script
-  skip_cleanup: true
-  script: bash ./deploy/deploy-production.sh
-  on:
-    branch: master
-- provider: script
-  skip_cleanup: true
-  script: bash ./deploy/deploy-sandbox.sh
-  on:
-    branch: staging
+    -   provider: script
+        skip_cleanup: true
+        script: bash ./deploy/deploy-production.sh
+        on:
+            branch: master
+    -   provider: script
+        skip_cleanup: true
+        script: bash ./deploy/deploy-sandbox.sh
+        on:
+            branch: staging
 notifications:
-  slack:
-    secure: hg+pX4FhfFKfenZWfO81yt/6GxKVSgUrN2iUY0zz7WfRaD3/RAnNod+t5iioJx7zPmna04tY0RN1gGK7czBFWnMm41yz7oLYDQ0BnaaWdQlkTrtB+Ol9lG0uz515Vn70VvYenuEGrRPyw3TIYQH91FVUMuVgmktauvge6T5N0+kbIVwDCRF5fkr6C03YE2Ms7a7yPKJVfZuMSKhSkmUpmoUi3x3dKC0JBm2n40G7D7Nhixmfqegv0QuHBOEnv2ueNF8V0336pvoBskcYrW6mmCAD1eUfynaj7XNL2/cp76A43oF9YjNn7sta28r5AaSbIYJtRwn3JX/uyvXGOSyr7X6tNmdctEXyPeXHxqnZvJOZ4zY4DzR4qei1sD5kvtTj68l9FzloapWsqz9rH3u//7Kg17sEsPJ/ZAtEdqvJWbsPfIDsB5RIpjE/WAYnOHMa87Mly4M+W+U2fJJ2+AW/lWj1fPaWAVBdzcCcfrfMLWQhn0LJJgigfgjDXD9vltTJ6wKlL6IFYe3hZe5fwBNcpjZ0R4TGwSpgttXBShBrjPBgmT0ItjFQ7AlpY30VkYjq2anzoMEftTEKR07d7EUXgF0kN5ilV2qOF4j7h6+2kJAJ/0298qXnv92qTGW954dcFCZRQFppSuFCfNe8v33L4dPexC5jsK2x+feYRZu6+wo=
+    slack:
+        secure: hg+pX4FhfFKfenZWfO81yt/6GxKVSgUrN2iUY0zz7WfRaD3/RAnNod+t5iioJx7zPmna04tY0RN1gGK7czBFWnMm41yz7oLYDQ0BnaaWdQlkTrtB+Ol9lG0uz515Vn70VvYenuEGrRPyw3TIYQH91FVUMuVgmktauvge6T5N0+kbIVwDCRF5fkr6C03YE2Ms7a7yPKJVfZuMSKhSkmUpmoUi3x3dKC0JBm2n40G7D7Nhixmfqegv0QuHBOEnv2ueNF8V0336pvoBskcYrW6mmCAD1eUfynaj7XNL2/cp76A43oF9YjNn7sta28r5AaSbIYJtRwn3JX/uyvXGOSyr7X6tNmdctEXyPeXHxqnZvJOZ4zY4DzR4qei1sD5kvtTj68l9FzloapWsqz9rH3u//7Kg17sEsPJ/ZAtEdqvJWbsPfIDsB5RIpjE/WAYnOHMa87Mly4M+W+U2fJJ2+AW/lWj1fPaWAVBdzcCcfrfMLWQhn0LJJgigfgjDXD9vltTJ6wKlL6IFYe3hZe5fwBNcpjZ0R4TGwSpgttXBShBrjPBgmT0ItjFQ7AlpY30VkYjq2anzoMEftTEKR07d7EUXgF0kN5ilV2qOF4j7h6+2kJAJ/0298qXnv92qTGW954dcFCZRQFppSuFCfNe8v33L4dPexC5jsK2x+feYRZu6+wo=
 before_install:
-- openssl aes-256-cbc -K $encrypted_ae4bfc95fd3d_key -iv $encrypted_ae4bfc95fd3d_iv
-  -in deploy/deploy-key.enc -out deploy/deploy-key -d
+    - openssl aes-256-cbc -K $encrypted_ae4bfc95fd3d_key -iv $encrypted_ae4bfc95fd3d_iv
+        -in deploy/deploy-key.enc -out deploy/deploy-key -d
+    - sleep 5
+    - mongo admin --eval 'db.createUser({user:"travis",pwd:"test",roles:["userAdminAnyDatabase","dbAdminAnyDatabase","readWriteAnyDatabase"]});'

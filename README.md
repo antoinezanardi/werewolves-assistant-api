@@ -40,23 +40,37 @@ Two versions are available for testing this API:
 
 **Sandbox API** may contains some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
 
+Both APIs are running on a server with the following configuration:
+- **OS**: `Debian GNU/Linux 10 (buster)` 
+- **NodeJS**: `v14.15.1`
+- **NPM**: `v6.14.9`
+- **MongoDB shell version**: `v4.4.2` 
+
+The MongoDB database is protected under username and password authentication.
+
 #### 🚀🧑‍🚀 Fan of Postman ? Try out the [**official public collection**](https://www.getpostman.com/collections/d24ac6443fe18e0fe389) for your tests ! 
 
 ## <a name="roles-available">🃏 Roles available</a>
 
-On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **9 different roles** are available to play:
+On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **15 different roles** are available to play:
 
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/big-bad-wolf.png" width="25"/> The Big Bad Wolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager**
-- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager-villager**
-- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/witch.png" width="25"/> The Witch**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager-Villager**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/seer.png" width="25"/> The Seer**
-- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="25"/> The Guard**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/cupid.png" width="25"/> The Cupid**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/witch.png" width="25"/> The Witch**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/hunter.png" width="25"/> The Hunter**
-- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="25"/> The Raven**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/little-girl.png" width="25"/> The Little Girl**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="25"/> The Guard**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/two-sisters.png" width="25"/> The Two Sisters**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/three-brothers.png" width="25"/> The Three Brothers**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/wild-child.png" width="25"/> The Wild Child**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/dog-wolf.png" width="25"/> The Dog-Wolf**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="25"/> The Raven**
 
-Please check the <a href="https://werewolves-assistant-api.antoinezanardi.fr/apidoc/#player-roles" target="_blank">**Player role section on API documentation**</a> for more details about each role.
+Please check the <a href="https://werewolves-assistant-api.antoinezanardi.fr/apidoc/#player-roles" target="_blank">**Player role section on API documentation**</a> or the <a href="https://werewolves-assistant.antoinezanardi.fr/about" target="_blank">**Available Roles section on the official website**</a> for more details about each role.
 
 ## <a name="api-documentation">📚 API Documentation</a>
 
@@ -88,6 +102,10 @@ Complete list of all enabled rules is available in the **[.eslintrc.js file](htt
 1. Install dependencies with `npm install` (add `--production` to omit dev dependencies).
 2. Copy `.env.example` and paste it as `.env`.
 3. Replace environment values in the fresh new `.env` file if necessary (When **⚠️️ Required** is specified):
+    * **DB_USER**: User for authenticating into the MongoDB database.
+      - _**⚠️ Required if MongoDB auth is enabled**_
+    * **DB_PASSWORD**: Password for authenticating into the MongoDB database.
+      - _**⚠️ Required if MongoDB auth is enabled**_
     * **DB_NAME**: Name of the MongoDB database. 
       - _**Not required - Default value**: `werewolves-assistant`_
     * **BASIC_USERNAME**: Username for basic authentication. 

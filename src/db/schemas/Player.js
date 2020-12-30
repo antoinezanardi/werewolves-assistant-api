@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 const { playerAttributes, playerActions, murderedPossibilities } = require("../../helpers/constants/Player");
-const { groupNames, roleNames } = require("../../helpers/constants/Role");
+const { sideNames, roleNames } = require("../../helpers/constants/Role");
 const { waitingForPossibilities } = require("../../helpers/constants/Game");
 
 const PlayerAttributeSchema = new Schema({
@@ -69,9 +69,16 @@ const PlayerSchema = new Schema({
             enum: roleNames,
             required: true,
         },
-        group: {
+    },
+    side: {
+        original: {
             type: String,
-            enum: groupNames,
+            enum: sideNames,
+            required: true,
+        },
+        current: {
+            type: String,
+            enum: sideNames,
             required: true,
         },
     },

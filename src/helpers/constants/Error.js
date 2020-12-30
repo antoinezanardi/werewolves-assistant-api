@@ -151,4 +151,24 @@ exports.errorMetadata = {
         code: 37,
         HTTPCode: 429,
     },
+    SISTERS_MUST_BE_TWO: {
+        code: 38,
+        HTTPCode: 400,
+    },
+    BROTHERS_MUST_BE_THREE: {
+        code: 39,
+        HTTPCode: 400,
+    },
+    WILD_CHILD_CANT_CHOOSE_HIMSELF: {
+        code: 40,
+        HTTPCode: 400,
+    },
+    DOG_WOLF_MUST_CHOOSE_SIDE: {
+        code: 41,
+        HTTPCode: 400,
+    },
+    TARGET_ALREADY_EATEN: {
+        code: 42,
+        HTTPCode: 400,
+    },
 };
