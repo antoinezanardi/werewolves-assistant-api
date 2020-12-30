@@ -1,17 +1,14 @@
 const mongoose = require("mongoose");
 const Config = require("../../../config");
 
-exports.connect = () => new Promise((resolve, reject) => {
+exports.connect = () => {
     const mongooseOptions = {
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,
         useUnifiedTopology: true,
+        auth: { authSource: "admin" },
+        ...Config.db.auth,
     };
-    mongoose.connect(`mongodb://localhost/${Config.db.name}`, mongooseOptions, err => {
-        if (err) {
-            return reject(err);
-        }
-        return resolve();
-    });
-});
+    return mongoose.connect(`mongodb://localhost/${Config.db.name}`, mongooseOptions);
+};

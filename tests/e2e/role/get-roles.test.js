@@ -17,7 +17,7 @@ describe("A - Get roles", () => {
                 expect(res).to.have.status(200);
                 expect(Array.isArray(res.body)).to.equals(true);
                 expect(res.body[0].name).to.exist;
-                expect(res.body[0].group).to.exist;
+                expect(res.body[0].side).to.exist;
                 expect(res.body[0].maxInGame).to.exist;
                 done();
             });

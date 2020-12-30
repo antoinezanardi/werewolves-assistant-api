@@ -34,6 +34,18 @@ const playersWithoutVillagers = [
     { name: "Dyg", role: "werewolf" },
     { name: "Deg", role: "werewolf" },
 ];
+const playersWithOnlyOneSister = [
+    { name: "Dig", role: "villager" },
+    { name: "Doug", role: "two-sisters" },
+    { name: "Dag", role: "werewolf" },
+    { name: "Dug", role: "werewolf" },
+];
+const playersWithOnlyTwoBrothers = [
+    { name: "Dig", role: "three-brothers" },
+    { name: "Doug", role: "three-brothers" },
+    { name: "Dag", role: "werewolf" },
+    { name: "Dug", role: "werewolf" },
+];
 let token, token2, game, game2, queryString;
 
 describe("A - Game creation", () => {
@@ -133,6 +145,28 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("👭 Can't create game a with only one sister (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: playersWithOnlyOneSister })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("SISTERS_MUST_BE_TWO");
+                done();
+            });
+    });
+    it("👨‍👨‍👦 Can't create game a with only two brothers (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: playersWithOnlyTwoBrothers })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BROTHERS_MUST_BE_THREE");
+                done();
+            });
+    });
     it("🎲 User1 creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
@@ -145,6 +179,10 @@ describe("A - Game creation", () => {
                 expect(game.turn).to.equals(1);
                 expect(game.phase).to.equals("night");
                 expect(game.tick).to.equals(1);
+                expect(game.options.sistersWakingUpInterval).to.equals(2);
+                expect(game.options.brothersWakingUpInterval).to.equals(2);
+                expect(game.options.isSheriffVoteDoubled).to.equals(true);
+                expect(game.options.isSeerTalkative).to.equals(true);
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);

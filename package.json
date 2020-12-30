@@ -1,6 +1,6 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {
@@ -29,12 +29,12 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "eslint": "^7.14.0",
+    "eslint": "^7.16.0",
     "mocha": "^8.2.1",
     "nodemon": "^2.0.6"
   },
   "dependencies": {
-    "@sentry/node": "^5.27.4",
+    "@sentry/node": "^5.29.2",
     "apidoc": "^0.25.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
@@ -43,18 +43,18 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
-    "express-validator": "^6.6.1",
+    "express-validator": "^6.9.0",
     "jsonwebtoken": "^8.5.1",
     "migrate-mongo": "^8.1.4",
     "mongo-dot-notation": "^2.0.0",
-    "mongoose": "^5.10.15",
+    "mongoose": "^5.11.9",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "qs": "^6.9.4",
     "requirejs": "^2.3.6",
-    "validator": "^13.1.17",
+    "validator": "^13.5.2",
     "xss": "^1.0.8"
   }
 }

@@ -1,3 +1,7 @@
-const { roles } = require("../constants/Role");
+const { roles, sideNames, groupNames } = require("../constants/Role");
 
-exports.getPlayerRoles = () => JSON.parse(JSON.stringify(roles));
+exports.getRoles = () => JSON.parse(JSON.stringify(roles));
+
+exports.getSideNames = () => JSON.parse(JSON.stringify(sideNames));
+
+exports.getGroupNames = () => JSON.parse(JSON.stringify(groupNames));

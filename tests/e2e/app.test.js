@@ -1,12 +1,13 @@
-const app = require("../../app");
 const chai = require("chai");
-const { describe, it } = require("mocha");
+const app = require("../../app");
+const { describe, it, before } = require("mocha");
 const chaiHttp = require("chai-http");
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe("Testing main route", () => {
+    before(done => !app.isReady ? app.on("ready", done) : done);
     it("👋 Welcomes user with API name", done => {
         chai.request(app)
             .get("/")
