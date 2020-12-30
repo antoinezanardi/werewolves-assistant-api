@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.8.0 (2020-12-??)
+## 0.8.0 (2020-12-30)
 
 ### 🚀 New features
 
@@ -27,8 +27,8 @@
 
 * `@sentry/node` updated to version `5.29.2`.
 * `eslint` updated to version `7.16.0`.
-* `express-validator` updated to version `6.8.0`.
-* `mongoose` updated to version `5.11.8`.
+* `express-validator` updated to version `6.9.0`.
+* `mongoose` updated to version `5.11.9`.
 * `validator` updated to version `13.5.2`.
 
 ---
