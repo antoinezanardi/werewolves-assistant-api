@@ -358,18 +358,20 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
 };
 exports.areThreeBrothersCallableDuringTheNight = async game => {
+    const brothersWakingUpInterval = game.options.roles.threeBrothers.wakingUpInterval;
     const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
     const brotherPlayers = getPlayersWithRole("three-brothers", game);
     const turnsSinceLastBrothersPlay = game.turn - lastBrothersPlay.turn;
     return brotherPlayers.filter(brother => brother.isAlive).length >= 2 &&
-        (!lastBrothersPlay || turnsSinceLastBrothersPlay >= game.options.brothersWakingUpInterval && game.options.brothersWakingUpInterval);
+        (!lastBrothersPlay || turnsSinceLastBrothersPlay >= brothersWakingUpInterval && brothersWakingUpInterval);
 };
 exports.areTwoSistersCallableDuringTheNight = async game => {
+    const sistersWakingUpInterval = game.options.roles.twoSisters.wakingUpInterval;
     const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
     const sisterPlayers = getPlayersWithRole("two-sisters", game);
     const turnsSinceLastSistersPlay = game.turn - lastSistersPlay.turn;
     return sisterPlayers.every(({ isAlive }) => isAlive) &&
-        (!lastSistersPlay || turnsSinceLastSistersPlay >= game.options.sistersWakingUpInterval && game.options.sistersWakingUpInterval);
+        (!lastSistersPlay || turnsSinceLastSistersPlay >= sistersWakingUpInterval && sistersWakingUpInterval);
 };
 
 exports.isRoleCallableDuringTheNight = (game, role) => {

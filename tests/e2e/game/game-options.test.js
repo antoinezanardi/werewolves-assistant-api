@@ -51,14 +51,21 @@ describe("K - Game options", () => {
             .send({
                 players: originalPlayers,
                 options: {
-                    brothersWakingUpInterval: 1,
-                    sistersWakingUpInterval: 1,
-                    isSheriffVoteDoubled: false,
+                    roles: {
+                        sheriff: { hasDoubledVote: false },
+                        seer: { isTalkative: false },
+                        twoSisters: { wakingUpInterval: 1 },
+                        threeBrothers: { wakingUpInterval: 1 },
+                    },
                 },
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.options.roles.sheriff.hasDoubledVote).to.equals(false);
+                expect(game.options.roles.seer.isTalkative).to.equals(false);
+                expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);
+                expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(1);
                 done();
             });
     });

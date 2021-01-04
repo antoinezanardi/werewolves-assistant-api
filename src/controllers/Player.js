@@ -189,7 +189,7 @@ exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
     const votedPlayers = [];
     const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
     for (const vote of votes) {
-        if (action === "vote" && sheriffPlayer && sheriffPlayer._id === vote.from._id && game.options.isSheriffVoteDoubled) {
+        if (action === "vote" && sheriffPlayer && sheriffPlayer._id === vote.from._id && game.options.roles.sheriff.hasDoubledVote) {
             this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game, 2);
         } else {
             this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game);

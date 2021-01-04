@@ -9,6 +9,8 @@
 
 ### ♻️ Refactoring
 
+* [#85](https://github.com/antoinezanardi/werewolves-assistant-api/issues/85) - Change game options structure.
+
 ### 📚 Documentation
 
 ### 📦 Packages

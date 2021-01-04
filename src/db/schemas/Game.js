@@ -4,25 +4,35 @@ const { gameStatuses, waitingForPossibilities, gamePhases, wonByPossibilities } 
 const { playerActions } = require("../../helpers/constants/Player");
 
 const gameOptions = {
-    sistersWakingUpInterval: {
-        type: Number,
-        default: 2,
-        min: 0,
-        max: 5,
-    },
-    brothersWakingUpInterval: {
-        type: Number,
-        default: 2,
-        min: 0,
-        max: 5,
-    },
-    isSheriffVoteDoubled: {
-        type: Boolean,
-        default: true,
-    },
-    isSeerTalkative: {
-        type: Boolean,
-        default: true,
+    roles: {
+        sheriff: {
+            hasDoubledVote: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        seer: {
+            isTalkative: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        twoSisters: {
+            wakingUpInterval: {
+                type: Number,
+                default: 2,
+                min: 0,
+                max: 5,
+            },
+        },
+        threeBrothers: {
+            wakingUpInterval: {
+                type: Number,
+                default: 2,
+                min: 0,
+                max: 5,
+            },
+        },
     },
 };
 
@@ -117,10 +127,12 @@ const GameSchema = new Schema({
     options: {
         type: gameOptions,
         default: {
-            sistersWakingUpInterval: 2,
-            brothersWakingUpInterval: 2,
-            isSheriffVoteDoubled: true,
-            isSeerTalkative: true,
+            roles: {
+                sheriff: { hasDoubledVote: true },
+                seer: { isTalkative: true },
+                twoSisters: { wakingUpInterval: 2 },
+                threeBrothers: { wakingUpInterval: 2 },
+            },
         },
     },
     won: {
