@@ -6,7 +6,7 @@ exports.playerAttributes = [
     { attribute: "drank-life-potion", source: "witch", remainingPhases: 1 },
     { attribute: "drank-death-potion", source: "witch", remainingPhases: 1 },
     { attribute: "protected", source: "guard", remainingPhases: 1 },
-    { attribute: "raven-marked", source: "raven", remainingPhases: 1 },
+    { attribute: "raven-marked", source: "raven", remainingPhases: 2 },
     { attribute: "in-love", source: "cupid" },
     { attribute: "worshiped", source: "wild-child" },
 ];

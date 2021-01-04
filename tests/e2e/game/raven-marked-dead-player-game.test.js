@@ -85,7 +85,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.players[1].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
                 done();
@@ -108,7 +108,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     it("☀️ Sun is rising and villager is dead", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[1].isAlive).to.equals(false);
-        expect(game.players[1].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+        expect(game.players[1].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 2 });
         done();
     });
     it("👪 One vote only for raven, dead villager is not nominated despite the fact he has two votes (POST /games/:id/play)", done => {
@@ -122,7 +122,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 game = res.body;
                 expect(game.players[0].isAlive).to.equals(false);
                 expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
-                expect(game.players[1].attributes).to.not.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.players[1].attributes).to.not.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 2 });
                 done();
             });
     });

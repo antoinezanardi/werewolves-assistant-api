@@ -817,7 +817,7 @@ describe("B - Full game of 18 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[6].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.players[6].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[6]._id);
                 done();
@@ -1280,6 +1280,7 @@ describe("B - Full game of 18 players with all roles", () => {
     });
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
+        expect(game.players[6].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
         expect(game.players[2].attributes).to.not.deep.include({ attribute: "drank-life-potion", source: "witch", remainingPhases: 1 });
         expect(game.players[2].attributes).to.not.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
         expect(game.players[14].attributes).to.not.deep.include({ attribute: "eaten", source: "big-bad-wolf", remainingPhases: 1 });
@@ -1428,7 +1429,7 @@ describe("B - Full game of 18 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[6].attributes).to.not.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.players[6].attributes).to.not.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.players[5].isAlive).to.equals(true);
                 expect(game.players[6].isAlive).to.equals(true);
                 expect(game.history[0].play.votes).to.exist;
@@ -1845,7 +1846,7 @@ describe("B - Full game of 18 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[4].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
+                expect(game.players[4].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[4]._id);
                 done();
@@ -1934,6 +1935,7 @@ describe("B - Full game of 18 players with all roles", () => {
     });
     it("☀️ Sun is rising, little girl is eaten even if protected by guard and cupid dies from broken heart 💔", done => {
         expect(game.phase).to.equals("day");
+        expect(game.players[4].attributes).to.deep.include({ attribute: "raven-marked", source: "raven", remainingPhases: 1 });
         expect(game.players[7].attributes).to.not.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
         expect(game.players[7].isAlive).to.equals(false);
         expect(game.players[7].murdered).to.deep.equals({ by: "werewolves", of: "eat" });

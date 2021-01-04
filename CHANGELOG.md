@@ -10,6 +10,7 @@
 ### ♻️ Refactoring
 
 * [#85](https://github.com/antoinezanardi/werewolves-assistant-api/issues/85) - Change game options structure.
+* [#89](https://github.com/antoinezanardi/werewolves-assistant-api/issues/89) - Decrease `remainingPhases` for attributes.
 
 ### 📚 Documentation
 
@@ -17,6 +18,7 @@
 
 * `eslint` updated to version `7.17.0`.
 * `express-validator` updated to version `6.9.1`.
+* `mongoose` updated to version `5.11.10`.
 
 ---
 
