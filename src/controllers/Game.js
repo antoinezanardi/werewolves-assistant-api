@@ -75,6 +75,9 @@ exports.fillPlayersData = players => {
         const role = getRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name };
         player.side = { original: role.side, current: role.side };
+        if (role.name === "villager-villager") {
+            player.role.isRevealed = true;
+        }
     }
 };
 

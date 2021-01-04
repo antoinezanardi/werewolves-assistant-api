@@ -69,6 +69,10 @@ const PlayerSchema = new Schema({
             enum: roleNames,
             required: true,
         },
+        isRevealed: {
+            type: Boolean,
+            default: false,
+        },
     },
     side: {
         original: {

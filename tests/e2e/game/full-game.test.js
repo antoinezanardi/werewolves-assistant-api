@@ -90,7 +90,10 @@ describe("B - Full game of 18 players with all roles", () => {
             });
     });
     it("🌙 Night falls", done => {
+        players = game.players;
         expect(game.phase).to.equals("night");
+        expect(players[0].role.isRevealed).to.be.false;
+        expect(players[8].role.isRevealed).to.be.true;
         done();
     });
     it("🎲 Game is waiting for 'all' to 'elect-sheriff'", done => {
@@ -1283,7 +1286,9 @@ describe("B - Full game of 18 players with all roles", () => {
         expect(game.players[5].attributes).to.not.deep.include({ attribute: "protected", source: "guard", remainingPhases: 1 });
         expect(game.players[0].attributes).to.not.deep.include({ attribute: "seen", source: "seer", remainingPhases: 1 });
         expect(game.players[2].isAlive).to.equals(true);
+        expect(game.players[2].role.isRevealed).to.equals(false);
         expect(game.players[14].isAlive).to.equals(false);
+        expect(game.players[14].role.isRevealed).to.equals(true);
         expect(game.players[14].murdered.of).to.equals("eat");
         expect(game.players[14].murdered.by).to.equals("big-bad-wolf");
         done();

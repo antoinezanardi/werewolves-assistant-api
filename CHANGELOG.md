@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#86](https://github.com/antoinezanardi/werewolves-assistant-api/issues/86) - Extend player limit to 40.
+* [#87](https://github.com/antoinezanardi/werewolves-assistant-api/issues/87) - Add isRevealed to role structure.
 
 ### ♻️ Refactoring
 

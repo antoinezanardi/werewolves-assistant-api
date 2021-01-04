@@ -140,6 +140,7 @@ exports.killPlayer = (playerId, { action }, game, forcedSource) => {
     const player = game.players.find(({ _id, isAlive }) => _id.toString() === playerId.toString() && isAlive);
     if (player && (action === "eat" && canBeEaten(player) || action !== "eat")) {
         player.isAlive = false;
+        player.role.isRevealed = true;
         const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
         if (murdered) {
             player.murdered = murdered;

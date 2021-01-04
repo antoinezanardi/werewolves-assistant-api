@@ -96,13 +96,13 @@ describe("D - Game Reset", () => {
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.equals(true);
-                expect(game.players[0].role).to.deep.equals({ original: "werewolf", current: "werewolf" });
+                expect(game.players[0].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
                 expect(game.players[0].side.current).to.equals("werewolves");
-                expect(game.players[1].role).to.deep.equals({ original: "werewolf", current: "werewolf" });
+                expect(game.players[1].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
                 expect(game.players[1].side.current).to.equals("werewolves");
-                expect(game.players[2].role).to.deep.equals({ original: "werewolf", current: "werewolf" });
+                expect(game.players[2].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
                 expect(game.players[2].side.current).to.equals("werewolves");
-                expect(game.players[3].role).to.deep.equals({ original: "villager", current: "villager" });
+                expect(game.players[3].role).to.deep.equals({ original: "villager", current: "villager", isRevealed: false });
                 expect(game.players[3].side.current).to.equals("villagers");
                 done();
             });
