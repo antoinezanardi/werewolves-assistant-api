@@ -1,5 +1,22 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.9.0 (2021-01-??)
+
+### 🚀 New features
+
+* [#86](https://github.com/antoinezanardi/werewolves-assistant-api/issues/86) - Extend player limit to 40.
+
+### ♻️ Refactoring
+
+### 📚 Documentation
+
+### 📦 Packages
+
+* `eslint` updated to version `7.17.0`.
+* `express-validator` updated to version `6.9.1`.
+
+---
+
 ## 0.8.0 (2020-12-30)
 
 ### 🚀 New features

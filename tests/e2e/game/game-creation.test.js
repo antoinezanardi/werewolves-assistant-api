@@ -46,6 +46,50 @@ const playersWithOnlyTwoBrothers = [
     { name: "Dag", role: "werewolf" },
     { name: "Dug", role: "werewolf" },
 ];
+
+const tooMuchPlayers = [
+    { name: "1", role: "villager" },
+    { name: "2", role: "villager" },
+    { name: "3", role: "villager" },
+    { name: "4", role: "villager" },
+    { name: "5", role: "villager" },
+    { name: "6", role: "villager" },
+    { name: "7", role: "villager" },
+    { name: "8", role: "villager" },
+    { name: "9", role: "villager" },
+    { name: "10", role: "villager" },
+    { name: "11", role: "villager" },
+    { name: "12", role: "villager" },
+    { name: "13", role: "villager" },
+    { name: "14", role: "villager" },
+    { name: "15", role: "villager" },
+    { name: "16", role: "villager" },
+    { name: "17", role: "villager" },
+    { name: "18", role: "villager" },
+    { name: "19", role: "villager" },
+    { name: "20", role: "villager" },
+    { name: "21", role: "villager" },
+    { name: "22", role: "villager" },
+    { name: "23", role: "villager" },
+    { name: "24", role: "villager" },
+    { name: "25", role: "villager" },
+    { name: "26", role: "villager" },
+    { name: "27", role: "villager" },
+    { name: "28", role: "villager" },
+    { name: "29", role: "villager" },
+    { name: "30", role: "villager" },
+    { name: "31", role: "villager" },
+    { name: "32", role: "villager" },
+    { name: "33", role: "villager" },
+    { name: "34", role: "villager" },
+    { name: "35", role: "villager" },
+    { name: "36", role: "villager" },
+    { name: "37", role: "villager" },
+    { name: "38", role: "villager" },
+    { name: "39", role: "villager" },
+    { name: "40", role: "villager" },
+    { name: "41", role: "werewolf" },
+];
 let token, token2, game, game2, queryString;
 
 describe("A - Game creation", () => {
@@ -98,6 +142,28 @@ describe("A - Game creation", () => {
             .post("/games")
             .end((err, res) => {
                 expect(res).to.have.status(401);
+                done();
+            });
+    });
+    it("🤼 Can't create game with less than 4 players (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [{ name: "Doug", role: "witch" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🤼 Can't create game with more than 40 players (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: tooMuchPlayers })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
                 done();
             });
     });

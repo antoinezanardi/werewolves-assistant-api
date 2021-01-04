@@ -62,7 +62,7 @@ module.exports = app => {
      * @apiName GetGameRepartition
      * @apiGroup Games 🎲
      *
-     * @apiParam (Query String Parameters) {Object[]} players Must contain between 4 and 20 players.
+     * @apiParam (Query String Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Query String Parameters) {String} players.name Player's name. Must be unique in the array.
      * @apiPermission Basic
      * @apiPermission JWT
@@ -73,8 +73,8 @@ module.exports = app => {
     app.get("/games/repartition", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
-            .withMessage("Must contain between 4 and 20 players"),
+            .custom(value => value.length >= 4 && value.length <= 40 ? Promise.resolve() : Promise.reject(new Error()))
+            .withMessage("Must contain between 4 and 40 players"),
         query("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
@@ -102,7 +102,7 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiPermission JWT
-     * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 20 players.
+     * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Request Body Parameters) {String{>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiParam (Request Body Parameters) {Object} [options] Game's options
@@ -115,8 +115,8 @@ module.exports = app => {
     app.post("/games", basicLimiter, passport.authenticate("jwt", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
-            .withMessage("Must contain between 4 and 20 players"),
+            .custom(value => value.length >= 4 && value.length <= 40 ? Promise.resolve() : Promise.reject(new Error()))
+            .withMessage("Must contain between 4 and 40 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
