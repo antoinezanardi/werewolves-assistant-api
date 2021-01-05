@@ -245,6 +245,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[7].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.history).to.be.an("array").to.have.lengthOf(1);
                 expect(game.history[0].play.votes).to.exist;
                 expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
@@ -302,6 +303,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 game = res.body;
                 expect(game.players[16].side.original).to.equals("villagers");
                 expect(game.players[16].side.current).to.equals("werewolves");
+                expect(game.history).to.be.an("array").to.have.lengthOf(2);
                 expect(game.history[0].play.side).to.equals("werewolves");
                 expect(game.history[0].play.source.name).to.equal("dog-wolf");
                 expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(1);
@@ -436,6 +438,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 game = res.body;
                 expect(game.players[7].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
                 expect(game.players[9].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
+                expect(game.history).to.be.an("array").to.have.lengthOf(3);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
                 expect(game.history[0].play.targets[1].player._id).to.equals(players[9]._id);
@@ -479,6 +482,7 @@ describe("B - Full game of 18 players with all roles", () => {
             .end((err, res) => {
                 game = res.body;
                 expect(res).to.have.status(200);
+                expect(game.history).to.be.an("array").to.have.lengthOf(3);
                 done();
             });
     });
@@ -580,6 +584,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ attribute: "seen", source: "seer", remainingPhases: 1 });
+                expect(game.history).to.be.an("array").to.have.lengthOf(3);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
                 done();
@@ -2459,6 +2464,17 @@ describe("B - Full game of 18 players with all roles", () => {
                 game = res.body;
                 expect(game.review.rating).to.equals(3.5);
                 expect(game.review.dysfunctionFound).to.be.true;
+                done();
+            });
+    });
+    it("🎲 Get game with full history (PATCH /games/:id?history-limit=0)", done => {
+        chai.request(app)
+            .get(`/games/${game._id}?history-limit=0`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history.length).to.equals(45);
                 done();
             });
     });

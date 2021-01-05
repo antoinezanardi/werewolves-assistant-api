@@ -12,7 +12,7 @@ exports.wonByPossibilities = ["werewolves", "villagers", "lovers"];
 
 exports.populate = [
     { path: "gameMaster", select: "-password" },
-    { path: "history" },
+    { path: "history", limit: 3 },
 ];
 
 exports.turnNightActionsOrder = [
@@ -30,3 +30,5 @@ exports.turnNightActionsOrder = [
     { source: "big-bad-wolf", action: "eat" },
     { source: "witch", action: "use-potion" },
 ];
+
+exports.findFields = ["status"];

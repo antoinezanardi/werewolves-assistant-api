@@ -1,4 +1,4 @@
-const { patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder } = require("../constants/Game");
+const { patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields } = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
 
 exports.isWerewolfSideAlive = game => game.players.some(player => player.side.current === "werewolves" && player.isAlive);
@@ -54,3 +54,5 @@ exports.getPlayersExpectedToPlay = game => {
     const playersExpectedToPlay = waitingForGroups[source] ? waitingForGroups[source] : this.getPlayersWithRole(source, game);
     return deadPlayersActions.includes(action) ? playersExpectedToPlay : playersExpectedToPlay.filter(({ isAlive }) => isAlive);
 };
+
+exports.getFindFields = () => JSON.parse(JSON.stringify(findFields));

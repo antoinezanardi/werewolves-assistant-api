@@ -46,6 +46,7 @@ module.exports = app => {
      * - `Basic auth`: All games can be retrieved.
      * @apiParam (Query String Parameters) {String} [fields] Specifies which user fields to include. Each value must be separated by a `,` without space. (e.g: `field1,field2`)
      * @apiParam (Query String Parameters) {String} [status] Filter by game's status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_
+     * @apiParam (Query String Parameters) {Number} [history-limit] Number of game history's entries. Set to `0` for no limit.
      * @apiPermission JWT
      * @apiPermission Basic
      * @apiUse GameResponse
@@ -59,6 +60,10 @@ module.exports = app => {
         query("status")
             .optional()
             .isIn(getGameStatuses()).withMessage(`Must be equal to one of the following values: ${getGameStatuses()}`),
+        query("history-limit")
+            .optional()
+            .isInt({ min: 0 }).withMessage(`Must be a valid number equal or greater than 0`)
+            .toInt(),
     ], Game.getGames);
 
     /**
@@ -92,6 +97,7 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiParam (Query String Parameters) {Number} [history-limit] Number of game history's entries. Set to `0` for no limit.
      * @apiPermission Basic
      * @apiPermission JWT
      * @apiUse GameResponse
@@ -99,6 +105,10 @@ module.exports = app => {
     app.get("/games/:id", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
+        query("history-limit")
+            .optional()
+            .isInt({ min: 0 }).withMessage(`Must be a valid number equal or greater than 0`)
+            .toInt(),
     ], Game.getGame);
 
     /**
