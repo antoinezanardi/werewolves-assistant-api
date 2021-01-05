@@ -250,6 +250,8 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[7]._id);
+                expect(game.history[0].play.source.name).to.equal("all");
+                expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(players.length);
                 done();
             });
     });
@@ -301,6 +303,9 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(game.players[16].side.original).to.equals("villagers");
                 expect(game.players[16].side.current).to.equals("werewolves");
                 expect(game.history[0].play.side).to.equals("werewolves");
+                expect(game.history[0].play.source.name).to.equal("dog-wolf");
+                expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(1);
+                expect(game.history[0].play.source.players[0]._id).to.equals(players[16]._id);
                 done();
             });
     });
@@ -434,6 +439,9 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
                 expect(game.history[0].play.targets[1].player._id).to.equals(players[9]._id);
+                expect(game.history[0].play.source.name).to.equal("cupid");
+                expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(1);
+                expect(game.history[0].play.source.players[0]._id).to.equals(players[9]._id);
                 done();
             });
     });

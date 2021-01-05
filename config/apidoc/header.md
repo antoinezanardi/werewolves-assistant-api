@@ -144,9 +144,11 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 
 | Field                                  | Type                      | Description                                                                                                                                  |
 |----------------------------------------|:-------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------|
-| source                                 | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)         |
 | action                                 | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                             |
-| **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, players are nominated from the vote.                                                     |
+| source                                 | Object                    | Source of the play.                                                                                                                          |
+| &emsp;&emsp;name                       | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)         |
+| &emsp;&emsp;players                    | [Player](#player-class)[] | Players expected to play.                                                                                                                    |
+| **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, targets are nominated from the vote.                                                     |
 | &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                                                                                             |
 | **&emsp;&emsp;potion***                | Object                    | Only available for the `witch`.                                                                                                              |
 | **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from werewolves.                                                           |

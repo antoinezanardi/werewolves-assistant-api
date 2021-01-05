@@ -37,3 +37,20 @@ exports.getPlayersWithRole = (roleName, game) => game.players.filter(({ role }) 
 exports.getPlayersWithSide = (sideName, game) => game.players.filter(({ side }) => side.current === sideName);
 
 exports.getAlivePlayers = game => game.players.filter(({ isAlive }) => isAlive);
+
+exports.getPlayersExpectedToPlay = game => {
+    if (!game.waiting || !game.waiting.length) {
+        return [];
+    }
+    const { for: source, to: action } = game.waiting[0];
+    const deadPlayersActions = ["delegate", "shoot"];
+    const waitingForGroups = {
+        all: game.players,
+        sheriff: this.getPlayersWithAttribute("sheriff", game),
+        lovers: this.getPlayersWithAttribute("in-love", game),
+        villagers: this.getPlayersWithSide("villagers", game),
+        werewolves: this.getPlayersWithSide("werewolves", game),
+    };
+    const playersExpectedToPlay = waitingForGroups[source] ? waitingForGroups[source] : this.getPlayersWithRole(source, game);
+    return deadPlayersActions.includes(action) ? playersExpectedToPlay : playersExpectedToPlay.filter(({ isAlive }) => isAlive);
+};

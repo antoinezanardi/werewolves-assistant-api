@@ -11,13 +11,14 @@
 
 * [#85](https://github.com/antoinezanardi/werewolves-assistant-api/issues/85) - Change game options structure.
 * [#89](https://github.com/antoinezanardi/werewolves-assistant-api/issues/89) - Decrease `remainingPhases` for attributes.
+* [#90](https://github.com/antoinezanardi/werewolves-assistant-api/issues/90) - Add players source to Game History entry.
 
 ### 📚 Documentation
 
 ### 📦 Packages
 
 * `eslint` updated to version `7.17.0`.
-* `express-validator` updated to version `6.9.1`.
+* `express-validator` updated to version `6.9.2`.
 * `mongoose` updated to version `5.11.10`.
 
 ---

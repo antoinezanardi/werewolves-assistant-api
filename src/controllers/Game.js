@@ -7,7 +7,7 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -454,12 +454,18 @@ exports.generatePlayMethods = () => ({
     "big-bad-wolf": Player.bigBadWolfPlays,
 });
 
-exports.generateGameHistoryEntry = (game, play) => ({
+exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({
     gameId: game._id,
     turn: game.turn,
     phase: game.phase,
     tick: game.tick,
-    play,
+    play: {
+        source: {
+            name: source,
+            players: getPlayersExpectedToPlay(game),
+        },
+        ...rest,
+    },
 });
 
 exports.checkPlay = async play => {
