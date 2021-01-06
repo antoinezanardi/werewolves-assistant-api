@@ -1,4 +1,7 @@
-const { patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields } = require("../constants/Game");
+const {
+    patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions,
+    gamePhases, wonByPossibilities,
+} = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
 
 exports.isWerewolfSideAlive = game => game.players.some(player => player.side.current === "werewolves" && player.isAlive);
@@ -56,3 +59,9 @@ exports.getPlayersExpectedToPlay = game => {
 };
 
 exports.getFindFields = () => JSON.parse(JSON.stringify(findFields));
+
+exports.getGamePhases = () => JSON.parse(JSON.stringify(gamePhases));
+
+exports.getWonByPossibilities = () => JSON.parse(JSON.stringify(wonByPossibilities));
+
+exports.getDefaultGameOptions = () => JSON.parse(JSON.stringify(defaultGameOptions));

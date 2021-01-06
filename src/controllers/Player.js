@@ -372,12 +372,19 @@ exports.seerPlays = async(play, game) => {
     this.addPlayerAttribute(targets[0].player._id, "seen", game);
 };
 
-exports.allVote = (play, game, gameHistoryEntry) => {
+exports.allVote = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     if (nominatedPlayers.length > 1) {
-        game.waiting.push({ for: "sheriff", to: "settle-votes" });
+        if (getPlayerWithAttribute("sheriff", game)) {
+            game.waiting.push({ for: "sheriff", to: "settle-votes" });
+        } else {
+            const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
+            if (!lastVotePlay || lastVotePlay.turn !== game.turn) {
+                game.waiting.push({ for: "all", to: "vote" });
+            }
+        }
     } else {
         this.killPlayer(nominatedPlayers[0]._id, play, game, gameHistoryEntry);
     }

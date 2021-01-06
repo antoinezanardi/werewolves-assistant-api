@@ -279,7 +279,7 @@ describe("A - Game creation", () => {
                 done();
             });
     });
-    it("🎲 Cancels game (PATCH /games)", done => {
+    it("🎲 Cancels game (PATCH /games/:id)", done => {
         chai.request(app)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })

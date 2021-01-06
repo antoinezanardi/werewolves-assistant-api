@@ -8,11 +8,12 @@ const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
-    getFindFields,
+    getFindFields, getPlayerWithAttribute,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
 const { populate: fullGamePopulate } = require("../helpers/constants/Game");
+const { getProp } = require("../helpers/functions/Object");
 const { filterOutHTMLTags } = require("../helpers/functions/String");
 
 exports.getFindPopulate = (projection, options) => {
@@ -388,9 +389,17 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };
 
+exports.isSheriffCallableDuringTheNight = game => {
+    const isSheriffEnabled = getProp(game, "options.roles.sheriff.enabled", true);
+    const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
+    return isSheriffEnabled && !!sheriffPlayer && sheriffPlayer.isAlive;
+};
+
 exports.isSourceCallableDuringTheNight = (game, source) => {
-    if (source === "all" || source === "sheriff") {
-        return true;
+    if (source === "all") {
+        return getProp(game, "options.roles.sheriff.enabled", true);
+    } else if (source === "sheriff") {
+        return this.isSheriffCallableDuringTheNight(game);
     }
     const sourceType = getGroupNames().includes(source) ? "group" : "role";
     return sourceType === "group" ? this.isGroupCallableDuringTheNight(game, source) : this.isRoleCallableDuringTheNight(game, source);
@@ -516,6 +525,7 @@ exports.resetGame = async(req, res) => {
         const resetData = { players: game.players.map(player => ({ name: player.name, role: player.role.original })) };
         await this.fillPlayersData(resetData.players);
         this.fillTickData(resetData);
+        resetData.options = game.options;
         await this.fillWaitingQueueWithNightActions(resetData);
         game = await this.findOneAndUpdate({ _id: params.id }, resetData);
         res.status(200).json(game);

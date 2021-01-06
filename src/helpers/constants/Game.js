@@ -32,3 +32,12 @@ exports.turnNightActionsOrder = [
 ];
 
 exports.findFields = ["status"];
+
+exports.defaultGameOptions = {
+    roles: {
+        sheriff: { enabled: true, hasDoubledVote: true },
+        seer: { isTalkative: true },
+        twoSisters: { wakingUpInterval: 2 },
+        threeBrothers: { wakingUpInterval: 2 },
+    },
+};

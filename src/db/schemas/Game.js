@@ -1,11 +1,18 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
-const { gameStatuses, waitingForPossibilities, gamePhases, wonByPossibilities } = require("../../helpers/constants/Game");
-const { playerActions } = require("../../helpers/constants/Player");
+const {
+    getGameStatuses, getWaitingForPossibilities, getGamePhases, getWonByPossibilities,
+    getDefaultGameOptions,
+} = require("../../helpers/functions/Game");
+const { getPlayerActions } = require("../../helpers/functions/Player");
 
 const gameOptions = {
     roles: {
         sheriff: {
+            enabled: {
+                type: Boolean,
+                default: true,
+            },
             hasDoubledVote: {
                 type: Boolean,
                 default: true,
@@ -39,7 +46,7 @@ const gameOptions = {
 const WonSchema = new Schema({
     by: {
         type: String,
-        enum: wonByPossibilities,
+        enum: getWonByPossibilities(),
         required: true,
     },
     players: {
@@ -71,12 +78,12 @@ const ReviewSchema = new Schema({
 const WaitingSchema = new Schema({
     for: {
         type: String,
-        enum: waitingForPossibilities,
+        enum: getWaitingForPossibilities(),
         required: true,
     },
     to: {
         type: String,
-        enum: playerActions,
+        enum: getPlayerActions(),
         required: true,
     },
 }, {
@@ -103,7 +110,7 @@ const GameSchema = new Schema({
     },
     phase: {
         type: String,
-        enum: gamePhases,
+        enum: getGamePhases(),
         default: "night",
         required: true,
     },
@@ -120,20 +127,13 @@ const GameSchema = new Schema({
     },
     status: {
         type: String,
-        enum: gameStatuses,
+        enum: getGameStatuses(),
         default: "playing",
         required: true,
     },
     options: {
         type: gameOptions,
-        default: {
-            roles: {
-                sheriff: { hasDoubledVote: true },
-                seer: { isTalkative: true },
-                twoSisters: { wakingUpInterval: 2 },
-                threeBrothers: { wakingUpInterval: 2 },
-            },
-        },
+        default: getDefaultGameOptions(),
     },
     won: {
         type: WonSchema,
