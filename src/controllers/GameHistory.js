@@ -66,9 +66,9 @@ exports.create = async(data, options = {}) => {
 
 exports.deleteMany = search => GameHistory.deleteMany(search);
 
-exports.isLifePotionUsed = gameId => this.findOne({ gameId, "play.targets.potion.life": true });
+exports.isLifePotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.life": true });
 
-exports.isDeathPotionUsed = gameId => this.findOne({ gameId, "play.targets.potion.death": true });
+exports.isDeathPotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.death": true });
 
 exports.getLastNightPlay = gameId => {
     const nightPlayActions = [...turnPreNightActionsOrder, ...turnNightActionsOrder].map(({ action }) => action);
@@ -85,3 +85,8 @@ exports.getLastVotePlay = gameId => this.findOne({ gameId, "play.action": "vote"
 exports.getLastSistersPlay = gameId => this.findOne({ gameId, "play.source.name": "two-sisters" }, null, { sort: { createdAt: -1 } });
 
 exports.getLastBrothersPlay = gameId => this.findOne({ gameId, "play.source.name": "three-brothers" }, null, { sort: { createdAt: -1 } });
+
+exports.didVillageVoteToday = async game => {
+    const lastVotePlay = await this.getLastVotePlay(game._id);
+    return !!lastVotePlay && lastVotePlay.turn === game.turn;
+};

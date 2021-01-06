@@ -321,18 +321,6 @@ exports.dequeueWaiting = game => {
     }
 };
 
-exports.isDayOver = async game => {
-    const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
-    return !!(lastVotePlay && lastVotePlay.turn === game.turn);
-};
-
-exports.purgeAttributesAfterSunRising = game => {
-    const purgedAttributes = ["protected", "seen", "drank-life-potion"];
-    for (const purgedAttribute of purgedAttributes) {
-        Player.removeAttributeFromAllPlayers(purgedAttribute, game);
-    }
-};
-
 exports.decreasePlayersAttributesRemainingPhases = game => {
     const alivePlayersWithAttributes = getAlivePlayers(game).filter(({ attributes }) => attributes);
     for (const player of alivePlayersWithAttributes) {
@@ -345,7 +333,7 @@ exports.decreasePlayersAttributesRemainingPhases = game => {
     }
 };
 
-exports.fillWaitingQueueWithDayActions = async game => {
+exports.fillWaitingQueueWithDayActions = (game, gameHistoryEntry) => {
     const playerAttributeMethods = [
         { attribute: "eaten", trigger: Player.eaten },
         { attribute: "drank-death-potion", trigger: Player.drankDeathPotion },
@@ -355,12 +343,9 @@ exports.fillWaitingQueueWithDayActions = async game => {
         for (const { attribute, trigger } of playerAttributeMethods) {
             const playerAttribute = getPlayerAttribute(player, attribute);
             if (playerAttribute) {
-                trigger(game, playerAttribute);
+                trigger(game, playerAttribute, gameHistoryEntry);
             }
         }
-    }
-    if (!await this.isDayOver(game)) {
-        game.waiting.push({ for: "all", to: "vote" });
     }
 };
 
@@ -423,13 +408,14 @@ exports.fillWaitingQueueWithNightActions = async game => {
     }
 };
 
-exports.fillWaitingQueue = async game => {
+exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
     if (game.phase === "night") {
         game.phase = "day";
-        this.fillWaitingQueueWithDayActions(game);
+        this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
+        game.waiting.push({ for: "all", to: "vote" });
         this.decreasePlayersAttributesRemainingPhases(game);
     } else if (game.phase === "day") {
-        await this.fillWaitingQueueWithDayActions(game);
+        this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (!game.waiting || !game.waiting.length) {
             game.phase = "night";
             game.turn++;
@@ -490,11 +476,11 @@ exports.play = async play => {
     const gameHistoryEntry = this.generateGameHistoryEntry(game, play);
     const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game, gameHistoryEntry);
-    await GameHistory.create(gameHistoryEntry);
     this.dequeueWaiting(game);
     if (!game.waiting || !game.waiting.length) {
-        await this.fillWaitingQueue(game);
+        await this.fillWaitingQueue(game, gameHistoryEntry);
     }
+    await GameHistory.create(gameHistoryEntry);
     game.tick++;
     this.checkGameWinners(game);
     return this.findOneAndUpdate({ _id: play.gameId }, game);

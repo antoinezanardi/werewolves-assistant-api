@@ -7,6 +7,7 @@
 * [#86](https://github.com/antoinezanardi/werewolves-assistant-api/issues/86) - Extend player limit to 40.
 * [#87](https://github.com/antoinezanardi/werewolves-assistant-api/issues/87) - Add isRevealed to role structure.
 * [#95](https://github.com/antoinezanardi/werewolves-assistant-api/issues/95) - Limit game history length.
+* [#96](https://github.com/antoinezanardi/werewolves-assistant-api/issues/96) - Add dead players in game history entries.
 
 ### ♻️ Refactoring
 
@@ -18,9 +19,11 @@
 
 ### 📦 Packages
 
+* `apidoc` updated to version `0.26.0`.
 * `eslint` updated to version `7.17.0`.
 * `express-validator` updated to version `6.9.2`.
 * `mongoose` updated to version `5.11.10`.
+* `nodemon` updated to version `2.0.7`.
 
 ---
 

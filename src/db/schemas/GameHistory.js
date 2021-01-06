@@ -88,6 +88,10 @@ const gameHistorySchema = new Schema({
         type: playSchema,
         required: false,
     },
+    dead: {
+        type: [Player],
+        default: undefined,
+    },
 }, {
     timestamps: true,
     versionKey: false,
