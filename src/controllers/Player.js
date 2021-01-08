@@ -1,3 +1,4 @@
+const Game = require("./Game");
 const GameHistory = require("./GameHistory");
 const { canBeEaten, doesPlayerHaveAttribute } = require("../helpers/functions/Player");
 const { getPlayerWithAttribute, getPlayerWithRole } = require("../helpers/functions/Game");
@@ -221,7 +222,7 @@ exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
     return nominatedPlayers;
 };
 
-exports.checkPlayerMultipleVotes = (votes, players) => {
+exports.checkPlayerMultipleVotes = (votes, { players }) => {
     for (const player of players) {
         if (votes.reduce((acc, vote) => vote.from === player._id.toString() ? ++acc : acc, 0) > 1) {
             throw generateError("CANT_VOTE_MULTIPLE_TIMES", `Player with id "${player._id}" isn't allowed to vote more than once.`);
@@ -229,21 +230,23 @@ exports.checkPlayerMultipleVotes = (votes, players) => {
     }
 };
 
-exports.checkVoteTarget = (playerId, players) => {
-    const player = players.find(({ _id }) => _id.toString() === playerId);
-    if (!player) {
-        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${playerId}" is not in game and so can't be a vote's target.`);
-    } else if (!player.isAlive) {
-        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${playerId}" is dead and so can't be a vote's target.`);
+exports.checkVoteTarget = (targetId, { players }, options) => {
+    const targetedPlayer = players.find(({ _id }) => _id.toString() === targetId);
+    if (!targetedPlayer) {
+        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is not in game and so can't be a vote's target.`);
+    } else if (!targetedPlayer.isAlive) {
+        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is dead and so can't be a vote's target.`);
+    } else if (options.isSecondVoteAfterTie && !options.previousPlay.play.targets.find(({ _id }) => _id.toString() === targetId)) {
+        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is dead and so can't be a vote's target.`);
     }
 };
 
-exports.checkPlayerAbilityToVote = (playerId, players) => {
-    const player = players.find(({ _id }) => _id.toString() === playerId);
-    if (!player) {
-        throw generateError("CANT_VOTE", `Player with id "${playerId}" is not in game and so can't vote.`);
-    } else if (!player.isAlive) {
-        throw generateError("CANT_VOTE", `Player with id "${playerId}" is dead and so can't vote.`);
+exports.checkPlayerAbilityToVote = (voterId, { players }) => {
+    const voter = players.find(({ _id }) => _id.toString() === voterId);
+    if (!voter) {
+        throw generateError("CANT_VOTE", `Player with id "${voterId}" is not in game and so can't vote.`);
+    } else if (!voter.isAlive) {
+        throw generateError("CANT_VOTE", `Player with id "${voterId}" is dead and so can't vote.`);
     }
 };
 
@@ -255,22 +258,24 @@ exports.checkVoteStructure = vote => {
     }
 };
 
-exports.checkVotesSourceAndTarget = (votes, { players }, options) => {
+exports.checkVotesSourceAndTarget = async(votes, game) => {
+    const isSecondVoteAfterTie = await Game.isCurrentPlaySecondVoteAfterTie(game);
+    const previousPlay = await GameHistory.getPreviousPlay(game._id);
     for (const vote of votes) {
         this.checkVoteStructure(vote);
-        this.checkPlayerAbilityToVote(vote.from, players, options);
-        this.checkVoteTarget(vote.for, players, options);
+        this.checkPlayerAbilityToVote(vote.from, game);
+        this.checkVoteTarget(vote.for, game, { isSecondVoteAfterTie, previousPlay });
     }
-    this.checkPlayerMultipleVotes(votes, players);
+    this.checkPlayerMultipleVotes(votes, game);
 };
 
-exports.checkAndFillVotes = (votes, game, options) => {
+exports.checkAndFillVotes = async(votes, game, options) => {
     if (!votes || !Array.isArray(votes)) {
         throw generateError("VOTES_REQUIRED", "`votes` need to be set");
     } else if (!votes.length) {
         throw generateError("VOTES_CANT_BE_EMPTY", "`votes` can't be empty");
     }
-    this.checkVotesSourceAndTarget(votes, game, options);
+    await this.checkVotesSourceAndTarget(votes, game, options);
     for (let i = 0; i < votes.length; i++) {
         votes[i].from = game.players.find(player => player._id.toString() === votes[i].from);
         votes[i].for = game.players.find(player => player._id.toString() === votes[i].for);
@@ -374,7 +379,7 @@ exports.seerPlays = async(play, game) => {
 
 exports.allVote = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
-    this.checkAndFillVotes(votes, game, { action });
+    await this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     if (nominatedPlayers.length > 1) {
         if (getPlayerWithAttribute("sheriff", game)) {
@@ -391,9 +396,9 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
-exports.allElectSheriff = (play, game, gameHistoryEntry) => {
+exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
-    this.checkAndFillVotes(votes, game, { action });
+    await this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
     this.addPlayerAttribute(nominatedPlayers[0]._id, "sheriff", game);
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));

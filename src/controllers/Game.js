@@ -533,3 +533,10 @@ exports.resetGame = async(req, res) => {
         sendError(res, e);
     }
 };
+
+exports.isCurrentPlaySecondVoteAfterTie = async game => {
+    const previousPlay = await GameHistory.getPreviousPlay(game._id);
+    const currentPlay = game?.waiting.length ? game.waiting[0] : undefined;
+    return currentPlay?.to === "vote" && previousPlay?.play.action === "vote" &&
+        previousPlay.turn === game.turn && previousPlay.play.targets.length > 1;
+};

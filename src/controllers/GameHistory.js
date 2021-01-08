@@ -86,7 +86,4 @@ exports.getLastSistersPlay = gameId => this.findOne({ gameId, "play.source.name"
 
 exports.getLastBrothersPlay = gameId => this.findOne({ gameId, "play.source.name": "three-brothers" }, null, { sort: { createdAt: -1 } });
 
-exports.didVillageVoteToday = async game => {
-    const lastVotePlay = await this.getLastVotePlay(game._id);
-    return !!lastVotePlay && lastVotePlay.turn === game.turn;
-};
+exports.getPreviousPlay = gameId => this.findOne({ gameId }, null, { sort: { createdAt: -1 } });

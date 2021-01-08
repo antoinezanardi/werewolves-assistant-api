@@ -426,4 +426,5 @@ describe("K - Game options", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
         done();
     });
+    // Can't vote for a target not in tie
 });
