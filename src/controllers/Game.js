@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const deepMerge = require("deepmerge");
 const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
 const Player = require("./Player");
@@ -8,7 +9,7 @@ const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
-    getFindFields, getPlayerWithAttribute,
+    getFindFields, getPlayerWithAttribute, getDefaultGameOptions,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -50,6 +51,10 @@ exports.checkUserCurrentGames = async userId => {
     if (await Game.countDocuments({ gameMaster: userId, status: "playing" })) {
         throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already game with status `playing`.");
     }
+};
+
+exports.fillOptionsData = game => {
+    game.options = game.options ? deepMerge(getDefaultGameOptions(), game.options) : getDefaultGameOptions();
 };
 
 exports.fillTickData = game => {
@@ -97,6 +102,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
     this.fillTickData(data);
+    this.fillOptionsData(data);
     await this.fillWaitingQueueWithNightActions(data);
 };
 

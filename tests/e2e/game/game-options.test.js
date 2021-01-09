@@ -350,13 +350,19 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🎲 Creates game with disabled sheriff option with JWT auth (POST /games)", done => {
+    it("🎲 Creates game with disabled sheriff option and brothers and sisters waking up only the first night with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
                 players: originalPlayers,
-                options: { roles: { sheriff: { enabled: false } } },
+                options: {
+                    roles: {
+                        sheriff: { enabled: false },
+                        twoSisters: { wakingUpInterval: 0 },
+                        threeBrothers: { wakingUpInterval: 0 },
+                    },
+                },
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -426,5 +432,103 @@ describe("K - Game options", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
         done();
     });
-    // Can't vote for a target not in tie
+    it("👪 All can't vote if one vote target is not one of the players in the previous tie in votes (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[3]._id },
+                    { from: players[1]._id, for: players[0]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
+                done();
+            });
+    });
+    it("👪 Another tie in votes between the werewolf and one of the two sisters, then nobody dies (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[0]._id },
+                    { from: players[2]._id, for: players[1]._id },
+                    { from: players[3]._id, for: players[0]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].isAlive).to.equals(true);
+                expect(game.players[1].isAlive).to.equals(true);
+                expect(game.history[0].dead).to.not.exist;
+                done();
+            });
+    });
+    it("🌙 Night falls", done => {
+        expect(game.phase).to.equals("night");
+        expect(game.turn).to.equals(2);
+        done();
+    });
+    it("🐺 Werewolf eats one of the three brothers (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("☀️ Sun is rising", done => {
+        expect(game.phase).to.equals("day");
+        done();
+    });
+    it("👪 Tie in votes between the two sisters (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[1]._id },
+                    { from: players[1]._id, for: players[2]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[1].isAlive).to.equals(true);
+                expect(game.players[2].isAlive).to.equals(true);
+                done();
+            });
+    });
+    it("👪 All vote for the second sister (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[0]._id, for: players[2]._id },
+                    { from: players[1]._id, for: players[2]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[1].isAlive).to.equals(true);
+                expect(game.players[2].isAlive).to.equals(false);
+                expect(game.history[0].dead).to.be.an("array").lengthOf(1);
+                expect(game.history[0].dead[0]._id).to.be.equals(game.players[2]._id);
+                done();
+            });
+    });
 });

@@ -236,8 +236,8 @@ exports.checkVoteTarget = (targetId, { players }, options) => {
         throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is not in game and so can't be a vote's target.`);
     } else if (!targetedPlayer.isAlive) {
         throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is dead and so can't be a vote's target.`);
-    } else if (options.isSecondVoteAfterTie && !options.previousPlay.play.targets.find(({ _id }) => _id.toString() === targetId)) {
-        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is dead and so can't be a vote's target.`);
+    } else if (options.isSecondVoteAfterTie && !options.previousPlay.play.targets.find(({ player }) => player._id.toString() === targetId)) {
+        throw generateError("CANT_BE_VOTE_TARGET", `Player with id "${targetId}" is not one of the player in the previous tie in votes and so can't be a vote's target.`);
     }
 };
 
@@ -384,7 +384,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     if (nominatedPlayers.length > 1) {
         if (getPlayerWithAttribute("sheriff", game)) {
             game.waiting.push({ for: "sheriff", to: "settle-votes" });
-        } else {
+        } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
             const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
             if (!lastVotePlay || lastVotePlay.turn !== game.turn) {
                 game.waiting.push({ for: "all", to: "vote" });
