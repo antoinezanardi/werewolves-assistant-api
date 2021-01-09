@@ -2219,6 +2219,54 @@ describe("B - Full game of 18 players with all roles", () => {
         expect(game.turn).to.equals(4);
         done();
     });
+    it("🎲 Get game with full history (GET /games/:id?history-limit=0)", done => {
+        chai.request(app)
+            .get(`/games/${game._id}?history-limit=0`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history.length).to.equals(32);
+                done();
+            });
+    });
+    it("📜 Get only full game history (GET /games/:id/history)", done => {
+        chai.request(app)
+            .get(`/games/${game._id}/history`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const history = res.body;
+                expect(history.length).to.equals(32);
+                done();
+            });
+    });
+    it("📜 Get only witch plays in game history (GET /games/:id/history?play-source=witch)", done => {
+        chai.request(app)
+            .get(`/games/${game._id}/history?play-source=witch`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const history = res.body;
+                expect(history.length).to.equals(3);
+                expect(history[0].play.source.name).to.equals("witch");
+                expect(history[1].play.source.name).to.equals("witch");
+                expect(history[2].play.source.name).to.equals("witch");
+                done();
+            });
+    });
+    it("📜 Get only choose-side plays in game history (GET /games/:id/history?play-action=choose-side)", done => {
+        chai.request(app)
+            .get(`/games/${game._id}/history?play-action=choose-side`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                const history = res.body;
+                expect(history.length).to.equals(1);
+                expect(history[0].play.action).to.equals("choose-side");
+                done();
+            });
+    });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -2474,17 +2522,6 @@ describe("B - Full game of 18 players with all roles", () => {
                 game = res.body;
                 expect(game.review.rating).to.equals(3.5);
                 expect(game.review.dysfunctionFound).to.be.true;
-                done();
-            });
-    });
-    it("🎲 Get game with full history (PATCH /games/:id?history-limit=0)", done => {
-        chai.request(app)
-            .get(`/games/${game._id}?history-limit=0`)
-            .set({ Authorization: `Bearer ${token}` })
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                game = res.body;
-                expect(game.history.length).to.equals(45);
                 done();
             });
     });

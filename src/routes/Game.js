@@ -1,6 +1,7 @@
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
+const GameHistory = require("../controllers/GameHistory");
 const { getRoles, getSideNames } = require("../helpers/functions/Role");
 const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
@@ -225,7 +226,7 @@ module.exports = app => {
      * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String} source Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
-     * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
+     * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)
      * @apiParam (Request Body Parameters) {Object[]} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets.player Player's id.
      * @apiParam (Request Body Parameters) {Object} [targets.potion] Only for the `witch` actions.
@@ -269,4 +270,33 @@ module.exports = app => {
             .isString().withMessage("Must be a valid string")
             .isIn(getSideNames()).withMessage(`Must be equal to one of the following values: ${getSideNames()}`),
     ], Game.postPlay);
+
+    /**
+     * @api {GET} /games/:id/history H] Get game history
+     * @apiName GetGameHistory
+     * @apiGroup Games 🎲
+     *
+     * @apiPermission JWT
+     * @apiPermission Basic
+     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiParam (Query String Parameters) {String} [play-source] Filter by play's source. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
+     * @apiParam (Query String Parameters) {String} [play-action] Filter by play's action. (_Possibilities: [Codes - Player Actions](#player-actions)_)
+     * @apiSuccess {ObjectId} _id Game history entry's ID.
+     * @apiSuccess {ObjectId} gameId Game's ID.
+     * @apiSuccess {Number} turn Game's ID.
+     * @apiSuccess {String="day","night"} turn Game's phase.
+     * @apiSuccess {Number} tick Game's tick.
+     * @apiSuccess {Play} play Game's play. (_See: [Classes - Play](#play-class)_)
+     * @apiSuccess {Player[]} [dead] Player(s) that might died during the play
+     */
+    app.get("/games/:id/history", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+        query("play-source")
+            .optional()
+            .isIn(getWaitingForPossibilities()).withMessage(`Must be equal to one of the following values: ${getWaitingForPossibilities()}`),
+        query("play-action")
+            .optional()
+            .isIn(getPlayerActions()).withMessage(`Must be equal to one of the following values: ${getPlayerActions()}`),
+    ], GameHistory.getGameHistory);
 };
