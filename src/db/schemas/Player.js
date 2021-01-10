@@ -1,7 +1,7 @@
 const { Schema } = require("mongoose");
 const { playerAttributes, playerActions, murderedPossibilities } = require("../../helpers/constants/Player");
-const { sideNames, roleNames } = require("../../helpers/constants/Role");
-const { waitingForPossibilities } = require("../../helpers/constants/Game");
+const { getRoleNames, getSideNames } = require("../../helpers/functions/Role");
+const { getWaitingForPossibilities } = require("../../helpers/functions/Game");
 
 const PlayerAttributeSchema = new Schema({
     attribute: {
@@ -11,7 +11,7 @@ const PlayerAttributeSchema = new Schema({
     },
     source: {
         type: String,
-        enum: waitingForPossibilities,
+        enum: getWaitingForPossibilities(),
         required: true,
     },
     remainingPhases: { type: Number },
@@ -39,7 +39,7 @@ const PlayerPowerSchema = new Schema({
 const MurderedSchema = new Schema({
     by: {
         type: String,
-        enum: waitingForPossibilities,
+        enum: getWaitingForPossibilities(),
         required: true,
     },
     of: {
@@ -61,12 +61,12 @@ const PlayerSchema = new Schema({
     role: {
         original: {
             type: String,
-            enum: roleNames,
+            enum: getRoleNames(),
             required: true,
         },
         current: {
             type: String,
-            enum: roleNames,
+            enum: getRoleNames(),
             required: true,
         },
         isRevealed: {
@@ -77,12 +77,12 @@ const PlayerSchema = new Schema({
     side: {
         original: {
             type: String,
-            enum: sideNames,
+            enum: getSideNames(),
             required: true,
         },
         current: {
             type: String,
-            enum: sideNames,
+            enum: getSideNames(),
             required: true,
         },
     },

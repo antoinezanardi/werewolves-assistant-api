@@ -56,6 +56,7 @@ On this current version [![GitHub release](https://img.shields.io/github/release
 
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/big-bad-wolf.png" width="25"/> The Big Bad Wolf**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/vile-father-of-wolves.png" width="25"/> The Vile Father Of Wolves**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/villager.png" width="25"/> The Villager-Villager**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/seer.png" width="25"/> The Seer**

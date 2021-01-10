@@ -71,6 +71,8 @@ exports.isLifePotionUsed = async gameId => !!await this.findOne({ gameId, "play.
 
 exports.isDeathPotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.death": true });
 
+exports.isInfectionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.isInfected": true });
+
 exports.getLastNightPlay = gameId => {
     const nightPlayActions = [...turnPreNightActionsOrder, ...turnNightActionsOrder].map(({ action }) => action);
     return this.findOne({ gameId, "play.action": { $in: nightPlayActions } }, null, { sort: { createdAt: -1 } });

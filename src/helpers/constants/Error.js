@@ -171,4 +171,16 @@ exports.errorMetadata = {
         code: 42,
         HTTPCode: 400,
     },
+    TARGET_MUST_BE_EATEN_BY_WEREWOLVES: {
+        code: 43,
+        HTTPCode: 400,
+    },
+    ABSENT_VILE_FATHER_OF_WOLVES: {
+        code: 44,
+        HTTPCode: 400,
+    },
+    ONLY_ONE_INFECTION: {
+        code: 45,
+        HTTPCode: 400,
+    },
 };

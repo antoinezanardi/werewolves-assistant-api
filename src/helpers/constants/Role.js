@@ -1,21 +1,3 @@
-exports.roleNames = [
-    "villager",
-    "werewolf",
-    "seer",
-    "guard",
-    "witch",
-    "hunter",
-    "raven",
-    "little-girl",
-    "villager-villager",
-    "cupid",
-    "two-sisters",
-    "three-brothers",
-    "wild-child",
-    "dog-wolf",
-    "big-bad-wolf",
-];
-
 exports.sideNames = ["villagers", "werewolves"];
 
 exports.groupNames = [...this.sideNames, "lovers"];
@@ -23,6 +5,7 @@ exports.groupNames = [...this.sideNames, "lovers"];
 exports.roles = [
     { name: "werewolf", side: "werewolves", maxInGame: 4 },
     { name: "big-bad-wolf", side: "werewolves", maxInGame: 1, recommendedMinPlayers: 12 },
+    { name: "vile-father-of-wolves", side: "werewolves", maxInGame: 1 },
     { name: "villager", side: "villagers", maxInGame: 39 },
     { name: "villager-villager", side: "villagers", maxInGame: 1 },
     { name: "seer", side: "villagers", maxInGame: 1 },
@@ -37,3 +20,5 @@ exports.roles = [
     { name: "dog-wolf", side: "villagers", maxInGame: 1 },
     { name: "raven", side: "villagers", maxInGame: 1 },
 ];
+
+exports.roleNames = this.roles.map(({ name }) => name);

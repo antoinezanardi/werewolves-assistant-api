@@ -144,21 +144,22 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 
 ## <a id="play-class"></a>🕹 Play
 
-| Field                                  | Type                      | Description                                                                                                                                  |
-|----------------------------------------|:-------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------|
-| action                                 | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                             |
-| source                                 | Object                    | Source of the play.                                                                                                                          |
-| &emsp;&emsp;name                       | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)         |
-| &emsp;&emsp;players                    | [Player](#player-class)[] | Players expected to play.                                                                                                                    |
-| **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, targets are nominated from the vote.                                                     |
-| &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                                                                                             |
-| **&emsp;&emsp;potion***                | Object                    | Only available for the `witch`.                                                                                                              |
-| **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from werewolves.                                                           |
-| **&emsp;&emsp;&emsp;&emsp;death***     | Boolean                   | Only available for the `witch`. If set to `true`, target is killed.                                                                          |
-| **votes***                             | Object[]                  | Votes of the play.                                                                                                                           |
-| &emsp;&emsp;from                       | [Player](#player-class)   | Vote's source.                                                                                                                               |
-| &emsp;&emsp;for                        | [Player](#player-class)   | Vote's target.                                                                                                                               |
-| **side**                               | String                    | Only available for the `dog-wolf`. Is equal to `villagers` or `werewolves` depending on the chosen side.                                     |
+| Field                                  | Type                      | Description                                                                                                                                                                      |
+|----------------------------------------|:-------------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| action                                 | String                    | Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)                                                                                                 |
+| source                                 | Object                    | Source of the play.                                                                                                                                                              |
+| &emsp;&emsp;name                       | String                    | Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_)                                             |
+| &emsp;&emsp;players                    | [Player](#player-class)[] | Players expected to play.                                                                                                                                                        |
+| **targets***                           | Object[]                  | Players affected by the play. When `votes` are set, targets are nominated from the vote.                                                                                         |
+| &emsp;&emsp;player                     | [Player](#player-class)   | Targeted player.                                                                                                                                                                 |
+| **&emsp;&emsp;isInfected***            | Boolean                   | Only if there is `vile-father-of-wolves` in the game and the action is `eat` from `werewolves`. If set to `true`, the target joined the `werewolves` side.                       |
+| **&emsp;&emsp;potion***                | Object                    | Only available for the `witch`.                                                                                                                                                  |
+| **&emsp;&emsp;&emsp;&emsp;life***      | Boolean                   | Only available for the `witch`. If set to `true`, target is saved from werewolves.                                                                                               |
+| **&emsp;&emsp;&emsp;&emsp;death***     | Boolean                   | Only available for the `witch`. If set to `true`, target is killed.                                                                                                              |
+| **votes***                             | Object[]                  | Votes of the play.                                                                                                                                                               |
+| &emsp;&emsp;from                       | [Player](#player-class)   | Vote's source.                                                                                                                                                                   |
+| &emsp;&emsp;for                        | [Player](#player-class)   | Vote's target.                                                                                                                                                                   |
+| **side**                               | String                    | Only available for the `dog-wolf`. Is equal to `villagers` or `werewolves` depending on the chosen side.                                                                         |
 
 ## <a id="error-class"></a>⚠️ API Error
 

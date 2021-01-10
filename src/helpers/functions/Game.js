@@ -37,6 +37,8 @@ exports.getPlayerWithRole = (roleName, game) => game.players.find(({ role }) => 
 
 exports.getPlayersWithRole = (roleName, game) => game.players.filter(({ role }) => role.current === roleName);
 
+exports.getPlayerWithId = (playerId, game) => game.players.find(({ _id }) => _id.toString() === playerId.toString());
+
 exports.getPlayersWithSide = (sideName, game) => game.players.filter(({ side }) => side.current === sideName);
 
 exports.getAlivePlayers = game => game.players.filter(({ isAlive }) => isAlive);

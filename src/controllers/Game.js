@@ -479,9 +479,9 @@ exports.checkPlay = async play => {
     } else if (game.status !== "playing") {
         throw generateError("NO_MORE_PLAY_ALLOWED", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
     } else if (game.waiting[0].for !== play.source) {
-        throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
+        throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting[0].for}", not "${play.source}"`);
     } else if (game.waiting[0].to !== play.action) {
-        throw generateError("BAD_PLAY_ACTION", `Game is waiting for "${game.waiting.for}" to "${game.waiting.to}", not "${play.action}"`);
+        throw generateError("BAD_PLAY_ACTION", `Game is waiting for "${game.waiting[0].for}" to "${game.waiting[0].to}", not "${play.action}"`);
     }
 };
 

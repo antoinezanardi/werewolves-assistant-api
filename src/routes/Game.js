@@ -229,6 +229,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)
      * @apiParam (Request Body Parameters) {Object[]} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets.player Player's id.
+     * @apiParam (Request Body Parameters) {Boolean} [targets.isInfected] Only if there is vile-father-of-wolves in the game and the action is `eat` from `werewolves`. Set to `true` if the werewolves victim will instantly join the `werewolves` side.
      * @apiParam (Request Body Parameters) {Object} [targets.potion] Only for the `witch` actions.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life from werewolves meal.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
@@ -248,6 +249,10 @@ module.exports = app => {
         body("targets")
             .optional()
             .isArray().withMessage("Must be an array"),
+        body("targets.*.isInfected")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("targets.*.player")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("targets.*.potion.life")

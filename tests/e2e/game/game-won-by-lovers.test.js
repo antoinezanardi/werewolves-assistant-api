@@ -101,6 +101,18 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
                 done();
             });
     });
+    it("🐺 Vile father of wolves can't infect if he is not in the game (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id, isInfected: true }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ABSENT_VILE_FATHER_OF_WOLVES");
+                done();
+            });
+    });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)

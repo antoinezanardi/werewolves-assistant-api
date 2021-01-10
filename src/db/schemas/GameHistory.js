@@ -32,6 +32,7 @@ const playSchema = new Schema({
                     life: { type: Boolean },
                     death: { type: Boolean },
                 },
+                isInfected: { type: Boolean },
             },
         ],
         _id: false,
