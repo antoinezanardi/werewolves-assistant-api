@@ -10,6 +10,7 @@
 * [#91](https://github.com/antoinezanardi/werewolves-assistant-api/issues/91) - Game option for no sheriff.
 * [#95](https://github.com/antoinezanardi/werewolves-assistant-api/issues/95) - Limit game history length.
 * [#96](https://github.com/antoinezanardi/werewolves-assistant-api/issues/96) - Add dead players in game history entries.
+* [#99](https://github.com/antoinezanardi/werewolves-assistant-api/issues/99) - ESLint rules updated with last rules.
 
 ### ♻️ Refactoring
 
