@@ -18,6 +18,10 @@
 * [#89](https://github.com/antoinezanardi/werewolves-assistant-api/issues/89) - Decrease `remainingPhases` for attributes.
 * [#90](https://github.com/antoinezanardi/werewolves-assistant-api/issues/90) - Add players source to Game History entry.
 
+### 📚 Documentation
+
+* [#98](https://github.com/antoinezanardi/werewolves-assistant-api/issues/98) - APIDoc improved for `Classes` and nested properties.
+
 ### 🛣️ Routes
 
 * [#97](https://github.com/antoinezanardi/werewolves-assistant-api/issues/97) - Users can get full game history or filter entries by source or action.

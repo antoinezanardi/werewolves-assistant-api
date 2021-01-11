@@ -52,7 +52,7 @@ The MongoDB database is protected under username and password authentication.
 
 ## <a name="roles-available">🃏 Roles available</a>
 
-On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **15 different roles** are available to play:
+On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **16 different roles** are available to play:
 
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/big-bad-wolf.png" width="25"/> The Big Bad Wolf**
@@ -94,7 +94,7 @@ Current release on **main API** is [![GitHub release](https://img.shields.io/git
 
 ## <a name="code-analysis-and-consistency">☑️ Code analysis and consistency</a>
 
-In order to keep the code clean, consistent and free of bad JS practises, **[ESLint](https://eslint.org/)** is installed with nearly **220 rules activated** !
+In order to keep the code clean, consistent and free of bad JS practises, **[ESLint](https://eslint.org/)** is installed with more than **220 rules activated** !
 
 Complete list of all enabled rules is available in the **[.eslintrc.js file](https://github.com/antoinezanardi/werewolves-assistant-api/blob/master/.eslintrc.js)**.
 
