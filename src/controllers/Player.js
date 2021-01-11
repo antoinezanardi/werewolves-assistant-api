@@ -193,7 +193,7 @@ exports.addPlayerAttribute = (playerId, attribute, game, forcedSource) => {
 exports.removePlayerAttribute = (playerId, attributeName, game) => {
     const player = getPlayerWithId(playerId, game);
     if (player && player.attributes) {
-        player.attributes = player.attributes.filter(({ attribute }) => attribute !== attributeName);
+        player.attributes = player.attributes.filter(({ name }) => name !== attributeName);
     }
 };
 

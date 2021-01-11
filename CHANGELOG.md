@@ -17,6 +17,7 @@
 * [#85](https://github.com/antoinezanardi/werewolves-assistant-api/issues/85) - Change game options structure.
 * [#89](https://github.com/antoinezanardi/werewolves-assistant-api/issues/89) - Decrease `remainingPhases` for attributes.
 * [#90](https://github.com/antoinezanardi/werewolves-assistant-api/issues/90) - Add players source to Game History entry.
+* [#100](https://github.com/antoinezanardi/werewolves-assistant-api/issues/100) - Change `attributes.attribute` to `attributes.name` in Player class.
 
 ### 📚 Documentation
 

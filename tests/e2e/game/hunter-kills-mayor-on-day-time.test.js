@@ -66,7 +66,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[2].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.players[2].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
                 done();
             });

@@ -83,8 +83,8 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
-                expect(game.players[3].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
+                expect(game.players[0].attributes).to.deep.include({ name: "in-love", source: "cupid" });
+                expect(game.players[3].attributes).to.deep.include({ name: "in-love", source: "cupid" });
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
                 expect(game.history[0].play.targets[1].player._id).to.equals(players[3]._id);
                 done();

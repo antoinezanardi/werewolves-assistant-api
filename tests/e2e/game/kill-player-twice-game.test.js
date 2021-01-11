@@ -66,7 +66,7 @@ describe("G - Game where player is killed twice during the night", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.players[1].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
                 expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
@@ -84,7 +84,7 @@ describe("G - Game where player is killed twice during the night", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].attributes).to.deep.include({ attribute: "eaten", source: "werewolves", remainingPhases: 1 });
+                expect(game.players[1].attributes).to.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
                 done();
@@ -123,8 +123,8 @@ describe("G - Game where player is killed twice during the night", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].attributes).to.not.deep.include({ attribute: "sheriff", source: "all" });
-                expect(game.players[0].attributes).to.deep.include({ attribute: "sheriff", source: "sheriff" });
+                expect(game.players[1].attributes).to.not.deep.include({ name: "sheriff", source: "all" });
+                expect(game.players[0].attributes).to.deep.include({ name: "sheriff", source: "sheriff" });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
                 done();

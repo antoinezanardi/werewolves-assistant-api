@@ -1,12 +1,12 @@
 const { Schema } = require("mongoose");
-const { playerAttributes, playerActions, murderedPossibilities } = require("../../helpers/constants/Player");
 const { getRoleNames, getSideNames } = require("../../helpers/functions/Role");
 const { getWaitingForPossibilities } = require("../../helpers/functions/Game");
+const { getPlayerAttributes, getPlayerActions, getPlayerMurderedPossibilities } = require("../../helpers/functions/Player");
 
 const PlayerAttributeSchema = new Schema({
-    attribute: {
+    name: {
         type: String,
-        enum: playerAttributes.map(playerAttribute => playerAttribute.attribute),
+        enum: getPlayerAttributes().map(({ name }) => name),
         required: true,
     },
     source: {
@@ -44,7 +44,7 @@ const MurderedSchema = new Schema({
     },
     of: {
         type: String,
-        enum: playerActions,
+        enum: getPlayerActions(),
         required: true,
     },
 }, {
@@ -101,7 +101,7 @@ const PlayerSchema = new Schema({
     },
     murdered: {
         type: MurderedSchema,
-        enum: murderedPossibilities,
+        enum: getPlayerMurderedPossibilities(),
         required: false,
     },
 }, {

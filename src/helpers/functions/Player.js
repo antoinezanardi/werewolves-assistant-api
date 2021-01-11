@@ -4,14 +4,16 @@ exports.canBeEaten = player => !this.doesPlayerHaveAttribute(player, "drank-life
                                 player.role.current === "little-girl");
 
 exports.doesPlayerHaveAttribute = ({ attributes }, attributeName) => attributes &&
-    attributes.findIndex(({ attribute }) => attribute === attributeName) !== -1;
+    attributes.findIndex(({ name }) => name === attributeName) !== -1;
 
 exports.getAttributes = () => JSON.parse(JSON.stringify(playerAttributes));
 
-exports.getAttribute = attribute => this.getAttributes().find(playerAttribute => playerAttribute.attribute === attribute);
+exports.getAttribute = attributeName => this.getAttributes().find(({ name }) => name === attributeName);
 
 exports.getPlayerActions = () => JSON.parse(JSON.stringify(playerActions));
 
 exports.getPlayerMurderedPossibilities = () => JSON.parse(JSON.stringify(murderedPossibilities));
 
-exports.getPlayerAttribute = ({ attributes }, attributeName) => attributes && attributes.find(({ attribute }) => attribute === attributeName);
+exports.getPlayerAttribute = ({ attributes }, attributeName) => attributes && attributes.find(({ name }) => name === attributeName);
+
+exports.getPlayerAttributes = () => JSON.parse(JSON.stringify(playerAttributes));

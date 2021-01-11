@@ -1,15 +1,15 @@
 exports.playerAttributes = [
-    { attribute: "sheriff", source: "all" },
-    { attribute: "seen", source: "seer", remainingPhases: 1 },
-    { attribute: "eaten", source: "werewolves", remainingPhases: 1 },
-    { attribute: "eaten", source: "big-bad-wolf", remainingPhases: 1 },
-    { attribute: "infected", source: "vile-father-of-wolves", remainingPhases: 1 },
-    { attribute: "drank-life-potion", source: "witch", remainingPhases: 1 },
-    { attribute: "drank-death-potion", source: "witch", remainingPhases: 1 },
-    { attribute: "protected", source: "guard", remainingPhases: 1 },
-    { attribute: "raven-marked", source: "raven", remainingPhases: 2 },
-    { attribute: "in-love", source: "cupid" },
-    { attribute: "worshiped", source: "wild-child" },
+    { name: "sheriff", source: "all" },
+    { name: "seen", source: "seer", remainingPhases: 1 },
+    { name: "eaten", source: "werewolves", remainingPhases: 1 },
+    { name: "eaten", source: "big-bad-wolf", remainingPhases: 1 },
+    { name: "infected", source: "vile-father-of-wolves", remainingPhases: 1 },
+    { name: "drank-life-potion", source: "witch", remainingPhases: 1 },
+    { name: "drank-death-potion", source: "witch", remainingPhases: 1 },
+    { name: "protected", source: "guard", remainingPhases: 1 },
+    { name: "raven-marked", source: "raven", remainingPhases: 2 },
+    { name: "in-love", source: "cupid" },
+    { name: "worshiped", source: "wild-child" },
 ];
 
 exports.playerActions = [
