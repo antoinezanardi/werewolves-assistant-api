@@ -1,8 +1,10 @@
 const Game = require("./Game");
 const GameHistory = require("./GameHistory");
-const { canBeEaten, doesPlayerHaveAttribute } = require("../helpers/functions/Player");
+const {
+    canBeEaten, doesPlayerHaveAttribute, isAncientKillable, getAttribute,
+    getPlayerMurderedPossibilities,
+} = require("../helpers/functions/Player");
 const { getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId } = require("../helpers/functions/Game");
-const { getAttribute, getPlayerMurderedPossibilities } = require("../helpers/functions/Player");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -151,27 +153,37 @@ exports.insertActionBeforeAllVote = (game, waiting) => {
     }
 };
 
-exports.applyConsequencesDependingOnKilledPlayerRole = (player, game) => {
+exports.applyConsequencesDependingOnKilledPlayerRole = (player, game, action) => {
+    const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
     if (player.role.current === "hunter") {
         this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
+    } else if (player.role.current === "ancient" && ancientRevengeActions.includes(action)) {
+        for (const { _id, isAlive, role } of game.players) {
+            if (isAlive && role.original === "villagers") {
+                this.addPlayerAttribute(_id, "powerless", game);
+            }
+        }
     }
 };
 
 exports.killPlayer = (playerId, { action }, game, gameHistoryEntry, forcedSource) => {
     const player = getPlayerWithId(playerId, game);
-    if (player?.isAlive && (action === "eat" && canBeEaten(player) || action !== "eat")) {
-        player.isAlive = false;
+    if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
+        const alreadyRevealed = player.role.isRevealed;
         player.role.isRevealed = true;
-        const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
-        if (murdered) {
-            player.murdered = murdered;
-            if (forcedSource) {
-                player.murdered.by = forcedSource;
+        if (player.role.current !== "ancient" || isAncientKillable(action, alreadyRevealed)) {
+            player.isAlive = false;
+            const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
+            if (murdered) {
+                player.murdered = murdered;
+                if (forcedSource) {
+                    player.murdered.by = forcedSource;
+                }
+                this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             }
-            this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+            this.applyConsequencesDependingOnKilledPlayerRole(player, game, action);
+            this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
         }
-        this.applyConsequencesDependingOnKilledPlayerRole(player, game);
-        this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
     }
 };
 

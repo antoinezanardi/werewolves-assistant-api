@@ -3,6 +3,8 @@ const { playerAttributes, murderedPossibilities, playerActions } = require("../c
 exports.canBeEaten = player => !this.doesPlayerHaveAttribute(player, "drank-life-potion") && (!this.doesPlayerHaveAttribute(player, "protected") ||
                                 player.role.current === "little-girl");
 
+exports.isAncientKillable = (action, alreadyRevealed) => action !== "eat" || alreadyRevealed;
+
 exports.doesPlayerHaveAttribute = ({ attributes }, attributeName) => attributes &&
     attributes.findIndex(({ name }) => name === attributeName) !== -1;
 

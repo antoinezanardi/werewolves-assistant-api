@@ -10,6 +10,7 @@ exports.playerAttributes = [
     { name: "raven-marked", source: "raven", remainingPhases: 2 },
     { name: "in-love", source: "cupid" },
     { name: "worshiped", source: "wild-child" },
+    { name: "powerless", source: "ancient" },
 ];
 
 exports.playerActions = [
