@@ -140,7 +140,8 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 | phase                            | String                    | Game's phase.                                                          |
 | tick                             | Number                    | Game's tick.                                                           |
 | play                             | [Play](#play-class)       | Game's play. (_See: [Classes - Play](#play-class)_)                    |
-| **dead***                        | [Player](#player-class)[] | Player(s) that might died during the play.                             |
+| **deadPlayers***                 | [Player](#player-class)[] | Player(s) that might died after the play.                              |
+| **revealedPlayers***             | [Player](#player-class)[] | Player(s) which role has been revealed after the play.                 |
 
 ## <a id="play-class"></a>🕹 Play
 

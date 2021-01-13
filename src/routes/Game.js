@@ -292,7 +292,8 @@ module.exports = app => {
      * @apiSuccess {String="day","night"} turn Game's phase.
      * @apiSuccess {Number} tick Game's tick.
      * @apiSuccess {Play} play Game's play. (_See: [Classes - Play](#play-class)_)
-     * @apiSuccess {Player[]} [dead] Player(s) that might died during the play
+     * @apiSuccess {Player[]} [deadPlayers] Player(s) that might died after the play.
+     * @apiSuccess {Player[]} [revealedPlayers] Player(s) which role has been revealed after the play.
      */
     app.get("/games/:id/history", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         param("id")

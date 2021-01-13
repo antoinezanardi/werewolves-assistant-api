@@ -466,7 +466,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[0].isAlive).to.equals(true);
                 expect(game.players[1].isAlive).to.equals(true);
-                expect(game.history[0].dead).to.not.exist;
+                expect(game.history[0].deadPlayers).to.not.exist;
                 done();
             });
     });
@@ -526,8 +526,8 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[1].isAlive).to.equals(true);
                 expect(game.players[2].isAlive).to.equals(false);
-                expect(game.history[0].dead).to.be.an("array").lengthOf(1);
-                expect(game.history[0].dead[0]._id).to.be.equals(game.players[2]._id);
+                expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
+                expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
                 done();
             });
     });

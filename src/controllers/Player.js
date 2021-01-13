@@ -118,10 +118,18 @@ exports.checkAndFillTargets = async(targets, game, options) => {
 };
 
 exports.insertDeadPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) => {
-    if (!gameHistoryEntry.dead) {
-        gameHistoryEntry.dead = [player];
+    if (!gameHistoryEntry.deadPlayers) {
+        gameHistoryEntry.deadPlayers = [player];
     } else {
-        gameHistoryEntry.dead.push(player);
+        gameHistoryEntry.deadPlayers.push(player);
+    }
+};
+
+exports.insertRevealedPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) => {
+    if (!gameHistoryEntry.revealedPlayers) {
+        gameHistoryEntry.revealedPlayers = [player];
+    } else {
+        gameHistoryEntry.revealedPlayers.push(player);
     }
 };
 
@@ -138,7 +146,7 @@ exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, game
     }
     if (doesPlayerHaveAttribute(player, "worshiped")) {
         const wildChildPlayer = getPlayerWithRole("wild-child", game);
-        if (wildChildPlayer?.isAlive) {
+        if (wildChildPlayer?.isAlive && !doesPlayerHaveAttribute(wildChildPlayer, "powerless")) {
             wildChildPlayer.side.current = "werewolves";
         }
     }
@@ -155,7 +163,7 @@ exports.insertActionBeforeAllVote = (game, waiting) => {
 
 exports.applyConsequencesDependingOnKilledPlayerRole = (player, game, action) => {
     const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
-    if (player.role.current === "hunter") {
+    if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
     } else if (player.role.current === "ancient" && ancientRevengeActions.includes(action)) {
         for (const { _id, isAlive, role } of game.players) {
@@ -171,6 +179,7 @@ exports.killPlayer = (playerId, { action }, game, gameHistoryEntry, forcedSource
     if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
         const alreadyRevealed = player.role.isRevealed;
         player.role.isRevealed = true;
+        this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
         if (player.role.current !== "ancient" || isAncientKillable(action, alreadyRevealed)) {
             player.isAlive = false;
             const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
@@ -363,7 +372,11 @@ exports.werewolvesPlay = async(play, game) => {
     if (targets[0].isInfected) {
         const infectedPlayer = getPlayerWithId(targets[0].player._id, game);
         if (infectedPlayer) {
-            infectedPlayer.side.current = "werewolves";
+            if (infectedPlayer.role.current === "ancient" && !infectedPlayer.role.isRevealed) {
+                this.addPlayerAttribute(targets[0].player._id, "eaten", game);
+            } else {
+                infectedPlayer.side.current = "werewolves";
+            }
         }
     } else {
         this.addPlayerAttribute(targets[0].player._id, "eaten", game);

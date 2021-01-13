@@ -89,7 +89,11 @@ const gameHistorySchema = new Schema({
         type: playSchema,
         required: false,
     },
-    dead: {
+    deadPlayers: {
+        type: [Player],
+        default: undefined,
+    },
+    revealedPlayers: {
         type: [Player],
         default: undefined,
     },

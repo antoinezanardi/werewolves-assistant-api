@@ -11,7 +11,7 @@ const {
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
     getFindFields, getPlayerWithAttribute, getDefaultGameOptions,
 } = require("../helpers/functions/Game");
-const { getPlayerAttribute } = require("../helpers/functions/Player");
+const { getPlayerAttribute, doesPlayerHaveAttribute } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
 const { populate: fullGamePopulate } = require("../helpers/constants/Game");
 const { getProp } = require("../helpers/functions/Object");
@@ -86,6 +86,7 @@ exports.fillPlayersData = players => {
         if (role.name === "villager-villager") {
             player.role.isRevealed = true;
         }
+        player.isAlive = true;
     }
 };
 
@@ -357,8 +358,9 @@ exports.fillWaitingQueueWithDayActions = (game, gameHistoryEntry) => {
 };
 
 exports.isGroupCallableDuringTheNight = (game, group) => {
-    if (group === "lovers" && getPlayerWithRole("cupid", game)) {
-        return true;
+    if (group === "lovers") {
+        const cupidPlayer = getPlayerWithRole("cupid", game);
+        return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
@@ -367,7 +369,7 @@ exports.areThreeBrothersCallableDuringTheNight = async game => {
     const brothersWakingUpInterval = game.options.roles.threeBrothers.wakingUpInterval;
     const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
     const brotherPlayers = getPlayersWithRole("three-brothers", game);
-    const turnsSinceLastBrothersPlay = game.turn - lastBrothersPlay.turn;
+    const turnsSinceLastBrothersPlay = lastBrothersPlay ? game.turn - lastBrothersPlay.turn : undefined;
     return brotherPlayers.filter(brother => brother.isAlive).length >= 2 &&
         (!lastBrothersPlay || turnsSinceLastBrothersPlay >= brothersWakingUpInterval && brothersWakingUpInterval);
 };
@@ -375,15 +377,15 @@ exports.areTwoSistersCallableDuringTheNight = async game => {
     const sistersWakingUpInterval = game.options.roles.twoSisters.wakingUpInterval;
     const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
     const sisterPlayers = getPlayersWithRole("two-sisters", game);
-    const turnsSinceLastSistersPlay = game.turn - lastSistersPlay.turn;
+    const turnsSinceLastSistersPlay = lastSistersPlay ? game.turn - lastSistersPlay.turn : undefined;
     return sisterPlayers.every(({ isAlive }) => isAlive) &&
         (!lastSistersPlay || turnsSinceLastSistersPlay >= sistersWakingUpInterval && sistersWakingUpInterval);
 };
 
 exports.isRoleCallableDuringTheNight = (game, role) => {
     const player = getPlayerWithRole(role, game);
-    if (!player || game.tick === 1) {
-        return !!player;
+    if (!player || doesPlayerHaveAttribute(player, "powerless")) {
+        return false;
     }
     if (role === "two-sisters") {
         return this.areTwoSistersCallableDuringTheNight(game);

@@ -254,7 +254,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[7]._id);
                 expect(game.history[0].play.source.name).to.equal("all");
                 expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(players.length);
-                expect(game.history[0].dead).to.not.exist;
+                expect(game.history[0].deadPlayers).to.not.exist;
                 done();
             });
     });
@@ -1319,10 +1319,10 @@ describe("B - Full game of 18 players with all roles", () => {
         expect(game.players[14].role.isRevealed).to.equals(true);
         expect(game.players[14].murdered.of).to.equals("eat");
         expect(game.players[14].murdered.by).to.equals("big-bad-wolf");
-        expect(game.history[0].dead).to.be.an("array").to.be.lengthOf(1);
-        expect(game.history[0].dead[0]._id).to.equals(players[14]._id);
-        expect(game.history[0].dead[0].murdered.of).to.equals("eat");
-        expect(game.history[0].dead[0].murdered.by).to.equals("big-bad-wolf");
+        expect(game.history[0].deadPlayers).to.be.an("array").to.be.lengthOf(1);
+        expect(game.history[0].deadPlayers[0]._id).to.equals(players[14]._id);
+        expect(game.history[0].deadPlayers[0].murdered.of).to.equals("eat");
+        expect(game.history[0].deadPlayers[0].murdered.by).to.equals("big-bad-wolf");
         done();
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
@@ -1464,7 +1464,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(game.players[5].isAlive).to.equals(true);
                 expect(game.players[6].isAlive).to.equals(true);
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].dead).to.not.exist;
+                expect(game.history[0].deadPlayers).to.not.exist;
                 done();
             });
     });
@@ -1569,9 +1569,9 @@ describe("B - Full game of 18 players with all roles", () => {
                 expect(game.players[6].isAlive).to.equals(false);
                 expect(game.players[6].murdered).to.deep.equals({ by: "sheriff", of: "settle-votes" });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].dead).to.be.an("array").to.be.lengthOf(1);
-                expect(game.history[0].dead[0]._id).to.equals(players[6]._id);
-                expect(game.history[0].dead[0].murdered).to.deep.equals({ by: "sheriff", of: "settle-votes" });
+                expect(game.history[0].deadPlayers).to.be.an("array").to.be.lengthOf(1);
+                expect(game.history[0].deadPlayers[0]._id).to.equals(players[6]._id);
+                expect(game.history[0].deadPlayers[0].murdered).to.deep.equals({ by: "sheriff", of: "settle-votes" });
                 done();
             });
     });
@@ -1798,7 +1798,7 @@ describe("B - Full game of 18 players with all roles", () => {
         expect(game.players[2].isAlive).to.equals(true);
         expect(game.players[11].isAlive).to.equals(false);
         expect(game.players[11].murdered).to.deep.equals({ by: "big-bad-wolf", of: "eat" });
-        expect(game.history[0].dead).to.be.an("array").to.be.lengthOf(2);
+        expect(game.history[0].deadPlayers).to.be.an("array").to.be.lengthOf(2);
         done();
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
