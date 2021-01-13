@@ -166,8 +166,8 @@ exports.applyConsequencesDependingOnKilledPlayerRole = (player, game, action) =>
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
     } else if (player.role.current === "ancient" && ancientRevengeActions.includes(action)) {
-        for (const { _id, isAlive, role } of game.players) {
-            if (isAlive && role.original === "villagers") {
+        for (const { _id, isAlive, side } of game.players) {
+            if (isAlive && side.original === "villagers") {
                 this.addPlayerAttribute(_id, "powerless", game);
             }
         }
@@ -178,8 +178,10 @@ exports.killPlayer = (playerId, { action }, game, gameHistoryEntry, forcedSource
     const player = getPlayerWithId(playerId, game);
     if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
         const alreadyRevealed = player.role.isRevealed;
-        player.role.isRevealed = true;
-        this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+        if (!alreadyRevealed) {
+            player.role.isRevealed = true;
+            this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+        }
         if (player.role.current !== "ancient" || isAncientKillable(action, alreadyRevealed)) {
             player.isAlive = false;
             const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);

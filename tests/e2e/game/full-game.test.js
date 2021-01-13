@@ -30,6 +30,7 @@ let players = [
     { name: "D@g", role: "dog-wolf" },
     { name: "D‡g", role: "big-bad-wolf" },
     { name: "D◊g", role: "vile-father-of-wolves" },
+    { name: "D€g", role: "ancient" },
 ];
 let token, game;
 
@@ -1698,7 +1699,7 @@ describe("B - Full game of 18 players with all roles", () => {
                 done();
             });
     });
-    it("🐺 Werewolves eat the guard, but vile father of wolves infects (POST /games/:id/play)", done => {
+    it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -2500,17 +2501,17 @@ describe("B - Full game of 18 players with all roles", () => {
                 done();
             });
     });
-    it("🐺 Werewolves eat the last brother (POST /games/:id/play)", done => {
+    it("🐺 Werewolves eat the ancient (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[12]._id }] })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[19]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[12]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[19]._id);
                 done();
             });
     });
@@ -2526,9 +2527,13 @@ describe("B - Full game of 18 players with all roles", () => {
                 done();
             });
     });
-    it("☀️ Sun is rising", done => {
+    it("☀️ Sun is rising, ancient is not dead because he has another life but his role is revealed", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[12].isAlive).to.equals(false);
+        expect(game.players[19].role.isRevealed).to.equals(true);
+        expect(game.players[19].isAlive).to.equals(true);
+        expect(game.history[0].revealedPlayers).to.exist;
+        expect(game.history[0].revealedPlayers).to.be.an("array").lengthOf(1);
+        expect(game.history[0].revealedPlayers[0]._id).to.equals(players[19]._id);
         done();
     });
     it("👪 All vote for the big bad wolf (POST /games/:id/play)", done => {
@@ -2699,6 +2704,76 @@ describe("B - Full game of 18 players with all roles", () => {
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[3].isAlive).to.be.false;
+        done();
+    });
+    it("👪 All vote for the last brother (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[12]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[12].isAlive).to.equals(false);
+                expect(game.players[12].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🌙 Night falls", done => {
+        expect(game.phase).to.equals("night");
+        expect(game.turn).to.equals(9);
+        done();
+    });
+    it("🛡 Guard protects the witch (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                done();
+            });
+    });
+    it("🐺 Werewolves eat the ancient again and will die (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[19]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[19]._id);
+                done();
+            });
+    });
+    it("🪄 Witch skips (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("☀️ Sun is rising, ancient is dead this time", done => {
+        expect(game.phase).to.equals("day");
+        expect(game.players[19].role.isRevealed).to.equals(true);
+        expect(game.players[19].isAlive).to.equals(false);
+        expect(game.history[0].revealedPlayers).to.not.exist;
+        expect(game.history[0].deadPlayers).to.exist;
+        expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
+        expect(game.history[0].deadPlayers[0]._id).to.equals(players[19]._id);
         done();
     });
     it("👪 All vote for the witch, which joined the werewolf side earlier (POST /games/:id/play)", done => {
