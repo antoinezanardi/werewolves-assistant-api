@@ -37,7 +37,7 @@
 * `express-validator` updated to version `6.9.2`.
 * `mongoose` updated to version `5.11.11`.
 * `nodemon` updated to version `2.0.7`.
-* `qs` updated to version `6.9.5`.
+* `qs` updated to version `6.9.6`.
 
 ---
 

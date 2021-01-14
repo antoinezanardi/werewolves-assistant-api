@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 const { getRoleNames, getSideNames } = require("../../helpers/functions/Role");
-const { getWaitingForPossibilities } = require("../../helpers/functions/Game");
+const { getWaitingForPossibilities, getGamePhases } = require("../../helpers/functions/Game");
 const { getPlayerAttributes, getPlayerActions, getPlayerMurderedPossibilities } = require("../../helpers/functions/Player");
 
 const PlayerAttributeSchema = new Schema({
@@ -15,6 +15,16 @@ const PlayerAttributeSchema = new Schema({
         required: true,
     },
     remainingPhases: { type: Number },
+    activeAt: {
+        turn: {
+            type: Number,
+            min: 1,
+        },
+        phase: {
+            type: String,
+            enum: getGamePhases(),
+        },
+    },
 }, {
     _id: false,
     timestamps: false,
