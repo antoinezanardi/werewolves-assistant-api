@@ -244,7 +244,6 @@ describe("B - Full game of 18 players with all roles", () => {
                 ],
             })
             .end((err, res) => {
-                console.log(res.body);
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[7].attributes).to.deep.include({ name: "sheriff", source: "all" });
