@@ -15,6 +15,7 @@ exports.roles = [
     { name: "little-girl", side: "villagers", maxInGame: 1 },
     { name: "guard", side: "villagers", maxInGame: 1 },
     { name: "ancient", side: "villagers", maxInGame: 1 },
+    { name: "scapegoat", side: "villagers", maxInGame: 1 },
     { name: "two-sisters", side: "villagers", minInGame: 2, maxInGame: 2, recommendedMinPlayers: 12 },
     { name: "three-brothers", side: "villagers", minInGame: 3, maxInGame: 3, recommendedMinPlayers: 15 },
     { name: "wild-child", side: "villagers", maxInGame: 1 },

@@ -19,3 +19,6 @@ exports.getPlayerMurderedPossibilities = () => JSON.parse(JSON.stringify(murdere
 exports.getPlayerAttribute = ({ attributes }, attributeName) => attributes && attributes.find(({ name }) => name === attributeName);
 
 exports.getPlayerAttributes = () => JSON.parse(JSON.stringify(playerAttributes));
+
+exports.isPlayerAttributeActive = ({ activeAt }, game) => !activeAt || activeAt.turn <= game.turn &&
+    (!activeAt.phase || activeAt.phase === "night" || game.phase === "day");

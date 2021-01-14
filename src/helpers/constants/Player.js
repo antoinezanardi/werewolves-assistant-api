@@ -11,6 +11,7 @@ exports.playerAttributes = [
     { name: "in-love", source: "cupid" },
     { name: "worshiped", source: "wild-child" },
     { name: "powerless", source: "ancient" },
+    { name: "cant-vote", source: "scapegoat", remainingPhases: 2 },
 ];
 
 exports.playerActions = [
@@ -28,6 +29,7 @@ exports.playerActions = [
     "meet-each-other",
     "choose-model",
     "choose-side",
+    "ban-voting",
 ];
 
 exports.murderedPossibilities = [

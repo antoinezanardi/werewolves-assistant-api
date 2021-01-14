@@ -141,7 +141,7 @@ exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, game
         const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== player._id.toString() &&
             isAlive && doesPlayerHaveAttribute({ attributes }, "in-love"));
         if (otherLoverPlayer) {
-            this.killPlayer(otherLoverPlayer._id, { action: "charm" }, game, gameHistoryEntry);
+            this.killPlayer(otherLoverPlayer._id, "charm", game, gameHistoryEntry);
         }
     }
     if (doesPlayerHaveAttribute(player, "worshiped")) {
@@ -161,7 +161,7 @@ exports.insertActionBeforeAllVote = (game, waiting) => {
     }
 };
 
-exports.applyConsequencesDependingOnKilledPlayerRole = (player, game, action) => {
+exports.applyConsequencesDependingOnKilledPlayerRole = (player, action, game, options) => {
     const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
@@ -171,10 +171,12 @@ exports.applyConsequencesDependingOnKilledPlayerRole = (player, game, action) =>
                 this.addPlayerAttribute(_id, "powerless", game);
             }
         }
+    } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1) {
+        this.insertActionBeforeAllVote(game, { for: "scapegoat", to: "ban-votinng" });
     }
 };
 
-exports.killPlayer = (playerId, { action }, game, gameHistoryEntry, forcedSource) => {
+exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) => {
     const player = getPlayerWithId(playerId, game);
     if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
         const alreadyRevealed = player.role.isRevealed;
@@ -187,12 +189,12 @@ exports.killPlayer = (playerId, { action }, game, gameHistoryEntry, forcedSource
             const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
             if (murdered) {
                 player.murdered = murdered;
-                if (forcedSource) {
-                    player.murdered.by = forcedSource;
+                if (options.forcedSource) {
+                    player.murdered.by = options.forcedSource;
                 }
                 this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             }
-            this.applyConsequencesDependingOnKilledPlayerRole(player, game, action);
+            this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, options);
             this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
         }
     }
@@ -355,9 +357,9 @@ exports.sheriffDelegates = async(play, game) => {
 };
 
 exports.sheriffSettlesVotes = async(play, game, gameHistoryEntry) => {
-    const { targets } = play;
+    const { targets, action } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.killPlayer(targets[0].player._id, play, game, gameHistoryEntry);
+    this.killPlayer(targets[0].player._id, action, game, gameHistoryEntry);
 };
 
 exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
@@ -386,9 +388,9 @@ exports.werewolvesPlay = async(play, game) => {
 };
 
 exports.hunterPlays = async(play, game, gameHistoryEntry) => {
-    const { targets } = play;
+    const { targets, action } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.killPlayer(targets[0].player._id, play, game, gameHistoryEntry);
+    this.killPlayer(targets[0].player._id, action, game, gameHistoryEntry);
 };
 
 exports.ravenPlays = async(play, game) => {
@@ -427,8 +429,11 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     await this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
+    const scapegoatPlayer = getPlayerWithAttribute("role", game);
     if (nominatedPlayers.length > 1) {
-        if (getPlayerWithAttribute("sheriff", game)) {
+        if (scapegoatPlayer) {
+            this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
+        } else if (getPlayerWithAttribute("sheriff", game)) {
             game.waiting.push({ for: "sheriff", to: "settle-votes" });
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
             const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
@@ -437,7 +442,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
             }
         }
     } else {
-        this.killPlayer(nominatedPlayers[0]._id, play, game, gameHistoryEntry);
+        this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
     }
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
@@ -460,7 +465,7 @@ exports.allPlay = async(play, game, gameHistoryEntry) => {
 
 exports.eaten = (game, play, gameHistoryEntry) => {
     const eatenPlayer = getPlayerWithAttribute("eaten", game);
-    this.killPlayer(eatenPlayer._id, { action: "eat" }, game, gameHistoryEntry, play.source);
+    this.killPlayer(eatenPlayer._id, "eat", game, gameHistoryEntry, { forcedSource: play.source });
     this.removePlayerAttribute(eatenPlayer._id, "eaten", game);
 };
 
@@ -472,6 +477,6 @@ exports.removeAttributeFromAllPlayers = (attributeName, game) => {
 
 exports.drankDeathPotion = (game, play, gameHistoryEntry) => {
     const poisonedPlayer = getPlayerWithAttribute("drank-death-potion", game);
-    this.killPlayer(poisonedPlayer._id, { action: "use-potion" }, game, gameHistoryEntry);
+    this.killPlayer(poisonedPlayer._id, "use-potion", game, gameHistoryEntry);
     this.removePlayerAttribute(poisonedPlayer._id, "drank-death-potion", game);
 };

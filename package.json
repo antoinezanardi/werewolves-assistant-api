@@ -48,7 +48,7 @@
     "jsonwebtoken": "^8.5.1",
     "migrate-mongo": "^8.1.4",
     "mongo-dot-notation": "^2.0.0",
-    "mongoose": "^5.11.11",
+    "mongoose": "^5.11.12",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",

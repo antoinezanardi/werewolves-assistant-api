@@ -11,7 +11,7 @@ const {
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
     getFindFields, getPlayerWithAttribute, getDefaultGameOptions,
 } = require("../helpers/functions/Game");
-const { getPlayerAttribute, doesPlayerHaveAttribute } = require("../helpers/functions/Player");
+const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
 const { populate: fullGamePopulate } = require("../helpers/constants/Game");
 const { getProp } = require("../helpers/functions/Object");
@@ -334,7 +334,7 @@ exports.decreasePlayersAttributesRemainingPhases = game => {
     for (const player of alivePlayersWithAttributes) {
         player.attributes = player.attributes.filter(({ remainingPhases }) => remainingPhases !== 1);
         for (const playerAttribute of player.attributes) {
-            if (playerAttribute.remainingPhases) {
+            if (playerAttribute.remainingPhases && isPlayerAttributeActive(playerAttribute, game)) {
                 playerAttribute.remainingPhases--;
             }
         }
