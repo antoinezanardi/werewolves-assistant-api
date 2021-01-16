@@ -1,8 +1,9 @@
 const Game = require("./Game");
 const GameHistory = require("./GameHistory");
 const {
-    canBeEaten, doesPlayerHaveAttribute, isAncientKillable, getAttribute,
-    getPlayerMurderedPossibilities, getPlayerAttribute, isPlayerAttributeActive,
+    canBeEaten, doesPlayerHaveAttribute, isAncientKillable, getAttributeWithName,
+    getAttributeWithNameAndSource, getPlayerMurderedPossibilities, getPlayerAttribute,
+    isPlayerAttributeActive,
 } = require("../helpers/functions/Player");
 const { getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId } = require("../helpers/functions/Game");
 const { generateError } = require("../helpers/functions/Error");
@@ -134,7 +135,7 @@ exports.insertRevealedPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) =>
 };
 
 exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, gameHistoryEntry) => {
-    if (doesPlayerHaveAttribute(player, "sheriff")) {
+    if (doesPlayerHaveAttribute(player, "sheriff") && (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
         this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
     }
     if (doesPlayerHaveAttribute(player, "in-love")) {
@@ -183,6 +184,9 @@ exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) =>
         if (!alreadyRevealed) {
             player.role.isRevealed = true;
             this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+            if (player.role.current === "idiot" && !doesPlayerHaveAttribute(player, "powerless") && action === "vote") {
+                this.addPlayerAttribute(player._id, "cant-vote", game, { source: "all" });
+            }
         }
         if (player.role.current !== "ancient" || isAncientKillable(action, alreadyRevealed)) {
             player.isAlive = false;
@@ -200,9 +204,9 @@ exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) =>
     }
 };
 
-exports.addPlayerAttribute = (playerId, attribute, game, options = {}) => {
+exports.addPlayerAttribute = (playerId, attributeName, game, options = {}) => {
     const player = getPlayerWithId(playerId, game);
-    const playerAttribute = getAttribute(attribute);
+    const playerAttribute = options.source ? getAttributeWithNameAndSource(attributeName, options.source) : getAttributeWithName(attributeName);
     if (player && playerAttribute) {
         if (options.forcedSource) {
             playerAttribute.source = options.forcedSource;
@@ -340,7 +344,7 @@ exports.scapegoatPlays = async(play, game) => {
 exports.bigBadWolfPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.addPlayerAttribute(targets[0].player._id, "eaten", game, { forcedSource: "big-bad-wolf" });
+    this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "big-bad-wolf" });
 };
 
 exports.dogWolfPlays = (play, game) => {

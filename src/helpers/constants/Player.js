@@ -12,6 +12,7 @@ exports.playerAttributes = [
     { name: "worshiped", source: "wild-child" },
     { name: "powerless", source: "ancient" },
     { name: "cant-vote", source: "scapegoat", remainingPhases: 2 },
+    { name: "cant-vote", source: "all" },
 ];
 
 exports.playerActions = [

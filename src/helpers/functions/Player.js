@@ -10,7 +10,10 @@ exports.doesPlayerHaveAttribute = ({ attributes }, attributeName) => attributes 
 
 exports.getAttributes = () => JSON.parse(JSON.stringify(playerAttributes));
 
-exports.getAttribute = attributeName => this.getAttributes().find(({ name }) => name === attributeName);
+exports.getAttributeWithName = attributeName => this.getAttributes().find(({ name }) => name === attributeName);
+
+exports.getAttributeWithNameAndSource = (attributeName, attributeSource) => this.getAttributes().find(({ name, source }) => name === attributeName &&
+    source === attributeSource);
 
 exports.getPlayerActions = () => JSON.parse(JSON.stringify(playerActions));
 
