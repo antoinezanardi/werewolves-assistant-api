@@ -9,7 +9,7 @@ const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
-    getFindFields, getPlayerWithAttribute, getDefaultGameOptions,
+    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -429,14 +429,19 @@ exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
     if (game.phase === "night") {
         game.phase = "day";
         this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
-        game.waiting.push({ for: "all", to: "vote" });
+        if (isVotePossible(game)) {
+            game.waiting.push({ for: "all", to: "vote" });
+        }
         this.decreasePlayersAttributesRemainingPhases(game);
+        if (!game.waiting.length) {
+            await this.fillWaitingQueue(game, gameHistoryEntry);
+        }
     } else if (game.phase === "day") {
         this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (!game.waiting || !game.waiting.length) {
+            this.decreasePlayersAttributesRemainingPhases(game);
             game.phase = "night";
             game.turn++;
-            this.decreasePlayersAttributesRemainingPhases(game);
             await this.fillWaitingQueueWithNightActions(game);
         }
     }
@@ -458,6 +463,7 @@ exports.generatePlayMethods = () => ({
     "wild-child": Player.wildChildPlays,
     "dog-wolf": Player.dogWolfPlays,
     "big-bad-wolf": Player.bigBadWolfPlays,
+    "scapegoat": Player.scapegoatPlays,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({

@@ -13,4 +13,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./game-won-by-lovers.test");
     require("./game-options.test");
     require("./ancient-revenge-game.test");
+    require("./game-with-empty-days.test");
 });

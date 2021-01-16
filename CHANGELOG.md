@@ -9,6 +9,7 @@
 * [#87](https://github.com/antoinezanardi/werewolves-assistant-api/issues/87) - Add isRevealed to role structure.
 * [#88](https://github.com/antoinezanardi/werewolves-assistant-api/issues/88) - Ancient Role implemented.
 * [#91](https://github.com/antoinezanardi/werewolves-assistant-api/issues/91) - Game option for no sheriff.
+* [#92](https://github.com/antoinezanardi/werewolves-assistant-api/issues/92) - Scapegoat Role implemented.
 * [#95](https://github.com/antoinezanardi/werewolves-assistant-api/issues/95) - Limit game history length.
 * [#96](https://github.com/antoinezanardi/werewolves-assistant-api/issues/96) - Add dead players in game history entries.
 * [#99](https://github.com/antoinezanardi/werewolves-assistant-api/issues/99) - ESLint rules updated with last rules.
@@ -36,7 +37,7 @@
 * `apidoc` updated to version `0.26.0`.
 * `eslint` updated to version `7.17.0`.
 * `express-validator` updated to version `6.9.2`.
-* `mongoose` updated to version `5.11.12`.
+* `mongoose` updated to version `5.11.12w`.
 * `nodemon` updated to version `2.0.7`.
 * `qs` updated to version `6.9.6`.
 

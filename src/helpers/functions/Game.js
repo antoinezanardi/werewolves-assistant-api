@@ -67,3 +67,5 @@ exports.getGamePhases = () => JSON.parse(JSON.stringify(gamePhases));
 exports.getWonByPossibilities = () => JSON.parse(JSON.stringify(wonByPossibilities));
 
 exports.getDefaultGameOptions = () => JSON.parse(JSON.stringify(defaultGameOptions));
+
+exports.isVotePossible = game => game.players.some(player => player.isAlive && !doesPlayerHaveAttribute(player, "cant-vote"));

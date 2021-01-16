@@ -23,6 +23,7 @@ let players = [
     { name: "Dπg", role: "three-brothers" },
     { name: "D¬g", role: "wild-child" },
     { name: "D€g", role: "ancient" },
+    { name: "Dœg", role: "scapegoat" },
 ];
 let token, game;
 
@@ -228,7 +229,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 done();
             });
     });
-    it("🐺 Vile father of wolves is the only one called during the night and eats hunter (POST /games/:id/play)", done => {
+    it("🐺 Vile father of wolves is the only one called during the night and eats guard (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -259,6 +260,44 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🎲 Game is waiting for 'werewolves' to 'eat'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        done();
+    });
+    it("🐺 Vile father of wolves is the only one called during the night and eats the witch (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                done();
+            });
+    });
+    it("👪 Tie in vote between a sister and the vile father of wolves (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[5]._id, for: players[6]._id },
+                    { from: players[6]._id, for: players[5]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].isAlive).to.be.true;
+                expect(game.players[6].isAlive).to.be.true;
+                expect(game.players[13].isAlive).to.be.true;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'sheriff' to 'settle-votes' because scapegoat is powerless", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "settle-votes" });
         done();
     });
 });
