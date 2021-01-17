@@ -67,6 +67,7 @@ On this current version [![GitHub release](https://img.shields.io/github/release
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/guard.png" width="25"/> The Guard**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/ancient.png" width="25"/> The Ancient**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/scapegoat.png" width="25"/> The Scapegoat**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/idiot.png" width="25"/> The Idiot**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/two-sisters.png" width="25"/> The Two Sisters**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/three-brothers.png" width="25"/> The Three Brothers**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/wild-child.png" width="25"/> The Wild Child**

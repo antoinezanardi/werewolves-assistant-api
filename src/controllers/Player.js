@@ -1,7 +1,7 @@
 const Game = require("./Game");
 const GameHistory = require("./GameHistory");
 const {
-    canBeEaten, doesPlayerHaveAttribute, isAncientKillable, getAttributeWithName,
+    canBeEaten, doesPlayerHaveAttribute, isPlayerKillable, getAttributeWithName,
     getAttributeWithNameAndSource, getPlayerMurderedPossibilities, getPlayerAttribute,
     isPlayerAttributeActive,
 } = require("../helpers/functions/Player");
@@ -135,7 +135,7 @@ exports.insertRevealedPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) =>
 };
 
 exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, gameHistoryEntry) => {
-    if (doesPlayerHaveAttribute(player, "sheriff") && (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
+    if (doesPlayerHaveAttribute(player, "sheriff") && player.role.current !== "idiot") {
         this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
     }
     if (doesPlayerHaveAttribute(player, "in-love")) {
@@ -188,7 +188,7 @@ exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) =>
                 this.addPlayerAttribute(player._id, "cant-vote", game, { source: "all" });
             }
         }
-        if (player.role.current !== "ancient" || isAncientKillable(action, alreadyRevealed)) {
+        if (isPlayerKillable(player, action, alreadyRevealed)) {
             player.isAlive = false;
             const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
             if (murdered) {
@@ -452,10 +452,11 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     await this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     const scapegoatPlayer = getPlayerWithRole("scapegoat", game);
+    const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
     if (nominatedPlayers.length > 1) {
         if (scapegoatPlayer?.isAlive && !doesPlayerHaveAttribute(scapegoatPlayer, "powerless")) {
             this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
-        } else if (getPlayerWithAttribute("sheriff", game)) {
+        } else if (sheriffPlayer?.isAlive) {
             game.waiting.push({ for: "sheriff", to: "settle-votes" });
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
             const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
