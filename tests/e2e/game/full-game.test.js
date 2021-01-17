@@ -33,10 +33,11 @@ let players = [
     { name: "D€g", role: "ancient" },
     { name: "Dg", role: "scapegoat" },
     { name: "Døg", role: "idiot" },
+    { name: "D≠g", role: "pied-piper" },
 ];
 let token, game;
 
-describe("B - Full game of 22 players with all roles", () => {
+describe("B - Full game of 23 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -1308,6 +1309,99 @@ describe("B - Full game of 22 players with all roles", () => {
                 done();
             });
     });
+    it("🎲 Game is waiting for 'pied-piper' to 'charm'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "pied-piper", to: "charm" });
+        done();
+    });
+    it("📣 Pied piper can't charm if play's source is not 'pied-piper' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "cupid", action: "charm" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("📣 Pied piper can't charm if play's action is not 'charm' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("📣 Pied piper can't charm if targets are not set (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_REQUIRED");
+                done();
+            });
+    });
+    it("📣 Pied piper can't charm if targets are empty (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TARGETS_CANT_BE_EMPTY");
+                done();
+            });
+    });
+    it("📣 Pied piper can't charm only one target (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("📣 Pied piper can't charm an unknown target (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "pied-piper", action: "charm", targets: [
+                    { player: new mongoose.Types.ObjectId() },
+                    { player: new mongoose.Types.ObjectId() },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("📣 Pied piper can't charm himself (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "pied-piper", action: "charm", targets: [
+                    { player: players[0]._id },
+                    { player: players[22]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("CANT_CHARM_HIMSELF");
+                done();
+            });
+    });
+    return;
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[6].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 1 });

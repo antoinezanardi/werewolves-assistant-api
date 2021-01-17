@@ -183,4 +183,8 @@ exports.errorMetadata = {
         code: 45,
         HTTPCode: 400,
     },
+    CANT_CHARM_HIMSELF: {
+        code: 46,
+        HTTPCode: 400,
+    },
 };

@@ -15,9 +15,16 @@ exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive
 exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
                                     game.players.every(player => doesPlayerHaveAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
 
+exports.hasPiedPiperWon = game => {
+    const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
+    const alivePlayers = this.getAlivePlayers(game);
+    return piedPiperPlayer?.isAlive &&
+        alivePlayers.every(({ role, attributes }) => role.current === "pied-piper" || attributes?.find(({ name }) => name === "charmed"));
+};
+
 exports.isGameDone = game => this.areAllPlayersDead(game) ||
-                            (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game)) &&
-                            !this.isActionInWaitingQueue(game, "shoot");
+        (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game) ||
+            this.hasPiedPiperWon(game)) && !this.isActionInWaitingQueue(game, "shoot");
 
 exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) => to === action);
 

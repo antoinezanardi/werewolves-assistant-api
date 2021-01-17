@@ -29,6 +29,7 @@ Among all players, groups are defined depending on players properties. Some grou
 | 🐺<br/>werewolves    | They are teaming up against `villagers` and need to kill them all to win the game. Has `side.current` property set to `werewolves`.                                  |
 | 🧑‍🌾<br/>villagers     | They are teaming up against `werewolves` and need to kill them all to win the game. Has `side.current` property set to `villagers`.                                  |
 | 💕<br/>lovers        | They are teaming up against `all` but themselves and need to be the last survivors to win the game despite their current side and role. Has the `in-love` attribute. |
+| 🕺️<br/>charmed       | All players with the `charmed` attribute, charmed by the `pied-piper`.                                                                                               |
 
 ## <a id="player-roles"></a>🃏 Player Roles
 
@@ -54,6 +55,7 @@ Each player in a game has a role. It defines the original player's side and powe
 | 👨‍👨‍👦<br/>three-brothers         | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/three-brothers.png" width="50"/>        | villagers               | The first night, they meet each other and, therefore, know that they can trust themselves. Depending on game options, they wake up every X night(s). (Default is `2`).                                                               |
 | 🐒<br/>wild-child             | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/wild-child.png" width="50"/>            | villagers / werewolves  | The first night, he chooses a model among the other players. If this model dies during the game, the wild child changes his side to `werewolves` and must win with them.                                                             |
 | 🐕<br/>dog-wolf               | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/dog-wolf.png" width="50"/>              | villagers / werewolves  | The first night, he chooses a side between `villagers` and `werewolves`. Then, he must win with the chosen side. Other players don't know what he chose.                                                                             |
+| 📣<br/>pied-piper             | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/pied-piper.png" width="50"/>            | villagers               | He must win alone. Each night, he charms two players, except himself. If all alive players are charmed, he wins the game. If he's infected by the `vile-father-of-wolves`, he looses his ability to charm.                           |
 | 🪶<br/>raven                  | <img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="50"/>                 | villagers               | Each night, he can mark someone (including himself). The next phase (during the day), the marked player will have two votes against himself.                                                                                         |
 
 ## <a id="player-actions"></a>🔪 Player Actions
@@ -75,11 +77,13 @@ Actions can be performed by a group, a role or a player which has a specific att
 | choose-model      | 🐒<br/>wild-child                 | 🧑‍🌾<br/>villagers         | -                                | First night - The wild child chooses his model among the players. If the model dies, wild child changes side to `werewolves`. He can't choose himself.           |
 | choose-side       | 🐕<br/>dog-wolf                   | 🧑‍🌾<br/>villagers         | -                                | First night - The dog-wolf chooses his side between `villagers` and `werewolves` and must win with the chosen side.                                              |
 | ban-voting        | 🐐<br/>scapegoat                  | 🧑‍🌾<br/>villagers         | -                                | When scapegoat dies from a tie in votes - He chooses who won't be able to vote during the next day. If no one can vote, there won't be votes during this day.    |
+| charm             | 📣<br/>pied-piper                 | 🧑‍🌾<br/>villagers         | -                                | Each night - He charms two players which will have the `charmed` attribute for the rest of the game. Charmed players meet each other right after pied piper turn.|
 | elect-sheriff     | -                                 | 👪<br/>all               | -                                | During the first phase (`night`) - Anyone can be elected as a sheriff.                                                                                           |
 | vote              | -                                 | 👪<br/>all               | -                                | Each day - All alive players vote for someone to kill.                                                                                                           |
 | delegate          | -                                 | -                       | 🎖<br/>sheriff                    | When sheriff dies - The dying sheriff chooses the next one in among the living.                                                                                  |
 | settle-votes      | -                                 | -                       | 🎖<br/>sheriff                    | When there is a tie in the votes during the `day` - Choose which one will be executed.                                                                           |
 | meet-each-other   | -                                 | -                       | 💕<br/>in-love                    | Right after Cupid chose his targets, lovers wake up and meet each other.                                                                                         |
+| meet-each-other   | -                                 | -                       | 🕺️<br/>charmed                    | Right after pied piper chose his targets, all charmed players (new and old) wake up and meet each other.                                                         |
 
 ## <a id="player-attributes"></a>🎖️ Player Attributes
 
@@ -98,6 +102,7 @@ Attributes are consequences of actions and hold by players. Each attribute has s
 | 🙇<br/>worshiped           | The wild child chose the player during the first night. If the player dies, the wild child changes his side to `werewolves`.                                                                                                        | Last forever<br/>(`remainingPhases` _not set_)                                                                            |
 | 🤷‍<br/>powerless           | The ancient died from the `hunter`, the `witch` or from the `vote`, all who started the game in the `villagers` side will have this attribute and therefore, won't be able to use their powers anymore.                             | Last forever<br/>(`remainingPhases` _not set_)                                                                            |
 | 🚫🗳️‍<br/>cant-vote         | The player is not able to vote while he has this attribute. If all alive players have this attribute, there is no vote.                                                                                                              | From the `scapegoat`: 2 phases<br/>(_1 turn_)<br/>From the `idiot`: Last forever<br/>(`remainingPhases` _not set_)        |
+| 🕺️‍<br/>charmed             | The pied piper charmed this player during the night. If all alive players have this attribute, the pied piper wis the game.                                                                                                         | Last forever<br/>(`remainingPhases` _not set_)                                                                            |
 
 ## <a id="errors"></a>⚠️ Errors
 
@@ -153,3 +158,4 @@ Description for each case below:
 | 43   | TARGET_MUST_BE_EATEN_BY_WEREWOLVES |    400    | Target must be eaten by the werewolves in order to be infected.                                   |
 | 44   | ABSENT_VILE_FATHER_OF_WOLVES       |    400    | Target can't be infected because the vile father of wolves is either not in the game or dead.     |
 | 45   | ONLY_ONE_INFECTION                 |    400    | Vile father of wolves can infect only one target per game.                                        |
+| 46   | CANT_CHARM_HIMSELF                 |    400    | Pied piper can't charm himself.                                                                   |

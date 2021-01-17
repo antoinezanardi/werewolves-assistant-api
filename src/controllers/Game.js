@@ -9,7 +9,7 @@ const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
-    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible,
+    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -314,6 +314,8 @@ exports.checkGameWinners = game => {
             game.won = { by: null };
         } else if (areLoversTheOnlyAlive(game)) {
             game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
+        } else if (hasPiedPiperWon(game)) {
+            game.won = { by: "pied-piper", players: getPlayersWithRole("pied-piper", game) };
         } else if (!isVillagerSideAlive(game)) {
             game.won = { by: "werewolves", players: getPlayersWithSide("werewolves", game) };
         } else if (!isWerewolfSideAlive(game)) {
@@ -361,6 +363,9 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
     if (group === "lovers") {
         const cupidPlayer = getPlayerWithRole("cupid", game);
         return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
+    } else if (group === "charmed") {
+        const piedPiperPlayer = getPlayerWithRole("pied-piper", game);
+        return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
@@ -464,6 +469,8 @@ exports.generatePlayMethods = () => ({
     "dog-wolf": Player.dogWolfPlays,
     "big-bad-wolf": Player.bigBadWolfPlays,
     "scapegoat": Player.scapegoatPlays,
+    "pied-piper": Player.piedPiperPlays,
+    "charmed-players": () => undefined,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({

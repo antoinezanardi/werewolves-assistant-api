@@ -8,7 +8,7 @@ exports.patchableGameStatuses = ["canceled"];
 
 exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"];
 
-exports.wonByPossibilities = ["werewolves", "villagers", "lovers"];
+exports.wonByPossibilities = ["werewolves", "villagers", "lovers", "pied-piper"];
 
 exports.populate = [
     { path: "gameMaster", select: "-password" },
@@ -29,6 +29,8 @@ exports.turnNightActionsOrder = [
     { source: "werewolves", action: "eat" },
     { source: "big-bad-wolf", action: "eat" },
     { source: "witch", action: "use-potion" },
+    { source: "pied-piper", action: "charm" },
+    { source: "charmed", action: "meet-each-other" },
 ];
 
 exports.findFields = ["status"];

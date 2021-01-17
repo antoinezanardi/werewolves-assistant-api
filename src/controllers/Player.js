@@ -63,6 +63,8 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
         }
     } else if (action === "choose-model" && target.player.role.current === "wild-child") {
         throw generateError("WILD_CHILD_CANT_CHOOSE_HIMSELF", `Wild child can't choose himself as a model.`);
+    } else if (source === "pied-piper" && action === "charm" && target.player.role.current === "pied-piper") {
+        throw generateError("CANT_CHARM_HIMSELF", `Pied piper can't charm himself.`);
     }
 };
 
@@ -330,6 +332,14 @@ exports.checkAndFillVotes = async(votes, game, options) => {
     for (let i = 0; i < votes.length; i++) {
         votes[i].from = getPlayerWithId(votes[i].from, game);
         votes[i].for = getPlayerWithId(votes[i].for, game);
+    }
+};
+
+exports.piedPiperPlays = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { expectedLength: 2, play });
+    for (const { player } of targets) {
+        this.addPlayerAttribute(player._id, "charmed", game);
     }
 };
 

@@ -1,6 +1,6 @@
 exports.sideNames = ["villagers", "werewolves"];
 
-exports.groupNames = [...this.sideNames, "lovers"];
+exports.groupNames = [...this.sideNames, "lovers", "charmed"];
 
 exports.roles = [
     { name: "werewolf", side: "werewolves", maxInGame: 4 },
@@ -21,6 +21,7 @@ exports.roles = [
     { name: "three-brothers", side: "villagers", minInGame: 3, maxInGame: 3, recommendedMinPlayers: 15 },
     { name: "wild-child", side: "villagers", maxInGame: 1 },
     { name: "dog-wolf", side: "villagers", maxInGame: 1 },
+    { name: "pied-piper", side: "villagers", maxInGame: 1, recommendedMinPlayers: 12 },
     { name: "raven", side: "villagers", maxInGame: 1 },
 ];
 
