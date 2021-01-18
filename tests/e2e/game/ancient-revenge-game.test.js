@@ -24,6 +24,8 @@ let players = [
     { name: "D¬g", role: "wild-child" },
     { name: "D€g", role: "ancient" },
     { name: "Dœg", role: "scapegoat" },
+    { name: "D•g", role: "pied-piper" },
+    { name: "Dêg", role: "idiot" },
 ];
 let token, game;
 
@@ -67,22 +69,22 @@ describe("L - Game with various villagers who loose their power because they kil
         expect(game.phase).to.equals("night");
         done();
     });
-    it("👪 All elect the witch as the sheriff (POST /games/:id/play)", done => {
+    it("👪 All elect the idiot as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[1]._id, for: players[0]._id }] })
+            .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[0]._id, for: players[15]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ name: "sheriff", source: "all" });
+                expect(game.players[15].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history).to.be.an("array").to.have.lengthOf(1);
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[1]._id);
-                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[15]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[15]._id);
                 expect(game.history[0].play.source.name).to.equal("all");
                 expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(players.length);
                 expect(game.history[0].deadPlayers).to.not.exist;
@@ -197,6 +199,35 @@ describe("L - Game with various villagers who loose their power because they kil
                 done();
             });
     });
+    it("📣 Pied piper charms witch and seer (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "pied-piper", action: "charm", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                expect(game.players[1].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                done();
+            });
+    });
+    it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "charmed", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[12].isAlive).to.equals(true);
@@ -226,6 +257,9 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[10].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[11].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[11].side.current).to.equals("villagers");
+                expect(game.players[13].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[14].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[15].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 done();
             });
     });
@@ -276,28 +310,88 @@ describe("L - Game with various villagers who loose their power because they kil
                 done();
             });
     });
-    it("👪 Tie in vote between a sister and the vile father of wolves (POST /games/:id/play)", done => {
+    it("👪 Tie in vote between the idiot and one sister (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
                 source: "all", action: "vote", votes: [
-                    { from: players[5]._id, for: players[6]._id },
-                    { from: players[6]._id, for: players[5]._id },
+                    { from: players[5]._id, for: players[15]._id },
+                    { from: players[7]._id, for: players[6]._id },
                 ],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[5].isAlive).to.be.true;
                 expect(game.players[6].isAlive).to.be.true;
-                expect(game.players[13].isAlive).to.be.true;
+                expect(game.players[15].isAlive).to.be.true;
                 done();
             });
     });
     it("🎲 Game is waiting for 'sheriff' to 'settle-votes' because scapegoat is powerless", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "settle-votes" });
         done();
+    });
+    it("🎖 Sheriff settles votes by choosing the sister (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[6]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[6].isAlive).to.be.false;
+                expect(game.players[15].isAlive).to.be.true;
+                done();
+            });
+    });
+    it("🐺 Vile father of wolves is the only one called during the night and eats the other sister (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[7]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
+                done();
+            });
+    });
+    it("👪 All vote for the idiot who is the sheriff, he dies from votes because he's powerless (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[5]._id, for: players[15]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[15].isAlive).to.be.false;
+                expect(game.players[15].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'sheriff' to 'delegate' because idiot is powerless", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
+        done();
+    });
+    it("🎖 Sheriff delegates to the vile father of wolves (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "sheriff", action: "delegate", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].attributes).to.deep.include({ name: "sheriff", source: "sheriff" });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[5]._id);
+                done();
+            });
     });
 });

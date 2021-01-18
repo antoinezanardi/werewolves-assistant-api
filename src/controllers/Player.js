@@ -141,7 +141,8 @@ exports.insertRevealedPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) =>
 };
 
 exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, gameHistoryEntry) => {
-    if (doesPlayerHaveAttribute(player, "sheriff") && player.role.current !== "idiot") {
+    if (doesPlayerHaveAttribute(player, "sheriff") &&
+        (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
         this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
     }
     if (doesPlayerHaveAttribute(player, "in-love")) {

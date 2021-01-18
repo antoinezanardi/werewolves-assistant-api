@@ -18,7 +18,7 @@ exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) 
 exports.hasPiedPiperWon = game => {
     const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
     const alivePlayers = this.getAlivePlayers(game);
-    return piedPiperPlayer?.isAlive &&
+    return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless") && piedPiperPlayer.side.current === "villagers" &&
         alivePlayers.every(({ role, attributes }) => role.current === "pied-piper" || attributes?.find(({ name }) => name === "charmed"));
 };
 
