@@ -1,6 +1,7 @@
 const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
+const GameHistory = require("../controllers/GameHistory");
 const { getRoles, getSideNames } = require("../helpers/functions/Role");
 const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
@@ -20,10 +21,16 @@ module.exports = app => {
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (Possibilities: [Codes - Player Actions](#player-actions)_)
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {Object} options Game's options.
-     * @apiSuccess {Number{>= 0 && <= 5}} options.sistersWakingUpInterval=2 Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
-     * @apiSuccess {Number{>= 0 && <= 5}} options.brothersWakingUpInterval=2 Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
-     * @apiSuccess {Boolean} options.isSheriffVoteDoubled=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
-     * @apiSuccess {Boolean} options.isSeerTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiSuccess {Object} options.roles Game roles options.
+     * @apiSuccess {Object} options.roles.sheriff Game role sheriff's options.
+     * @apiSuccess {Boolean} options.roles.sheriff.enabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
+     * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiSuccess {Object} options.roles.seer Game role seer's options.
+     * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiSuccess {Object} options.roles.twoSisters Game role two sisters options.
+     * @apiSuccess {Number{>= 0 && <= 5}} options.roles.twoSisters.wakingUpInterval=2 Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
+     * @apiSuccess {Object} options.roles.threeBrothers Game role three brothers options.
+     * @apiSuccess {Number{>= 0 && <= 5}} options.roles.threeBrothers.wakingUpInterval=2 Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
      * @apiSuccess {Object} [won] Winners of the game when status is `done`.
      * @apiSuccess {String={"werewolves", "villagers", "lovers", null}} won.by Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers` or null if nobody won_)
@@ -41,6 +48,7 @@ module.exports = app => {
      * - `Basic auth`: All games can be retrieved.
      * @apiParam (Query String Parameters) {String} [fields] Specifies which user fields to include. Each value must be separated by a `,` without space. (e.g: `field1,field2`)
      * @apiParam (Query String Parameters) {String} [status] Filter by game's status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_
+     * @apiParam (Query String Parameters) {Number} [history-limit] Number of game history's entries. Set to `0` for no limit.
      * @apiPermission JWT
      * @apiPermission Basic
      * @apiUse GameResponse
@@ -54,6 +62,10 @@ module.exports = app => {
         query("status")
             .optional()
             .isIn(getGameStatuses()).withMessage(`Must be equal to one of the following values: ${getGameStatuses()}`),
+        query("history-limit")
+            .optional()
+            .isInt({ min: 0 }).withMessage(`Must be a valid number equal or greater than 0`)
+            .toInt(),
     ], Game.getGames);
 
     /**
@@ -62,7 +74,7 @@ module.exports = app => {
      * @apiName GetGameRepartition
      * @apiGroup Games 🎲
      *
-     * @apiParam (Query String Parameters) {Object[]} players Must contain between 4 and 20 players.
+     * @apiParam (Query String Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Query String Parameters) {String} players.name Player's name. Must be unique in the array.
      * @apiPermission Basic
      * @apiPermission JWT
@@ -73,8 +85,8 @@ module.exports = app => {
     app.get("/games/repartition", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
-            .withMessage("Must contain between 4 and 20 players"),
+            .custom(value => value.length >= 4 && value.length <= 40 ? Promise.resolve() : Promise.reject(new Error()))
+            .withMessage("Must contain between 4 and 40 players"),
         query("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
@@ -87,6 +99,7 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiParam (Query String Parameters) {Number} [history-limit] Number of game history's entries. Set to `0` for no limit.
      * @apiPermission Basic
      * @apiPermission JWT
      * @apiUse GameResponse
@@ -94,6 +107,10 @@ module.exports = app => {
     app.get("/games/:id", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         param("id")
             .isMongoId().withMessage("Must be a valid MongoId"),
+        query("history-limit")
+            .optional()
+            .isInt({ min: 0 }).withMessage(`Must be a valid number equal or greater than 0`)
+            .toInt(),
     ], Game.getGame);
 
     /**
@@ -102,21 +119,27 @@ module.exports = app => {
      * @apiGroup Games 🎲
      *
      * @apiPermission JWT
-     * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 20 players.
+     * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Request Body Parameters) {String{>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
-     * @apiParam (Request Body Parameters) {Object} [options] Game's options
-     * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.sistersWakingUpInterval=2] Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
-     * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.brothersWakingUpInterval=2] Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
-     * @apiParam (Request Body Parameters) {Boolean} [options.isSheriffVoteDoubled=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
-     * @apiParam (Request Body Parameters) {Boolean} [options.isSeerTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options] Game's options.
+     * @apiParam (Request Body Parameters) {Object} [options.roles] Game roles options.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game role sheriff's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.enabled=true] If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game role seer's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game role two sisters options.
+     * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.twoSisters.wakingUpInterval=2] Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.threeBrothers] Game role three brothers options.
+     * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.threeBrothers.wakingUpInterval=2] Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiUse GameResponse
      */
     app.post("/games", basicLimiter, passport.authenticate("jwt", { session: false }), [
         body("players")
             .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length >= 4 && value.length <= 20 ? Promise.resolve() : Promise.reject(new Error()))
-            .withMessage("Must contain between 4 and 20 players"),
+            .custom(value => value.length >= 4 && value.length <= 40 ? Promise.resolve() : Promise.reject(new Error()))
+            .withMessage("Must contain between 4 and 40 players"),
         body("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
@@ -124,22 +147,26 @@ module.exports = app => {
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getRoles().map(({ name }) => name)}`),
-        body("options.sistersWakingUpInterval")
-            .optional()
-            .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
-            .toInt(),
-        body("options.brothersWakingUpInterval")
-            .optional()
-            .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
-            .toInt(),
-        body("options.isSheriffVoteDoubled")
+        body("options.roles.sheriff.enabled")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
-        body("options.isSeerTalkative")
+        body("options.roles.sheriff.hasDoubledVote")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.seer.isTalkative")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.twoSisters.wakingUpInterval")
+            .optional()
+            .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
+            .toInt(),
+        body("options.roles.threeBrothers.wakingUpInterval")
+            .optional()
+            .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
+            .toInt(),
     ], Game.postGame);
 
     /**
@@ -199,9 +226,10 @@ module.exports = app => {
      * @apiPermission JWT
      * @apiParam (Route Parameters) {ObjectId} id Game's ID.
      * @apiParam (Request Body Parameters) {String} source Source of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
-     * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
+     * @apiParam (Request Body Parameters) {String} action Action of the play. (_Possibilities: [Codes - Player Actions](#player-actions)_)
      * @apiParam (Request Body Parameters) {Object[]} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets.player Player's id.
+     * @apiParam (Request Body Parameters) {Boolean} [targets.isInfected] Only if there is vile-father-of-wolves in the game and the action is `eat` from `werewolves`. Set to `true` if the werewolves victim will instantly join the `werewolves` side.
      * @apiParam (Request Body Parameters) {Object} [targets.potion] Only for the `witch` actions.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life from werewolves meal.
      * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
@@ -221,6 +249,10 @@ module.exports = app => {
         body("targets")
             .optional()
             .isArray().withMessage("Must be an array"),
+        body("targets.*.isInfected")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("targets.*.player")
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("targets.*.potion.life")
@@ -243,4 +275,34 @@ module.exports = app => {
             .isString().withMessage("Must be a valid string")
             .isIn(getSideNames()).withMessage(`Must be equal to one of the following values: ${getSideNames()}`),
     ], Game.postPlay);
+
+    /**
+     * @api {GET} /games/:id/history H] Get game history
+     * @apiName GetGameHistory
+     * @apiGroup Games 🎲
+     *
+     * @apiPermission JWT
+     * @apiPermission Basic
+     * @apiParam (Route Parameters) {ObjectId} id Game's ID.
+     * @apiParam (Query String Parameters) {String} [play-source] Filter by play's source. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles) or `sheriff`_).
+     * @apiParam (Query String Parameters) {String} [play-action] Filter by play's action. (_Possibilities: [Codes - Player Actions](#player-actions)_)
+     * @apiSuccess {ObjectId} _id Game history entry's ID.
+     * @apiSuccess {ObjectId} gameId Game's ID.
+     * @apiSuccess {Number} turn Game's ID.
+     * @apiSuccess {String="day","night"} turn Game's phase.
+     * @apiSuccess {Number} tick Game's tick.
+     * @apiSuccess {Play} play Game's play. (_See: [Classes - Play](#play-class)_)
+     * @apiSuccess {Player[]} [deadPlayers] Player(s) that might died after the play.
+     * @apiSuccess {Player[]} [revealedPlayers] Player(s) which role has been revealed after the play.
+     */
+    app.get("/games/:id/history", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
+        param("id")
+            .isMongoId().withMessage("Must be a valid MongoId"),
+        query("play-source")
+            .optional()
+            .isIn(getWaitingForPossibilities()).withMessage(`Must be equal to one of the following values: ${getWaitingForPossibilities()}`),
+        query("play-action")
+            .optional()
+            .isIn(getPlayerActions()).withMessage(`Must be equal to one of the following values: ${getPlayerActions()}`),
+    ], GameHistory.getGameHistory);
 };

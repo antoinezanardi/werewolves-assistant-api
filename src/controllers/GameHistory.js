@@ -1,7 +1,8 @@
 const { isMongoId } = require("validator");
 const Game = require("./Game");
 const GameHistory = require("../db/models/GameHistory");
-const { generateError } = require("../helpers/functions/Error");
+const { generateError, sendError } = require("../helpers/functions/Error");
+const { checkRequestData } = require("../helpers/functions/Express");
 const { turnPreNightActionsOrder, turnNightActionsOrder } = require("../helpers/constants/Game");
 
 exports.find = (search, projection, options = {}) => GameHistory.find(search, projection, options);
@@ -66,9 +67,11 @@ exports.create = async(data, options = {}) => {
 
 exports.deleteMany = search => GameHistory.deleteMany(search);
 
-exports.isLifePotionUsed = gameId => this.findOne({ gameId, "play.targets.potion.life": true });
+exports.isLifePotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.life": true });
 
-exports.isDeathPotionUsed = gameId => this.findOne({ gameId, "play.targets.potion.death": true });
+exports.isDeathPotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.death": true });
+
+exports.isInfectionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.isInfected": true });
 
 exports.getLastNightPlay = gameId => {
     const nightPlayActions = [...turnPreNightActionsOrder, ...turnNightActionsOrder].map(({ action }) => action);
@@ -82,6 +85,42 @@ exports.getLastProtectedPlayer = async gameId => {
 
 exports.getLastVotePlay = gameId => this.findOne({ gameId, "play.action": "vote" }, null, { sort: { createdAt: -1 } });
 
-exports.getLastSistersPlay = gameId => this.findOne({ gameId, "play.source": "two-sisters" }, null, { sort: { createdAt: -1 } });
+exports.getLastSistersPlay = gameId => this.findOne({ gameId, "play.source.name": "two-sisters" }, null, { sort: { createdAt: -1 } });
 
-exports.getLastBrothersPlay = gameId => this.findOne({ gameId, "play.source": "three-brothers" }, null, { sort: { createdAt: -1 } });
+exports.getLastBrothersPlay = gameId => this.findOne({ gameId, "play.source.name": "three-brothers" }, null, { sort: { createdAt: -1 } });
+
+exports.getPreviousPlay = gameId => this.findOne({ gameId }, null, { sort: { createdAt: -1 } });
+
+exports.getFindSearch = query => {
+    const search = {};
+    const searchFields = {
+        "play-action": "play.action",
+        "play-source": "play.source.name",
+    };
+    for (const parameter in query) {
+        if (query[parameter] !== undefined) {
+            const value = query[parameter];
+            const searchField = searchFields[parameter] ? searchFields[parameter] : parameter;
+            search[searchField] = value;
+        }
+    }
+    return search;
+};
+
+exports.getGameHistory = async(req, res) => {
+    try {
+        const { params, query } = checkRequestData(req);
+        if (req.user.strategy === "JWT") {
+            await Game.checkGameBelongsToUser(params.id, req.user._id);
+        }
+        const game = await Game.findOne({ _id: params.id });
+        if (!game) {
+            throw generateError("NOT_FOUND", `Game not found with id "${params.id}"`);
+        }
+        const search = this.getFindSearch(query, req);
+        const gameHistory = await this.find({ gameId: params.id, ...search });
+        res.status(200).json(gameHistory);
+    } catch (e) {
+        sendError(res, e);
+    }
+};

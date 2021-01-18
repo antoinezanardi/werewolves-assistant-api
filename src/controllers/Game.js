@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const deepMerge = require("deepmerge");
 const { flatten } = require("mongo-dot-notation");
 const Game = require("../db/models/Game");
 const Player = require("./Player");
@@ -7,27 +8,30 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
+    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon,
 } = require("../helpers/functions/Game");
-const { getPlayerAttribute } = require("../helpers/functions/Player");
+const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
 const { populate: fullGamePopulate } = require("../helpers/constants/Game");
+const { getProp } = require("../helpers/functions/Object");
 const { filterOutHTMLTags } = require("../helpers/functions/String");
 
-exports.getFindPopulate = projection => {
+exports.getFindPopulate = (projection, options) => {
     const populate = [];
     if (!projection || projection.includes("gameMaster")) {
         populate.push({ path: "gameMaster", select: "-password" });
     }
     if (!projection || projection.includes("history")) {
-        populate.push({ path: "history" });
+        const limit = options["history-limit"] !== undefined ? options["history-limit"] : 3;
+        populate.push({ path: "history", options: { limit } });
     }
     return populate;
 };
 
 exports.find = async(search, projection, options = {}) => {
-    const populate = this.getFindPopulate(projection);
-    let games = await Game.find(search, projection, options).populate(populate);
+    const populate = this.getFindPopulate(projection, options);
+    let games = await Game.find(search, projection).populate(populate);
     if (options.toJSON) {
         games = games.map(game => game.toJSON());
     }
@@ -35,8 +39,8 @@ exports.find = async(search, projection, options = {}) => {
 };
 
 exports.findOne = async(search, projection, options = {}) => {
-    const populate = this.getFindPopulate(projection);
-    let game = await Game.findOne(search, projection, options).populate(populate);
+    const populate = this.getFindPopulate(projection, options);
+    let game = await Game.findOne(search, projection).populate(populate);
     if (game && options.toJSON) {
         game = game.toJSON();
     }
@@ -47,6 +51,10 @@ exports.checkUserCurrentGames = async userId => {
     if (await Game.countDocuments({ gameMaster: userId, status: "playing" })) {
         throw generateError("GAME_MASTER_HAS_ON_GOING_GAMES", "The game master has already game with status `playing`.");
     }
+};
+
+exports.fillOptionsData = game => {
+    game.options = game.options ? deepMerge(getDefaultGameOptions(), game.options) : getDefaultGameOptions();
 };
 
 exports.fillTickData = game => {
@@ -75,6 +83,10 @@ exports.fillPlayersData = players => {
         const role = getRoles().find(playerRole => playerRole.name === player.role);
         player.role = { original: role.name, current: role.name };
         player.side = { original: role.side, current: role.side };
+        if (role.name === "villager-villager") {
+            player.role.isRevealed = true;
+        }
+        player.isAlive = true;
     }
 };
 
@@ -91,6 +103,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.checkRolesCompatibility(data.players);
     await this.checkUserCurrentGames(data.gameMaster);
     this.fillTickData(data);
+    this.fillOptionsData(data);
     await this.fillWaitingQueueWithNightActions(data);
 };
 
@@ -136,10 +149,11 @@ exports.getFindSearch = (query, req) => {
     if (req.user.strategy === "JWT") {
         search.gameMaster = req.user._id;
     }
+    const findFields = getFindFields();
     for (const parameter in query) {
         if (query[parameter] !== undefined) {
             const value = query[parameter];
-            if (parameter !== "fields") {
+            if (findFields.includes(parameter)) {
                 search[parameter] = value;
             }
         }
@@ -152,7 +166,7 @@ exports.getGames = async(req, res) => {
         const { query } = checkRequestData(req);
         const search = this.getFindSearch(query, req);
         const projection = this.getFindProjection(query);
-        const games = await this.find(search, projection);
+        const games = await this.find(search, projection, query);
         res.status(200).json(games);
     } catch (e) {
         sendError(res, e);
@@ -248,11 +262,11 @@ exports.getGameRepartition = (req, res) => {
 
 exports.getGame = async(req, res) => {
     try {
-        const { params } = checkRequestData(req);
+        const { params, query } = checkRequestData(req);
         if (req.user.strategy === "JWT") {
             await this.checkGameBelongsToUser(params.id, req.user._id);
         }
-        const game = await this.findOne({ _id: params.id });
+        const game = await this.findOne({ _id: params.id }, null, query);
         if (!game) {
             throw generateError("NOT_FOUND", `Game not found with id "${params.id}"`);
         }
@@ -300,6 +314,8 @@ exports.checkGameWinners = game => {
             game.won = { by: null };
         } else if (areLoversTheOnlyAlive(game)) {
             game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
+        } else if (hasPiedPiperWon(game)) {
+            game.won = { by: "pied-piper", players: getPlayersWithRole("pied-piper", game) };
         } else if (!isVillagerSideAlive(game)) {
             game.won = { by: "werewolves", players: getPlayersWithSide("werewolves", game) };
         } else if (!isWerewolfSideAlive(game)) {
@@ -315,19 +331,19 @@ exports.dequeueWaiting = game => {
     }
 };
 
-exports.isDayOver = async game => {
-    const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
-    return !!(lastVotePlay && lastVotePlay.turn === game.turn);
-};
-
-exports.purgeAttributesAfterSunRising = game => {
-    const purgedAttributes = ["protected", "seen", "drank-life-potion"];
-    for (const purgedAttribute of purgedAttributes) {
-        Player.removeAttributeFromAllPlayers(purgedAttribute, game);
+exports.decreasePlayersAttributesRemainingPhases = game => {
+    const alivePlayersWithAttributes = getAlivePlayers(game).filter(({ attributes }) => attributes);
+    for (const player of alivePlayersWithAttributes) {
+        player.attributes = player.attributes.filter(({ remainingPhases }) => remainingPhases !== 1);
+        for (const playerAttribute of player.attributes) {
+            if (playerAttribute.remainingPhases && isPlayerAttributeActive(playerAttribute, game)) {
+                playerAttribute.remainingPhases--;
+            }
+        }
     }
 };
 
-exports.fillWaitingQueueWithDayActions = async game => {
+exports.fillWaitingQueueWithDayActions = (game, gameHistoryEntry) => {
     const playerAttributeMethods = [
         { attribute: "eaten", trigger: Player.eaten },
         { attribute: "drank-death-potion", trigger: Player.drankDeathPotion },
@@ -337,42 +353,44 @@ exports.fillWaitingQueueWithDayActions = async game => {
         for (const { attribute, trigger } of playerAttributeMethods) {
             const playerAttribute = getPlayerAttribute(player, attribute);
             if (playerAttribute) {
-                trigger(game, playerAttribute);
+                trigger(game, playerAttribute, gameHistoryEntry);
             }
         }
-    }
-    this.purgeAttributesAfterSunRising(game);
-    if (!await this.isDayOver(game)) {
-        game.waiting.push({ for: "all", to: "vote" });
     }
 };
 
 exports.isGroupCallableDuringTheNight = (game, group) => {
-    if (group === "lovers" && getPlayerWithRole("cupid", game)) {
-        return true;
+    if (group === "lovers") {
+        const cupidPlayer = getPlayerWithRole("cupid", game);
+        return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
+    } else if (group === "charmed") {
+        const piedPiperPlayer = getPlayerWithRole("pied-piper", game);
+        return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
 };
 exports.areThreeBrothersCallableDuringTheNight = async game => {
+    const brothersWakingUpInterval = game.options.roles.threeBrothers.wakingUpInterval;
     const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
     const brotherPlayers = getPlayersWithRole("three-brothers", game);
-    const turnsSinceLastBrothersPlay = game.turn - lastBrothersPlay.turn;
+    const turnsSinceLastBrothersPlay = lastBrothersPlay ? game.turn - lastBrothersPlay.turn : undefined;
     return brotherPlayers.filter(brother => brother.isAlive).length >= 2 &&
-        (!lastBrothersPlay || turnsSinceLastBrothersPlay >= game.options.brothersWakingUpInterval && game.options.brothersWakingUpInterval);
+        (!lastBrothersPlay || turnsSinceLastBrothersPlay >= brothersWakingUpInterval && brothersWakingUpInterval);
 };
 exports.areTwoSistersCallableDuringTheNight = async game => {
+    const sistersWakingUpInterval = game.options.roles.twoSisters.wakingUpInterval;
     const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
     const sisterPlayers = getPlayersWithRole("two-sisters", game);
-    const turnsSinceLastSistersPlay = game.turn - lastSistersPlay.turn;
+    const turnsSinceLastSistersPlay = lastSistersPlay ? game.turn - lastSistersPlay.turn : undefined;
     return sisterPlayers.every(({ isAlive }) => isAlive) &&
-        (!lastSistersPlay || turnsSinceLastSistersPlay >= game.options.sistersWakingUpInterval && game.options.sistersWakingUpInterval);
+        (!lastSistersPlay || turnsSinceLastSistersPlay >= sistersWakingUpInterval && sistersWakingUpInterval);
 };
 
 exports.isRoleCallableDuringTheNight = (game, role) => {
     const player = getPlayerWithRole(role, game);
-    if (!player || game.tick === 1) {
-        return !!player;
+    if (!player || doesPlayerHaveAttribute(player, "powerless")) {
+        return false;
     }
     if (role === "two-sisters") {
         return this.areTwoSistersCallableDuringTheNight(game);
@@ -380,13 +398,23 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
         return this.areThreeBrothersCallableDuringTheNight(game);
     } else if (role === "big-bad-wolf") {
         return player.isAlive && areAllWerewolvesAlive(game);
+    } else if (role === "pied-piper") {
+        return player.isAlive && player.side.current === "villagers";
     }
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };
 
+exports.isSheriffCallableDuringTheNight = game => {
+    const isSheriffEnabled = getProp(game, "options.roles.sheriff.enabled", true);
+    const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
+    return isSheriffEnabled && !!sheriffPlayer && sheriffPlayer.isAlive;
+};
+
 exports.isSourceCallableDuringTheNight = (game, source) => {
-    if (source === "all" || source === "sheriff") {
-        return true;
+    if (source === "all") {
+        return getProp(game, "options.roles.sheriff.enabled", true);
+    } else if (source === "sheriff") {
+        return this.isSheriffCallableDuringTheNight(game);
     }
     const sourceType = getGroupNames().includes(source) ? "group" : "role";
     return sourceType === "group" ? this.isGroupCallableDuringTheNight(game, source) : this.isRoleCallableDuringTheNight(game, source);
@@ -404,16 +432,24 @@ exports.fillWaitingQueueWithNightActions = async game => {
     }
 };
 
-exports.fillWaitingQueue = async game => {
+exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
     if (game.phase === "night") {
         game.phase = "day";
-        return this.fillWaitingQueueWithDayActions(game);
+        this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
+        if (isVotePossible(game)) {
+            game.waiting.push({ for: "all", to: "vote" });
+        }
+        this.decreasePlayersAttributesRemainingPhases(game);
+        if (!game.waiting.length) {
+            await this.fillWaitingQueue(game, gameHistoryEntry);
+        }
     } else if (game.phase === "day") {
-        await this.fillWaitingQueueWithDayActions(game);
+        this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (!game.waiting || !game.waiting.length) {
+            this.decreasePlayersAttributesRemainingPhases(game);
             game.phase = "night";
             game.turn++;
-            return this.fillWaitingQueueWithNightActions(game);
+            await this.fillWaitingQueueWithNightActions(game);
         }
     }
 };
@@ -434,14 +470,23 @@ exports.generatePlayMethods = () => ({
     "wild-child": Player.wildChildPlays,
     "dog-wolf": Player.dogWolfPlays,
     "big-bad-wolf": Player.bigBadWolfPlays,
+    "scapegoat": Player.scapegoatPlays,
+    "pied-piper": Player.piedPiperPlays,
+    "charmed": () => undefined,
 });
 
-exports.generateGameHistoryEntry = (game, play) => ({
+exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({
     gameId: game._id,
     turn: game.turn,
     phase: game.phase,
     tick: game.tick,
-    play,
+    play: {
+        source: {
+            name: source,
+            players: getPlayersExpectedToPlay(game),
+        },
+        ...rest,
+    },
 });
 
 exports.checkPlay = async play => {
@@ -451,9 +496,9 @@ exports.checkPlay = async play => {
     } else if (game.status !== "playing") {
         throw generateError("NO_MORE_PLAY_ALLOWED", `Game with id "${play.gameId}" is not playing but with status "${game.status}"`);
     } else if (game.waiting[0].for !== play.source) {
-        throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting.for}", not "${play.source}"`);
+        throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting[0].for}", not "${play.source}"`);
     } else if (game.waiting[0].to !== play.action) {
-        throw generateError("BAD_PLAY_ACTION", `Game is waiting for "${game.waiting.for}" to "${game.waiting.to}", not "${play.action}"`);
+        throw generateError("BAD_PLAY_ACTION", `Game is waiting for "${game.waiting[0].for}" to "${game.waiting[0].to}", not "${play.action}"`);
     }
 };
 
@@ -463,11 +508,11 @@ exports.play = async play => {
     const gameHistoryEntry = this.generateGameHistoryEntry(game, play);
     const playMethods = this.generatePlayMethods();
     await playMethods[play.source](play, game, gameHistoryEntry);
-    await GameHistory.create(gameHistoryEntry);
     this.dequeueWaiting(game);
     if (!game.waiting || !game.waiting.length) {
-        await this.fillWaitingQueue(game);
+        await this.fillWaitingQueue(game, gameHistoryEntry);
     }
+    await GameHistory.create(gameHistoryEntry);
     game.tick++;
     this.checkGameWinners(game);
     return this.findOneAndUpdate({ _id: play.gameId }, game);
@@ -503,10 +548,18 @@ exports.resetGame = async(req, res) => {
         const resetData = { players: game.players.map(player => ({ name: player.name, role: player.role.original })) };
         await this.fillPlayersData(resetData.players);
         this.fillTickData(resetData);
+        resetData.options = game.options;
         await this.fillWaitingQueueWithNightActions(resetData);
         game = await this.findOneAndUpdate({ _id: params.id }, resetData);
         res.status(200).json(game);
     } catch (e) {
         sendError(res, e);
     }
+};
+
+exports.isCurrentPlaySecondVoteAfterTie = async game => {
+    const previousPlay = await GameHistory.getPreviousPlay(game._id);
+    const currentPlay = game?.waiting.length ? game.waiting[0] : undefined;
+    return currentPlay?.to === "vote" && previousPlay?.play.action === "vote" &&
+        previousPlay.turn === game.turn && previousPlay.play.targets.length > 1;
 };

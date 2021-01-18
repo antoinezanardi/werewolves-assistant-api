@@ -12,4 +12,8 @@ describe("E2E - 🎲 Game tests", () => {
     require("./no-winner-game.test");
     require("./game-won-by-lovers.test");
     require("./game-options.test");
+    require("./ancient-revenge-game.test");
+    require("./game-with-empty-days.test");
+    require("./game-won-by-pied-piper.test");
+    require("./pied-piper-infected.test");
 });
