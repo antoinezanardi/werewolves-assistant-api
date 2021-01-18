@@ -5,7 +5,7 @@ const {
     getAttributeWithNameAndSource, getPlayerMurderedPossibilities, getPlayerAttribute,
     isPlayerAttributeActive,
 } = require("../helpers/functions/Player");
-const { getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId } = require("../helpers/functions/Game");
+const { getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue } = require("../helpers/functions/Game");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -417,6 +417,9 @@ exports.werewolvesPlay = async(play, game) => {
                 this.addPlayerAttribute(targets[0].player._id, "eaten", game);
             } else {
                 infectedPlayer.side.current = "werewolves";
+                if (infectedPlayer.role.current === "pied-piper") {
+                    filterOutSourcesFromWaitingQueue(game, ["pied-piper", "charmed"]);
+                }
             }
         }
     } else {

@@ -398,6 +398,8 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
         return this.areThreeBrothersCallableDuringTheNight(game);
     } else if (role === "big-bad-wolf") {
         return player.isAlive && areAllWerewolvesAlive(game);
+    } else if (role === "pied-piper") {
+        return player.isAlive && player.side.current === "villagers";
     }
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };

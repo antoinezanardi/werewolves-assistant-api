@@ -10,15 +10,15 @@ const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
 let players = [
-    { name: "Dag", role: "werewolf" },
+    { name: "Dag", role: "vile-father-of-wolves" },
     { name: "Dig", role: "pied-piper" },
     { name: "Deg", role: "villager" },
     { name: "Dog", role: "villager" },
-    { name: "Dπg", role: "villager" },
+    { name: "Døg", role: "villager" },
 ];
 let token, game;
 
-describe("N - Tiny game of 5 players in which the pied piper charmed everybody, and so wins", () => {
+describe("O - Tiny game of 5 players in which the pied piper is infected and so, looses his powers and can't win alone", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -65,7 +65,7 @@ describe("N - Tiny game of 5 players in which the pied piper charmed everybody, 
                 done();
             });
     });
-    it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
+    it("🐺 Vile father of wolf eats a villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -106,7 +106,37 @@ describe("N - Tiny game of 5 players in which the pied piper charmed everybody, 
                 done();
             });
     });
-    it("👪 All vote for werewolf (POST /games/:id/play)", done => {
+    it("👪 All vote for a villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[3]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[3].isAlive).to.equals(false);
+                expect(game.players[3].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🐺 Vile father of wolf infects the pied piper (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id, isInfected: true }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'all' to 'vote' because pied piper lost his powers due to the infection", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        done();
+    });
+    it("👪 All vote for the vile father of wolves (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -120,20 +150,11 @@ describe("N - Tiny game of 5 players in which the pied piper charmed everybody, 
                 done();
             });
     });
-    it("🎲 Game is WON by the pied piper even if there is no more werewolves because all alive players are charmed !", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("pied-piper");
-        expect(game.won.players).to.be.an("array").lengthOf(1);
-        expect(game.won.players[0]._id).to.equals(game.players[1]._id);
+    it("🎲 Game is not won by pied piper even if all alive players are charmed because he is infected", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        expect(game.status).to.equals("playing");
+        expect(game.players.every(({ isAlive, role, attributes }) => !isAlive || role.current === "pied-piper" ||
+            attributes?.find(({ name }) => name === "charmed"))).to.be.true;
         done();
     });
 });
-
-/*
- * const players = [
- *  { name: "Dag", role: "werewolf" },
- *  { name: "Dig", role: "cupid" },
- *  { name: "Deg", role: "villager" },
- *  { name: "Dog", role: "little-girl" },
- * ];
- */

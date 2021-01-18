@@ -76,3 +76,7 @@ exports.getWonByPossibilities = () => JSON.parse(JSON.stringify(wonByPossibiliti
 exports.getDefaultGameOptions = () => JSON.parse(JSON.stringify(defaultGameOptions));
 
 exports.isVotePossible = game => game.players.some(player => player.isAlive && !doesPlayerHaveAttribute(player, "cant-vote"));
+
+exports.filterOutSourcesFromWaitingQueue = (game, sources) => {
+    game.waiting = game.waiting.filter(({ for: source }) => !sources.includes(source));
+};
