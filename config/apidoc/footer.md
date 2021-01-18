@@ -159,3 +159,4 @@ Description for each case below:
 | 44   | ABSENT_VILE_FATHER_OF_WOLVES       |    400    | Target can't be infected because the vile father of wolves is either not in the game or dead.     |
 | 45   | ONLY_ONE_INFECTION                 |    400    | Vile father of wolves can infect only one target per game.                                        |
 | 46   | CANT_CHARM_HIMSELF                 |    400    | Pied piper can't charm himself.                                                                   |
+| 47   | ALREADY_CHARMED                    |    400    | Target is already charmed by the pied piper and can't be charmed twice.                           |

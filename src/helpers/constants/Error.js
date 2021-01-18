@@ -187,4 +187,8 @@ exports.errorMetadata = {
         code: 46,
         HTTPCode: 400,
     },
+    ALREADY_CHARMED: {
+        code: 47,
+        HTTPCode: 400,
+    },
 };

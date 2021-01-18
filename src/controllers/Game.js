@@ -470,7 +470,7 @@ exports.generatePlayMethods = () => ({
     "big-bad-wolf": Player.bigBadWolfPlays,
     "scapegoat": Player.scapegoatPlays,
     "pied-piper": Player.piedPiperPlays,
-    "charmed-players": () => undefined,
+    "charmed": () => undefined,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({

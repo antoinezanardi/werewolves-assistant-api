@@ -63,8 +63,12 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
         }
     } else if (action === "choose-model" && target.player.role.current === "wild-child") {
         throw generateError("WILD_CHILD_CANT_CHOOSE_HIMSELF", `Wild child can't choose himself as a model.`);
-    } else if (source === "pied-piper" && action === "charm" && target.player.role.current === "pied-piper") {
-        throw generateError("CANT_CHARM_HIMSELF", `Pied piper can't charm himself.`);
+    } else if (source === "pied-piper" && action === "charm") {
+        if (target.player.role.current === "pied-piper") {
+            throw generateError("CANT_CHARM_HIMSELF", `Pied piper can't charm himself.`);
+        } else if (doesPlayerHaveAttribute(target.player, "charmed")) {
+            throw generateError("ALREADY_CHARMED", `Player with id ${target.player._id} is already charmed and so can't be charmed again.`);
+        }
     }
 };
 
