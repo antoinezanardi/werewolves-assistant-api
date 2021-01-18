@@ -2291,7 +2291,6 @@ describe("B - Full game of 23 players with all roles", () => {
             });
     });
     it("☀️ Sun is rising, little girl is eaten even if protected by guard and cupid dies from broken heart 💔", done => {
-        console.log()
         expect(game.phase).to.equals("day");
         expect(game.players[4].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 1 });
         expect(game.players[7].isAlive).to.equals(false);
