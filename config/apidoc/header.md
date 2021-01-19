@@ -41,6 +41,7 @@ Game ends when one of the following conditions is met:
 - All players on `villagers` side are dead. 
 - All players on `werewolves` side are dead. 
 - Players with the `lovers` attribute are the only survivors.
+- The pied piper is in the game, alive, not infected by the vile father of wolves or powerless, and all other survivors have the `charmed` attribute.
 - All players are dead. 
 
 At the end of the game, winner(s) are set in the `won` property.

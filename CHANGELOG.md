@@ -27,6 +27,7 @@
 
 * [#98](https://github.com/antoinezanardi/werewolves-assistant-api/issues/98) - APIDoc improved for `Classes` and nested properties.
 * [#101](https://github.com/antoinezanardi/werewolves-assistant-api/issues/101) - Specify remaining phases for each attribute in the documentation.
+* [#103](https://github.com/antoinezanardi/werewolves-assistant-api/issues/103) - Documentation's oversight on game end conditions
 
 ### 🛣️ Routes
 
