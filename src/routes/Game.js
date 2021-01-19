@@ -84,6 +84,12 @@ module.exports = app => {
      */
     app.get("/games/repartition", basicLimiter, passport.authenticate(["basic", "jwt"], { session: false }), [
         query("players")
+            .customSanitizer(players => {
+                if (Array.isArray(players)) {
+                    return players;
+                }
+                return typeof players === "object" && players !== null ? Object.values(players).map(value => value) : [];
+            })
             .isArray().withMessage("Must be a valid array")
             .custom(value => value.length >= 4 && value.length <= 40 ? Promise.resolve() : Promise.reject(new Error()))
             .withMessage("Must contain between 4 and 40 players"),

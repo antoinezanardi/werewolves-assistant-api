@@ -16,6 +16,48 @@ const players = [
     { name: "Deg" },
     { name: "Dog" },
 ];
+const aLotOfPlayers = [
+    { name: "1" },
+    { name: "2" },
+    { name: "3" },
+    { name: "4" },
+    { name: "5" },
+    { name: "6" },
+    { name: "7" },
+    { name: "8" },
+    { name: "9" },
+    { name: "10" },
+    { name: "11" },
+    { name: "12" },
+    { name: "13" },
+    { name: "14" },
+    { name: "15" },
+    { name: "16" },
+    { name: "17" },
+    { name: "18" },
+    { name: "19" },
+    { name: "20" },
+    { name: "21" },
+    { name: "22" },
+    { name: "23" },
+    { name: "24" },
+    { name: "25" },
+    { name: "26" },
+    { name: "27" },
+    { name: "28" },
+    { name: "29" },
+    { name: "30" },
+    { name: "31" },
+    { name: "32" },
+    { name: "33" },
+    { name: "34" },
+    { name: "35" },
+    { name: "36" },
+    { name: "37" },
+    { name: "38" },
+    { name: "39" },
+    { name: "40" },
+];
 let token;
 
 describe("E - Game repartition with multiple teams", () => {
@@ -60,11 +102,40 @@ describe("E - Game repartition with multiple teams", () => {
                 done();
             });
     });
+    it("👪 Gets game repartition for 40 players with JWT auth (GET /games/repartition)", done => {
+        chai.request(app)
+            .get(`/games/repartition?${stringify({ players: aLotOfPlayers })}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                done();
+            });
+    });
     it("🔐 Can't get game repartition without auth (GET /games/repartition)", done => {
         chai.request(app)
             .get(`/games/repartition?${stringify({ players })}`)
             .end((err, res) => {
                 expect(res).to.have.status(401);
+                done();
+            });
+    });
+    it("🤼 Can't get game repartition with less than 4 players (GET /games/repartition)", done => {
+        chai.request(app)
+            .get(`/games/repartition?${stringify({ players: [{ name: "1" }] })}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
+                done();
+            });
+    });
+    it("🤼 Can't get game repartition with more than 40 players (GET /games/repartition)", done => {
+        chai.request(app)
+            .get(`/games/repartition?${stringify({ players: [...players, ...aLotOfPlayers] })}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_REQUEST");
                 done();
             });
     });
