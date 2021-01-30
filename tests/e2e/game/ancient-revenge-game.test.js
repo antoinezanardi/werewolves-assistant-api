@@ -275,6 +275,9 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[4].side.current).to.equals("villagers");
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[4]._id);
+                expect(game.players[4].isAlive).to.be.false;
+                expect(game.players[4].attributes).to.deep.includes({ name: "powerless", source: "ancient" });
+                expect(game.players[4].attributes).to.not.deep.includes({ name: "eaten", source: "werewolves" });
                 done();
             });
     });

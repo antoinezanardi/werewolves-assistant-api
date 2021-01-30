@@ -3109,7 +3109,7 @@ describe("B - Full game of 23 players with all roles", () => {
                 done();
             });
     });
-    it("👪 All vote for the idiot again, which die this time and doesn't delegate his power because he's an idiot (POST /games/:id/play)", done => {
+    it("👪 All vote for the idiot again, which die this time and doesn't delegate his sheriff power because he's an idiot (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -3120,6 +3120,7 @@ describe("B - Full game of 23 players with all roles", () => {
                 game = res.body;
                 expect(game.players[21].isAlive).to.equals(false);
                 expect(game.players[21].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[21].attributes).to.deep.includes({ name: "sheriff", source: "sheriff" });
                 done();
             });
     });

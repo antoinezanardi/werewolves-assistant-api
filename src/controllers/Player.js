@@ -140,6 +140,10 @@ exports.insertRevealedPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) =>
     }
 };
 
+exports.purgePlayerAttributes = player => {
+    player.attributes = player.attributes?.filter(({ remainingPhases }) => !remainingPhases);
+};
+
 exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, gameHistoryEntry) => {
     if (doesPlayerHaveAttribute(player, "sheriff") &&
         (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
@@ -207,6 +211,7 @@ exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) =>
             }
             this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, options);
             this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
+            this.purgePlayerAttributes(player);
         }
     }
 };
