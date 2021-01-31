@@ -42,7 +42,7 @@
 * `deepmerge` installed with version `4.2.2`.
 * `@sentry/node` updated to version `6.0.3`.
 * `apidoc` updated to version `0.26.0`.
-* `eslint` updated to version `7.18.0`.
+* `eslint` updated to version `7.19.0`.
 * `express-validator` updated to version `6.9.2`.
 * `mongoose` updated to version `5.11.14`.
 * `nodemon` updated to version `2.0.7`.
