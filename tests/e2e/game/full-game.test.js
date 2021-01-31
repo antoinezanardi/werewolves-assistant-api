@@ -2285,7 +2285,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [] })
+            .send({ source: "witch", action: "use-potion" })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -2664,7 +2664,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [] })
+            .send({ source: "witch", action: "use-potion" })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
