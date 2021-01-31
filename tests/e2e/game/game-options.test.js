@@ -62,8 +62,8 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.options.roles.sheriff.hasDoubledVote).to.equals(false);
-                expect(game.options.roles.seer.isTalkative).to.equals(false);
+                expect(game.options.roles.sheriff.hasDoubledVote).to.be.false;
+                expect(game.options.roles.seer.isTalkative).to.be.false;
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(1);
                 done();
@@ -138,7 +138,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[5].isAlive).to.equals(true);
+                expect(game.players[5].isAlive).to.be.true;
                 done();
             });
     });
@@ -155,7 +155,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[5].isAlive).to.equals(false);
+                expect(game.players[5].isAlive).to.be.false;
                 done();
             });
     });
@@ -219,7 +219,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[4].isAlive).to.equals(false);
+                expect(game.players[4].isAlive).to.be.false;
                 done();
             });
     });
@@ -325,7 +325,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[4].isAlive).to.equals(false);
+                expect(game.players[4].isAlive).to.be.false;
                 done();
             });
     });
@@ -367,7 +367,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.options.roles.sheriff.enabled).to.equals(false);
+                expect(game.options.roles.sheriff.enabled).to.be.false;
                 done();
             });
     });
@@ -423,8 +423,8 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].isAlive).to.equals(true);
-                expect(game.players[1].isAlive).to.equals(true);
+                expect(game.players[0].isAlive).to.be.true;
+                expect(game.players[1].isAlive).to.be.true;
                 done();
             });
     });
@@ -464,8 +464,8 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].isAlive).to.equals(true);
-                expect(game.players[1].isAlive).to.equals(true);
+                expect(game.players[0].isAlive).to.be.true;
+                expect(game.players[1].isAlive).to.be.true;
                 expect(game.history[0].deadPlayers).to.not.exist;
                 done();
             });
@@ -505,8 +505,8 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].isAlive).to.equals(true);
-                expect(game.players[2].isAlive).to.equals(true);
+                expect(game.players[1].isAlive).to.be.true;
+                expect(game.players[2].isAlive).to.be.true;
                 done();
             });
     });
@@ -524,8 +524,8 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].isAlive).to.equals(true);
-                expect(game.players[2].isAlive).to.equals(false);
+                expect(game.players[1].isAlive).to.be.true;
+                expect(game.players[2].isAlive).to.be.false;
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
                 done();

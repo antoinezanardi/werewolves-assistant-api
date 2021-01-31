@@ -127,7 +127,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
     });
     it("☀️ Sun is rising and villager is dead", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[2].isAlive).to.equals(false);
+        expect(game.players[2].isAlive).to.be.false;
         done();
     });
     it("👪 All vote for cupid (POST /games/:id/play)", done => {
@@ -139,7 +139,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].isAlive).to.equals(false);
+                expect(game.players[1].isAlive).to.be.false;
                 expect(game.players[1].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });

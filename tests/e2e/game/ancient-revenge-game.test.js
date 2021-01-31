@@ -230,7 +230,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[12].isAlive).to.equals(true);
+        expect(game.players[12].isAlive).to.be.true;
         done();
     });
     it("👪 All vote for the ancient, revenge is on: all villagers are powerless (POST /games/:id/play)", done => {
@@ -242,7 +242,7 @@ describe("L - Game with various villagers who loose their power because they kil
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[12].isAlive).to.equals(false);
+                expect(game.players[12].isAlive).to.be.false;
                 expect(game.players[12].murdered).to.deep.equals({ by: "all", of: "vote" });
                 expect(game.players[0].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[1].attributes).to.deep.include({ name: "powerless", source: "ancient" });
@@ -290,7 +290,7 @@ describe("L - Game with various villagers who loose their power because they kil
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[3].isAlive).to.equals(false);
+                expect(game.players[3].isAlive).to.be.false;
                 expect(game.players[3].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
