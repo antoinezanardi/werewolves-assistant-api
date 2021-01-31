@@ -236,7 +236,8 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
         if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, gameHistoryEntry))) {
             player.role.isRevealed = true;
             this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
-            if (player.role.current === "idiot" && !doesPlayerHaveAttribute(player, "powerless") && action === "vote") {
+            if (player.role.current === "idiot" && !doesPlayerHaveAttribute(player, "powerless") &&
+                (action === "vote" || action === "settle-votes")) {
                 this.addPlayerAttribute(player._id, "cant-vote", game, { source: "all" });
             }
         }
