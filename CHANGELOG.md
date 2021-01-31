@@ -16,6 +16,10 @@
 * [#96](https://github.com/antoinezanardi/werewolves-assistant-api/issues/96) - Add dead players in game history entries.
 * [#99](https://github.com/antoinezanardi/werewolves-assistant-api/issues/99) - ESLint rules updated with last rules.
 
+### 🐛 Bug fixes
+
+* [#106](https://github.com/antoinezanardi/werewolves-assistant-api/issues/106) - Remove player attributes with remaining phases if player is dead.
+
 ### ♻️ Refactoring
 
 * [#85](https://github.com/antoinezanardi/werewolves-assistant-api/issues/85) - Change game options structure.
@@ -36,11 +40,11 @@
 ### 📦 Packages
 
 * `deepmerge` installed with version `4.2.2`.
-* `@sentry/node` updated to version `5.30.0`.
+* `@sentry/node` updated to version `6.0.3`.
 * `apidoc` updated to version `0.26.0`.
 * `eslint` updated to version `7.18.0`.
 * `express-validator` updated to version `6.9.2`.
-* `mongoose` updated to version `5.11.12`.
+* `mongoose` updated to version `5.11.14`.
 * `nodemon` updated to version `2.0.7`.
 * `qs` updated to version `6.9.6`.
 

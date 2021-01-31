@@ -101,13 +101,13 @@ describe("G - Game where player is killed twice during the night", () => {
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[0].potion.death).to.equals(true);
+                expect(game.history[0].play.targets[0].potion.death).to.be.true;
                 done();
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[1].isAlive).to.equals(false);
+        expect(game.players[1].isAlive).to.be.false;
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {

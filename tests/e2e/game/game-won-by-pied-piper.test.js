@@ -15,10 +15,11 @@ let players = [
     { name: "Deg", role: "villager" },
     { name: "Dog", role: "villager" },
     { name: "Dπg", role: "villager" },
+    { name: "Dæg", role: "werewolf" },
 ];
 let token, game;
 
-describe("N - Tiny game of 5 players in which the pied piper charmed everybody, and so wins", () => {
+describe("N - Tiny game of 6 players in which the pied piper charmed everybody, and so wins", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -115,8 +116,44 @@ describe("N - Tiny game of 5 players in which the pied piper charmed everybody, 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].isAlive).to.equals(false);
+                expect(game.players[0].isAlive).to.be.false;
                 expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🐺 Werewolf eats the pied piper (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("👼 Pied piper can't charm just two targets if only one can be charmed (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }, { player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("📣 Pied piper charms the last werewolf (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
                 done();
             });
     });
@@ -128,12 +165,3 @@ describe("N - Tiny game of 5 players in which the pied piper charmed everybody, 
         done();
     });
 });
-
-/*
- * const players = [
- *  { name: "Dag", role: "werewolf" },
- *  { name: "Dig", role: "cupid" },
- *  { name: "Deg", role: "villager" },
- *  { name: "Dog", role: "little-girl" },
- * ];
- */

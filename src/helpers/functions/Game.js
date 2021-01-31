@@ -15,11 +15,14 @@ exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive
 exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
                                     game.players.every(player => doesPlayerHaveAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
 
+exports.getRemainingPlayersToCharm = game => game.players.filter(({ role, attributes, isAlive }) => isAlive &&
+    role.current !== "pied-piper" && !doesPlayerHaveAttribute({ attributes }, "charmed"));
+
 exports.hasPiedPiperWon = game => {
     const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
-    const alivePlayers = this.getAlivePlayers(game);
+    const remainingPlayersToCharm = this.getRemainingPlayersToCharm(game);
     return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless") && piedPiperPlayer.side.current === "villagers" &&
-        alivePlayers.every(({ role, attributes }) => role.current === "pied-piper" || attributes?.find(({ name }) => name === "charmed"));
+        !remainingPlayersToCharm.length;
 };
 
 exports.isGameDone = game => this.areAllPlayersDead(game) ||
@@ -55,11 +58,12 @@ exports.getPlayersExpectedToPlay = game => {
         return [];
     }
     const { for: source, to: action } = game.waiting[0];
-    const deadPlayersActions = ["delegate", "shoot"];
+    const deadPlayersActions = ["delegate", "shoot", "ban-voting"];
     const waitingForGroups = {
         all: game.players,
         sheriff: this.getPlayersWithAttribute("sheriff", game),
         lovers: this.getPlayersWithAttribute("in-love", game),
+        charmed: this.getPlayersWithAttribute("charmed", game),
         villagers: this.getPlayersWithSide("villagers", game),
         werewolves: this.getPlayersWithSide("werewolves", game),
     };

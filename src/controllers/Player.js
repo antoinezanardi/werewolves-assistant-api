@@ -1,11 +1,14 @@
 const Game = require("./Game");
 const GameHistory = require("./GameHistory");
 const {
-    canBeEaten, doesPlayerHaveAttribute, isPlayerKillable, getAttributeWithName,
+    canBeEaten, doesPlayerHaveAttribute, getAttributeWithName,
     getAttributeWithNameAndSource, getPlayerMurderedPossibilities, getPlayerAttribute,
-    isPlayerAttributeActive,
+    isPlayerAttributeActive, isIdiotKillable,
 } = require("../helpers/functions/Player");
-const { getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue } = require("../helpers/functions/Game");
+const {
+    getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
+    getRemainingPlayersToCharm,
+} = require("../helpers/functions/Game");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -24,6 +27,14 @@ exports.checkUniqueTargets = targets => {
     const uniqueTargets = [...new Set(targets.map(({ player }) => player._id))];
     if (uniqueTargets.length !== targets.length) {
         throw generateError("NON_UNIQUE_TARGETS", "Multiple targets are pointing the same player.");
+    }
+};
+
+exports.checkPiedPiperTargets = target => {
+    if (target.player.role.current === "pied-piper") {
+        throw generateError("CANT_CHARM_HIMSELF", `Pied piper can't charm himself.`);
+    } else if (doesPlayerHaveAttribute(target.player, "charmed")) {
+        throw generateError("ALREADY_CHARMED", `Player with id ${target.player._id} is already charmed and so can't be charmed again.`);
     }
 };
 
@@ -64,11 +75,9 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
     } else if (action === "choose-model" && target.player.role.current === "wild-child") {
         throw generateError("WILD_CHILD_CANT_CHOOSE_HIMSELF", `Wild child can't choose himself as a model.`);
     } else if (source === "pied-piper" && action === "charm") {
-        if (target.player.role.current === "pied-piper") {
-            throw generateError("CANT_CHARM_HIMSELF", `Pied piper can't charm himself.`);
-        } else if (doesPlayerHaveAttribute(target.player, "charmed")) {
-            throw generateError("ALREADY_CHARMED", `Player with id ${target.player._id} is already charmed and so can't be charmed again.`);
-        }
+        this.checkPiedPiperTargets(target);
+    } else if (action === "ban-voting" && doesPlayerHaveAttribute(target.player, "cant-vote")) {
+        throw generateError("CANT_VOTE_ALREADY", `Player with id ${target.player._id} is already banned of votes.`);
     }
 };
 
@@ -140,7 +149,11 @@ exports.insertRevealedPlayerIntoGameHistoryEntry = (player, gameHistoryEntry) =>
     }
 };
 
-exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, gameHistoryEntry) => {
+exports.purgePlayerAttributes = player => {
+    player.attributes = player.attributes?.filter(({ remainingPhases }) => !remainingPhases);
+};
+
+exports.applyConsequencesDependingOnKilledPlayerAttributes = async(player, game, gameHistoryEntry) => {
     if (doesPlayerHaveAttribute(player, "sheriff") &&
         (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
         this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
@@ -149,7 +162,7 @@ exports.applyConsequencesDependingOnKilledPlayerAttributes = (player, game, game
         const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== player._id.toString() &&
             isAlive && doesPlayerHaveAttribute({ attributes }, "in-love"));
         if (otherLoverPlayer) {
-            this.killPlayer(otherLoverPlayer._id, "charm", game, gameHistoryEntry);
+            await this.killPlayer(otherLoverPlayer._id, "charm", game, gameHistoryEntry);
         }
     }
     if (doesPlayerHaveAttribute(player, "worshiped")) {
@@ -184,18 +197,50 @@ exports.applyConsequencesDependingOnKilledPlayerRole = (player, action, game, op
     }
 };
 
-exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) => {
+exports.isAncientKillable = async(action, gameHistoryEntry) => {
+    if (action !== "eat") {
+        return true;
+    }
+    const werewolvesPlaysOnAncientSearch = {
+        "play.source.name": { $in: ["werewolves", "big-bad-wolf"] },
+        "play.targets": { $elemMatch: { "player.role.current": "ancient" } },
+    };
+    const werewolvesPlaysOnAncient = [...await GameHistory.find(werewolvesPlaysOnAncientSearch), gameHistoryEntry];
+    const ancientSavedByWitchPlaySearch = {
+        "play.source.name": "witch",
+        "play.targets": { $elemMatch: { "player.role.current": "ancient", "potion.life": true } },
+    };
+    const ancientSavedByGuardPlaySearch = {
+        "play.source.name": "guard",
+        "play.targets": { $elemMatch: { "player.role.current": "ancient" } },
+    };
+    let livesCount = 2;
+    for (const werewolvesPlay of werewolvesPlaysOnAncient) {
+        if (werewolvesPlay.play.action === "eat" && werewolvesPlay.play.targets.find(({ player }) => player.role.current === "ancient") &&
+            !await GameHistory.findOne({ ...ancientSavedByWitchPlaySearch, turn: werewolvesPlay.turn }) &&
+            !await GameHistory.findOne({ ...ancientSavedByGuardPlaySearch, turn: werewolvesPlay.turn })) {
+            livesCount--;
+        }
+    }
+    return !livesCount;
+};
+
+exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, gameHistoryEntry) => role.current !== "ancient" &&
+    role.current !== "idiot" || role.current === "ancient" && await this.isAncientKillable(action, gameHistoryEntry) ||
+    role.current === "idiot" && isIdiotKillable(action, { attributes }, alreadyRevealed);
+
+exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {}) => {
     const player = getPlayerWithId(playerId, game);
     if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
         const alreadyRevealed = player.role.isRevealed;
-        if (!alreadyRevealed) {
+        if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, gameHistoryEntry))) {
             player.role.isRevealed = true;
             this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             if (player.role.current === "idiot" && !doesPlayerHaveAttribute(player, "powerless") && action === "vote") {
                 this.addPlayerAttribute(player._id, "cant-vote", game, { source: "all" });
             }
         }
-        if (isPlayerKillable(player, action, alreadyRevealed)) {
+        if (await this.isPlayerKillable(player, action, alreadyRevealed, gameHistoryEntry)) {
             player.isAlive = false;
             const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
             if (murdered) {
@@ -206,7 +251,8 @@ exports.killPlayer = (playerId, action, game, gameHistoryEntry, options = {}) =>
                 this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             }
             this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, options);
-            this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
+            await this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
+            this.purgePlayerAttributes(player);
         }
     }
 };
@@ -342,7 +388,8 @@ exports.checkAndFillVotes = async(votes, game, options) => {
 
 exports.piedPiperPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 2, play });
+    const targetsExpectedLength = getRemainingPlayersToCharm(game).length === 1 ? 1 : 2;
+    await this.checkAndFillTargets(targets, game, { expectedLength: targetsExpectedLength, play });
     for (const { player } of targets) {
         this.addPlayerAttribute(player._id, "charmed", game);
     }
@@ -396,7 +443,7 @@ exports.sheriffDelegates = async(play, game) => {
 exports.sheriffSettlesVotes = async(play, game, gameHistoryEntry) => {
     const { targets, action } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.killPlayer(targets[0].player._id, action, game, gameHistoryEntry);
+    await this.killPlayer(targets[0].player._id, action, game, gameHistoryEntry);
 };
 
 exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
@@ -430,7 +477,7 @@ exports.werewolvesPlay = async(play, game) => {
 exports.hunterPlays = async(play, game, gameHistoryEntry) => {
     const { targets, action } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.killPlayer(targets[0].player._id, action, game, gameHistoryEntry);
+    await this.killPlayer(targets[0].player._id, action, game, gameHistoryEntry);
 };
 
 exports.ravenPlays = async(play, game) => {
@@ -469,11 +516,12 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     await this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
+    gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
     const scapegoatPlayer = getPlayerWithRole("scapegoat", game);
     const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
     if (nominatedPlayers.length > 1) {
         if (scapegoatPlayer?.isAlive && !doesPlayerHaveAttribute(scapegoatPlayer, "powerless")) {
-            this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
+            await this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
         } else if (sheriffPlayer?.isAlive) {
             game.waiting.push({ for: "sheriff", to: "settle-votes" });
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
@@ -483,9 +531,8 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
             }
         }
     } else {
-        this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
+        await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
     }
-    gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
 };
 
 exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
@@ -504,9 +551,9 @@ exports.allPlay = async(play, game, gameHistoryEntry) => {
     await allActions[play.action](play, game, gameHistoryEntry);
 };
 
-exports.eaten = (game, play, gameHistoryEntry) => {
+exports.eaten = async(game, play, gameHistoryEntry) => {
     const eatenPlayer = getPlayerWithAttribute("eaten", game);
-    this.killPlayer(eatenPlayer._id, "eat", game, gameHistoryEntry, { forcedSource: play.source });
+    await this.killPlayer(eatenPlayer._id, "eat", game, gameHistoryEntry, { forcedSource: play.source });
     this.removePlayerAttribute(eatenPlayer._id, "eaten", game);
 };
 
@@ -516,8 +563,8 @@ exports.removeAttributeFromAllPlayers = (attributeName, game) => {
     }
 };
 
-exports.drankDeathPotion = (game, play, gameHistoryEntry) => {
+exports.drankDeathPotion = async(game, play, gameHistoryEntry) => {
     const poisonedPlayer = getPlayerWithAttribute("drank-death-potion", game);
-    this.killPlayer(poisonedPlayer._id, "use-potion", game, gameHistoryEntry);
+    await this.killPlayer(poisonedPlayer._id, "use-potion", game, gameHistoryEntry);
     this.removePlayerAttribute(poisonedPlayer._id, "drank-death-potion", game);
 };

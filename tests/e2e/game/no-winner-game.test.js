@@ -105,13 +105,13 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
-                expect(game.history[0].play.targets[0].potion.life).to.equals(true);
+                expect(game.history[0].play.targets[0].potion.life).to.be.true;
                 done();
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[1].isAlive).to.equals(true);
+        expect(game.players[1].isAlive).to.be.true;
         done();
     });
     it("👪 All vote for villager (POST /games/:id/play)", done => {
@@ -123,7 +123,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[3].isAlive).to.equals(false);
+                expect(game.players[3].isAlive).to.be.false;
                 expect(game.players[3].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
@@ -156,7 +156,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[0].potion.death).to.equals(true);
+                expect(game.history[0].play.targets[0].potion.death).to.be.true;
                 done();
             });
     });
@@ -173,7 +173,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].isAlive).to.equals(false);
+                expect(game.players[0].isAlive).to.be.false;
                 done();
             });
     });

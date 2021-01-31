@@ -95,7 +95,7 @@ describe("D - Game Reset", () => {
                 expect(game.tick).to.equals(1);
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
-                expect(Array.isArray(game.players)).to.equals(true);
+                expect(Array.isArray(game.players)).to.be.true;
                 expect(game.players[0].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
                 expect(game.players[0].side.current).to.equals("werewolves");
                 expect(game.players[1].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });

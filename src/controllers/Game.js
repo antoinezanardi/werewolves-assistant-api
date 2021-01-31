@@ -343,7 +343,7 @@ exports.decreasePlayersAttributesRemainingPhases = game => {
     }
 };
 
-exports.fillWaitingQueueWithDayActions = (game, gameHistoryEntry) => {
+exports.fillWaitingQueueWithDayActions = async(game, gameHistoryEntry) => {
     const playerAttributeMethods = [
         { attribute: "eaten", trigger: Player.eaten },
         { attribute: "drank-death-potion", trigger: Player.drankDeathPotion },
@@ -353,7 +353,7 @@ exports.fillWaitingQueueWithDayActions = (game, gameHistoryEntry) => {
         for (const { attribute, trigger } of playerAttributeMethods) {
             const playerAttribute = getPlayerAttribute(player, attribute);
             if (playerAttribute) {
-                trigger(game, playerAttribute, gameHistoryEntry);
+                await trigger(game, playerAttribute, gameHistoryEntry);
             }
         }
     }
@@ -435,7 +435,7 @@ exports.fillWaitingQueueWithNightActions = async game => {
 exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
     if (game.phase === "night") {
         game.phase = "day";
-        this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
+        await this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (isVotePossible(game)) {
             game.waiting.push({ for: "all", to: "vote" });
         }
@@ -444,7 +444,7 @@ exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
             await this.fillWaitingQueue(game, gameHistoryEntry);
         }
     } else if (game.phase === "day") {
-        this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
+        await this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (!game.waiting || !game.waiting.length) {
             this.decreasePlayersAttributesRemainingPhases(game);
             game.phase = "night";

@@ -16,4 +16,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./game-with-empty-days.test");
     require("./game-won-by-pied-piper.test");
     require("./pied-piper-infected.test");
+    require("./unkillable-ancient.test");
 });

@@ -1,15 +1,9 @@
 const { playerAttributes, murderedPossibilities, playerActions } = require("../constants/Player");
 
-exports.isPlayerKillable = ({ role, attributes }, action, alreadyRevealed) => role.current !== "ancient" && role.current !== "idiot" ||
-    role.current === "ancient" && this.isAncientKillable(action, alreadyRevealed) ||
-    role.current === "idiot" && this.isIdiotKillable(action, { attributes }, alreadyRevealed);
-
 exports.canBeEaten = player => !this.doesPlayerHaveAttribute(player, "drank-life-potion") && (!this.doesPlayerHaveAttribute(player, "protected") ||
                                 player.role.current === "little-girl");
 
-exports.isAncientKillable = (action, alreadyRevealed) => action !== "eat" || alreadyRevealed;
-
-exports.isIdiotKillable = (action, player, alreadyRevealed) => action !== "vote" ||
+exports.isIdiotKillable = (action, player, alreadyRevealed) => action !== "vote" && action !== "settle-votes" ||
     this.doesPlayerHaveAttribute(player, "powerless") || alreadyRevealed;
 
 exports.doesPlayerHaveAttribute = ({ attributes }, attributeName) => attributes &&

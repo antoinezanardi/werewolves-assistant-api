@@ -191,4 +191,8 @@ exports.errorMetadata = {
         code: 47,
         HTTPCode: 400,
     },
+    CANT_VOTE_ALREADY: {
+        code: 48,
+        HTTPCode: 400,
+    },
 };

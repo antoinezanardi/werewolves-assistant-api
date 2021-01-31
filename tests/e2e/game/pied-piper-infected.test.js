@@ -115,7 +115,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[3].isAlive).to.equals(false);
+                expect(game.players[3].isAlive).to.be.false;
                 expect(game.players[3].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
@@ -145,7 +145,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].isAlive).to.equals(false);
+                expect(game.players[0].isAlive).to.be.false;
                 expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
