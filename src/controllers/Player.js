@@ -202,15 +202,18 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
         return true;
     }
     const werewolvesPlaysOnAncientSearch = {
+        "gameId": gameHistoryEntry.gameId,
         "play.source.name": { $in: ["werewolves", "big-bad-wolf"] },
         "play.targets": { $elemMatch: { "player.role.current": "ancient" } },
     };
     const werewolvesPlaysOnAncient = [...await GameHistory.find(werewolvesPlaysOnAncientSearch), gameHistoryEntry];
     const ancientSavedByWitchPlaySearch = {
+        "gameId": gameHistoryEntry.gameId,
         "play.source.name": "witch",
         "play.targets": { $elemMatch: { "player.role.current": "ancient", "potion.life": true } },
     };
     const ancientSavedByGuardPlaySearch = {
+        "gameId": gameHistoryEntry.gameId,
         "play.source.name": "guard",
         "play.targets": { $elemMatch: { "player.role.current": "ancient" } },
     };
@@ -222,7 +225,7 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
             livesCount--;
         }
     }
-    return !livesCount;
+    return livesCount <= 0;
 };
 
 exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, gameHistoryEntry) => role.current !== "ancient" &&
@@ -498,11 +501,13 @@ exports.guardPlays = async(play, game) => {
 exports.witchPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, play });
-    for (const target of targets) {
-        if (target.potion.life) {
-            this.addPlayerAttribute(target.player._id, "drank-life-potion", game);
-        } else if (target.potion.death) {
-            this.addPlayerAttribute(target.player._id, "drank-death-potion", game);
+    if (targets) {
+        for (const target of targets) {
+            if (target.potion.life) {
+                this.addPlayerAttribute(target.player._id, "drank-life-potion", game);
+            } else if (target.potion.death) {
+                this.addPlayerAttribute(target.player._id, "drank-death-potion", game);
+            }
         }
     }
 };
