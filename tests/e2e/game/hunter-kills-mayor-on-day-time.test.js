@@ -66,7 +66,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[2].attributes).to.deep.include({ attribute: "sheriff", source: "all" });
+                expect(game.players[2].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
                 done();
             });
@@ -85,7 +85,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
     });
     it("☀️ Sun is rising and hunter is dead", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[0].isAlive).to.equals(false);
+        expect(game.players[0].isAlive).to.be.false;
         done();
     });
     it("🔫 Hunter shoots at the sheriff werewolf (POST /games/:id/play)", done => {
@@ -97,7 +97,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[2].isAlive).to.equals(false);
+                expect(game.players[2].isAlive).to.be.false;
                 done();
             });
     });

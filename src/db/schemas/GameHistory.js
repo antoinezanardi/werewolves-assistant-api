@@ -11,9 +11,15 @@ const playSchema = new Schema({
         required: true,
     },
     source: {
-        type: String,
-        enum: waitingForPossibilities,
-        required: true,
+        name: {
+            type: String,
+            enum: waitingForPossibilities,
+            required: true,
+        },
+        players: {
+            type: [Player],
+            required: true,
+        },
     },
     targets: {
         type: [
@@ -26,6 +32,7 @@ const playSchema = new Schema({
                     life: { type: Boolean },
                     death: { type: Boolean },
                 },
+                isInfected: { type: Boolean },
             },
         ],
         _id: false,
@@ -57,28 +64,6 @@ const playSchema = new Schema({
     versionKey: false,
 });
 
-/*
- * const eventSchema = new Schema({
- *     type: {
- *         type: String,
- *         required: true,
- *     },
- *     source: {
- *         type: String,
- *         enum: waitingForPossibilities,
- *         required: true,
- *     },
- *     targets: {
- *         type: [Player],
- *         default: undefined,
- *     },
- * }, {
- *     _id: false,
- *     timestamps: false,
- *     versionKey: false,
- * });
- */
-
 const gameHistorySchema = new Schema({
     gameId: {
         type: Schema.Types.ObjectId,
@@ -104,12 +89,14 @@ const gameHistorySchema = new Schema({
         type: playSchema,
         required: false,
     },
-    /*
-     * event: {
-     *     type: eventSchema,
-     *     required: false,
-     * },
-     */
+    deadPlayers: {
+        type: [Player],
+        default: undefined,
+    },
+    revealedPlayers: {
+        type: [Player],
+        default: undefined,
+    },
 }, {
     timestamps: true,
     versionKey: false,

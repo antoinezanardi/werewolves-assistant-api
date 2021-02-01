@@ -1,5 +1,55 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.9.0 (2021-02-01)
+
+### 🚀 New features
+
+* [#73](https://github.com/antoinezanardi/werewolves-assistant-api/issues/73) - Vile Father of Wolves Role implemented.
+* [#86](https://github.com/antoinezanardi/werewolves-assistant-api/issues/86) - Extend player limit to 40.
+* [#87](https://github.com/antoinezanardi/werewolves-assistant-api/issues/87) - Add isRevealed to role structure.
+* [#88](https://github.com/antoinezanardi/werewolves-assistant-api/issues/88) - Ancient Role implemented.
+* [#91](https://github.com/antoinezanardi/werewolves-assistant-api/issues/91) - Game option for no sheriff.
+* [#92](https://github.com/antoinezanardi/werewolves-assistant-api/issues/92) - Scapegoat Role implemented.
+* [#93](https://github.com/antoinezanardi/werewolves-assistant-api/issues/93) - Idiot Role implemented.
+* [#94](https://github.com/antoinezanardi/werewolves-assistant-api/issues/94) - Pied Piper Role implemented.
+* [#95](https://github.com/antoinezanardi/werewolves-assistant-api/issues/95) - Limit game history length.
+* [#96](https://github.com/antoinezanardi/werewolves-assistant-api/issues/96) - Add dead players in game history entries.
+* [#99](https://github.com/antoinezanardi/werewolves-assistant-api/issues/99) - ESLint rules updated with last rules.
+
+### 🐛 Bug fixes
+
+* [#106](https://github.com/antoinezanardi/werewolves-assistant-api/issues/106) - Remove player attributes with remaining phases if player is dead.
+
+### ♻️ Refactoring
+
+* [#85](https://github.com/antoinezanardi/werewolves-assistant-api/issues/85) - Change game options structure.
+* [#89](https://github.com/antoinezanardi/werewolves-assistant-api/issues/89) - Decrease `remainingPhases` for attributes.
+* [#90](https://github.com/antoinezanardi/werewolves-assistant-api/issues/90) - Add players source to Game History entry.
+* [#100](https://github.com/antoinezanardi/werewolves-assistant-api/issues/100) - Change `attributes.attribute` to `attributes.name` in Player class.
+
+### 📚 Documentation
+
+* [#98](https://github.com/antoinezanardi/werewolves-assistant-api/issues/98) - APIDoc improved for `Classes` and nested properties.
+* [#101](https://github.com/antoinezanardi/werewolves-assistant-api/issues/101) - Specify remaining phases for each attribute in the documentation.
+* [#103](https://github.com/antoinezanardi/werewolves-assistant-api/issues/103) - Documentation's oversight on game end conditions
+
+### 🛣️ Routes
+
+* [#97](https://github.com/antoinezanardi/werewolves-assistant-api/issues/97) - Users can get full game history or filter entries by source or action.
+
+### 📦 Packages
+
+* `deepmerge` installed with version `4.2.2`.
+* `@sentry/node` updated to version `6.0.3`.
+* `apidoc` updated to version `0.26.0`.
+* `eslint` updated to version `7.19.0`.
+* `express-validator` updated to version `6.9.2`.
+* `mongoose` updated to version `5.11.14`.
+* `nodemon` updated to version `2.0.7`.
+* `qs` updated to version `6.9.6`.
+
+---
+
 ## 0.8.0 (2020-12-30)
 
 ### 🚀 New features

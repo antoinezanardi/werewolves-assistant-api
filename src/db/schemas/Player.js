@@ -1,20 +1,30 @@
 const { Schema } = require("mongoose");
-const { playerAttributes, playerActions, murderedPossibilities } = require("../../helpers/constants/Player");
-const { sideNames, roleNames } = require("../../helpers/constants/Role");
-const { waitingForPossibilities } = require("../../helpers/constants/Game");
+const { getRoleNames, getSideNames } = require("../../helpers/functions/Role");
+const { getWaitingForPossibilities, getGamePhases } = require("../../helpers/functions/Game");
+const { getPlayerAttributes, getPlayerActions, getPlayerMurderedPossibilities } = require("../../helpers/functions/Player");
 
 const PlayerAttributeSchema = new Schema({
-    attribute: {
+    name: {
         type: String,
-        enum: playerAttributes.map(playerAttribute => playerAttribute.attribute),
+        enum: getPlayerAttributes().map(({ name }) => name),
         required: true,
     },
     source: {
         type: String,
-        enum: waitingForPossibilities,
+        enum: getWaitingForPossibilities(),
         required: true,
     },
     remainingPhases: { type: Number },
+    activeAt: {
+        turn: {
+            type: Number,
+            min: 1,
+        },
+        phase: {
+            type: String,
+            enum: getGamePhases(),
+        },
+    },
 }, {
     _id: false,
     timestamps: false,
@@ -39,12 +49,12 @@ const PlayerPowerSchema = new Schema({
 const MurderedSchema = new Schema({
     by: {
         type: String,
-        enum: waitingForPossibilities,
+        enum: getWaitingForPossibilities(),
         required: true,
     },
     of: {
         type: String,
-        enum: playerActions,
+        enum: getPlayerActions(),
         required: true,
     },
 }, {
@@ -61,24 +71,28 @@ const PlayerSchema = new Schema({
     role: {
         original: {
             type: String,
-            enum: roleNames,
+            enum: getRoleNames(),
             required: true,
         },
         current: {
             type: String,
-            enum: roleNames,
+            enum: getRoleNames(),
             required: true,
+        },
+        isRevealed: {
+            type: Boolean,
+            default: false,
         },
     },
     side: {
         original: {
             type: String,
-            enum: sideNames,
+            enum: getSideNames(),
             required: true,
         },
         current: {
             type: String,
-            enum: sideNames,
+            enum: getSideNames(),
             required: true,
         },
     },
@@ -97,7 +111,7 @@ const PlayerSchema = new Schema({
     },
     murdered: {
         type: MurderedSchema,
-        enum: murderedPossibilities,
+        enum: getPlayerMurderedPossibilities(),
         required: false,
     },
 }, {

@@ -1,7 +1,6 @@
 const { describe, it, before, after } = require("mocha");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const mongoose = require("mongoose");
 const app = require("../../../app");
 const Config = require("../../../config");
 const { resetDatabase } = require("../../../src/helpers/functions/Test");
@@ -12,13 +11,15 @@ const { expect } = chai;
 const credentials = { email: "test@test.fr", password: "secret" };
 let players = [
     { name: "Dag", role: "werewolf" },
-    { name: "Dig", role: "hunter" },
-    { name: "Deg", role: "witch" },
+    { name: "Dig", role: "pied-piper" },
+    { name: "Deg", role: "villager" },
     { name: "Dog", role: "villager" },
+    { name: "Dπg", role: "villager" },
+    { name: "Dæg", role: "werewolf" },
 ];
 let token, game;
 
-describe("I - Tiny game of 4 players with no winner at the end", () => {
+describe("N - Tiny game of 6 players in which the pied piper charmed everybody, and so wins", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -53,29 +54,12 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 done();
             });
     });
-    it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${new mongoose.Types.ObjectId()}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "elect-sheriff" })
-            .end((err, res) => {
-                expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
-                done();
-            });
-    });
-    it("👪 All elect the hunter as the sheriff (POST /games/:id/play)", done => {
+    it("👪 All elect the pied piper as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({
-                source: "all", action: "elect-sheriff", votes: [
-                    { from: players[0]._id, for: players[1]._id },
-                    { from: players[2]._id, for: players[1]._id },
-                    { from: players[3]._id, for: players[1]._id },
-                ],
-            })
+            .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[0]._id, for: players[1]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -87,57 +71,6 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                game = res.body;
-                done();
-            });
-    });
-    it("🪄 Witch use life potion on villager (POST /games/:id/play)", done => {
-        players = game.players;
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, potion: { life: true } }] })
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                game = res.body;
-                expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
-                expect(game.history[0].play.targets[0].potion.life).to.be.true;
-                done();
-            });
-    });
-    it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
-        expect(game.players[1].isAlive).to.be.true;
-        done();
-    });
-    it("👪 All vote for villager (POST /games/:id/play)", done => {
-        players = game.players;
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[3]._id }] })
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                game = res.body;
-                expect(game.players[3].isAlive).to.be.false;
-                expect(game.players[3].murdered).to.deep.equals({ by: "all", of: "vote" });
-                done();
-            });
-    });
-    it("🌙 Night falls", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(2);
-        done();
-    });
-    it("🐺 Werewolf eats the witch (POST /games/:id/play)", done => {
-        players = game.players;
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -145,51 +78,90 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 done();
             });
     });
-    it("🪄 Witch use death potion on hunter (POST /games/:id/play)", done => {
-        players = game.players;
+    it("📣 Pied piper charms two villagers (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, potion: { death: true } }] })
+            .send({
+                source: "pied-piper", action: "charm", targets: [
+                    { player: players[3]._id },
+                    { player: players[4]._id },
+                ],
+            })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[0].potion.death).to.be.true;
+                expect(game.players[3].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                expect(game.players[4].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
                 done();
             });
     });
-    it("🎲 Game is not finished and is waiting for for 'hunter' to 'shoot'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "hunter", to: "shoot" });
-        done();
+    it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "charmed", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
     });
-    it("🔫 Hunter shoots at the last werewolf (POST /games/:id/play)", done => {
+    it("👪 All vote for werewolf (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "hunter", action: "shoot", targets: [{ player: players[0]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[0].isAlive).to.be.false;
+                expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
     });
-    it("🎲 Game is WON by... nobody ..!", done => {
+    it("🐺 Werewolf eats the pied piper (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("👼 Pied piper can't charm just two targets if only one can be charmed (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }, { player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("📣 Pied piper charms the last werewolf (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                done();
+            });
+    });
+    it("🎲 Game is WON by the pied piper even if there is no more werewolves because all alive players are charmed !", done => {
         expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals(null);
-        expect(game.won.players).to.not.exist;
+        expect(game.won.by).to.equals("pied-piper");
+        expect(game.won.players).to.be.an("array").lengthOf(1);
+        expect(game.won.players[0]._id).to.equals(game.players[1]._id);
         done();
     });
 });
-
-/*
- * const players = [
- *     { name: "0Dag", role: "werewolf" },
- *     { name: "1Dig", role: "hunter" },
- *     { name: "2Deg", role: "witch" },
- *     { name: "3Dog", role: "villager" }, X
- * ];
- */

@@ -83,8 +83,8 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
-                expect(game.players[3].attributes).to.deep.include({ attribute: "in-love", source: "cupid" });
+                expect(game.players[0].attributes).to.deep.include({ name: "in-love", source: "cupid" });
+                expect(game.players[3].attributes).to.deep.include({ name: "in-love", source: "cupid" });
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
                 expect(game.history[0].play.targets[1].player._id).to.equals(players[3]._id);
                 done();
@@ -98,6 +98,18 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             .end((err, res) => {
                 game = res.body;
                 expect(res).to.have.status(200);
+                done();
+            });
+    });
+    it("🐺 Vile father of wolves can't infect if he is not in the game (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id, isInfected: true }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ABSENT_VILE_FATHER_OF_WOLVES");
                 done();
             });
     });
@@ -115,7 +127,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
     });
     it("☀️ Sun is rising and villager is dead", done => {
         expect(game.phase).to.equals("day");
-        expect(game.players[2].isAlive).to.equals(false);
+        expect(game.players[2].isAlive).to.be.false;
         done();
     });
     it("👪 All vote for cupid (POST /games/:id/play)", done => {
@@ -127,7 +139,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].isAlive).to.equals(false);
+                expect(game.players[1].isAlive).to.be.false;
                 expect(game.players[1].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
