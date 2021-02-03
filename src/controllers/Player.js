@@ -313,7 +313,7 @@ exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
         const ravenMarkedPlayers = getPlayerWithAttribute("raven-marked", game);
         if (ravenMarkedPlayers) {
             if (ravenMarkedPlayers.isAlive) {
-                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers._id, game, 2);
+                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers._id, game, game.options.roles.raven.markPenalty);
             }
             this.removePlayerAttribute(ravenMarkedPlayers._id, "raven-marked", game);
         }

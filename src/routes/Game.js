@@ -22,15 +22,17 @@ module.exports = app => {
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {Object} options Game's options.
      * @apiSuccess {Object} options.roles Game roles options.
-     * @apiSuccess {Object} options.roles.sheriff Game role sheriff's options.
+     * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
      * @apiSuccess {Boolean} options.roles.sheriff.enabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
-     * @apiSuccess {Object} options.roles.seer Game role seer's options.
+     * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
-     * @apiSuccess {Object} options.roles.twoSisters Game role two sisters options.
+     * @apiSuccess {Object} options.roles.twoSisters Game two sisters role's options.
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.twoSisters.wakingUpInterval=2 Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
-     * @apiSuccess {Object} options.roles.threeBrothers Game role three brothers options.
+     * @apiSuccess {Object} options.roles.threeBrothers Game three brothers role's options.
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.threeBrothers.wakingUpInterval=2 Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
+     * @apiSuccess {Object} options.roles.raven Game raven role's options.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.raven.markPenalty=2 Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
      * @apiSuccess {Object} [won] Winners of the game when status is `done`.
      * @apiSuccess {String={"werewolves", "villagers", "lovers", null}} won.by Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers` or null if nobody won_)
@@ -130,15 +132,17 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiParam (Request Body Parameters) {Object} [options] Game's options.
      * @apiParam (Request Body Parameters) {Object} [options.roles] Game roles options.
-     * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game role sheriff's options.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game sheriff role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.enabled=true] If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
-     * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game role seer's options.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
-     * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game role two sisters options.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game two sisters role's options.
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.twoSisters.wakingUpInterval=2] Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
-     * @apiParam (Request Body Parameters) {Object} [options.roles.threeBrothers] Game role three brothers options.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.threeBrothers] Game three brothers role's options.
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.threeBrothers.wakingUpInterval=2] Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiUse GameResponse
      */
     app.post("/games", basicLimiter, passport.authenticate("jwt", { session: false }), [
@@ -172,6 +176,10 @@ module.exports = app => {
         body("options.roles.threeBrothers.wakingUpInterval")
             .optional()
             .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
+            .toInt(),
+        body("options.roles.raven.markPenalty")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
             .toInt(),
     ], Game.postGame);
 

@@ -41,5 +41,6 @@ exports.defaultGameOptions = {
         seer: { isTalkative: true },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },
+        raven: { markPenalty: 2 },
     },
 };

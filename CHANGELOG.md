@@ -4,6 +4,7 @@
 
 ### 🚀 New features
 
+* [#113](https://github.com/antoinezanardi/werewolves-assistant-api/issues/113) - Add option for raven mark penalty.
 
 ### 🐛 Bug fixes
 
