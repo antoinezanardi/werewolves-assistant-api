@@ -1,5 +1,27 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.10.0 (2021-02-??)
+
+### 🚀 New features
+
+
+### 🐛 Bug fixes
+
+* [#112](https://github.com/antoinezanardi/werewolves-assistant-api/issues/112) - Ancient is not infected if he already lost his first life, protected by guard and revived by the witch.
+
+### ♻️ Refactoring
+
+
+### 📚 Documentation
+
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `6.0.4`.
+* `mongoose` updated to version `5.11.15`.
+
+---
+
 ## 0.9.0 (2021-02-01)
 
 ### 🚀 New features

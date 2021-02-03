@@ -458,13 +458,13 @@ exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
     await sheriffActions[play.action](play, game, gameHistoryEntry);
 };
 
-exports.werewolvesPlay = async(play, game) => {
+exports.werewolvesPlay = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     if (targets[0].isInfected) {
         const infectedPlayer = getPlayerWithId(targets[0].player._id, game);
         if (infectedPlayer) {
-            if (infectedPlayer.role.current === "ancient" && !infectedPlayer.role.isRevealed) {
+            if (infectedPlayer.role.current === "ancient" && !await this.isAncientKillable(play.action, gameHistoryEntry)) {
                 this.addPlayerAttribute(targets[0].player._id, "eaten", game);
             } else {
                 infectedPlayer.side.current = "werewolves";
