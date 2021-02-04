@@ -41,6 +41,7 @@ exports.defaultGameOptions = {
     roles: {
         sheriff: { enabled: true, hasDoubledVote: true },
         seer: { isTalkative: true },
+        littleGirl: { isProtectedByGuard: false },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },
         raven: { markPenalty: 2 },

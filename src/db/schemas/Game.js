@@ -24,6 +24,12 @@ const gameOptions = {
                 default: true,
             },
         },
+        littleGirl: {
+            isProtectedByGuard: {
+                type: Boolean,
+                default: false,
+            },
+        },
         twoSisters: {
             wakingUpInterval: {
                 type: Number,

@@ -81,10 +81,10 @@ module.exports = app => {
      *
      * @apiParam (Query String Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Query String Parameters) {String} players.name Player's name. Must be unique in the array.
-     * @apiParam {Query String Parameters} [forbidden-roles=[]] Roles that won't be given by game repartition. All roles can be forbidden except `villager` and `werewolf`. (_See [Codes - Player Roles](#player-roles)_)
-     * @apiParam {Query String Parameters} [are-recommended-min-players-respected=true] If set to `true`, game repartition will make sure that roles distributed respect the recommend min players in the game.
-     * @apiParam {Query String Parameters} [are-powerful-villager-roles-prioritized=true] If set to `true`, villagers with powers will be given to players before simple villagers.
-     * @apiParam {Query String Parameters} [are-powerful-werewolf-roles-prioritized=true] If set to `true`, werewolves with powers will be given to players before simple werewolves.
+     * @apiParam (Query String Parameters) {String[]} [forbidden-roles="[]"] Roles that won't be given by game repartition. All roles can be forbidden except `villager` and `werewolf`. (_See [Codes - Player Roles](#player-roles)_)
+     * @apiParam (Query String Parameters) {Boolean} [are-recommended-min-players-respected=true] If set to `true`, game repartition will make sure that roles distributed respect the recommend min players in the game.
+     * @apiParam (Query String Parameters) {Boolean} [are-powerful-villager-roles-prioritized=true] If set to `true`, villagers with powers will be given to players before simple villagers.
+     * @apiParam (Query String Parameters) {Boolean} [are-powerful-werewolf-roles-prioritized=true] If set to `true`, werewolves with powers will be given to players before simple werewolves.
      * @apiPermission Basic
      * @apiPermission JWT
      * @apiSuccess {Object[]} players
@@ -170,12 +170,14 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.littleGirl] Game little girl role's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isProtectedByGuard=false] If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game two sisters role's options.
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.twoSisters.wakingUpInterval=2] Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiParam (Request Body Parameters) {Object} [options.roles.threeBrothers] Game three brothers role's options.
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.threeBrothers.wakingUpInterval=2] Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
-     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty=2] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiUse GameResponse
      */
     app.post("/games", basicLimiter, passport.authenticate("jwt", { session: false }), [
@@ -199,6 +201,10 @@ module.exports = app => {
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
         body("options.roles.seer.isTalkative")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.littleGirl.isProtectedByGuard")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

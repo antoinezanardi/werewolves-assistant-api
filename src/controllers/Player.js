@@ -234,7 +234,7 @@ exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, 
 
 exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {}) => {
     const player = getPlayerWithId(playerId, game);
-    if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
+    if (player?.isAlive && (action !== "eat" || canBeEaten(player, game))) {
         const alreadyRevealed = player.role.isRevealed;
         if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, gameHistoryEntry))) {
             player.role.isRevealed = true;

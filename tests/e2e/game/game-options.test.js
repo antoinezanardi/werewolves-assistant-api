@@ -395,15 +395,20 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🎲 Creates game with disabled sheriff option, brothers and sisters waking up only the first night and raven penalty to 1 with JWT auth (POST /games)", done => {
+    it("🎲 Creates game with disabled sheriff option, brothers and sisters waking up only the first night, raven penalty to 1 and little girl is protected by guard with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
-                players: originalPlayers,
+                players: [
+                    ...originalPlayers,
+                    { name: "Little girl", role: "little-girl" },
+                    { name: "Guard", role: "guard" },
+                ],
                 options: {
                     roles: {
                         sheriff: { enabled: false },
+                        littleGirl: { isProtectedByGuard: true },
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
                         raven: { markPenalty: 1 },
@@ -451,19 +456,35 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
+    it("🛡 Guard protects the little girl (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                done();
+            });
+    });
+    it("🐺 Werewolf eats the little girl (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[8]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 done();
             });
     });
-    it("☀️ Sun is rising", done => {
+    it("☀️ Sun is rising and little girl is alive because option for protecting her is set to true", done => {
+        expect(game.players[8].isAlive).to.be.true;
         expect(game.phase).to.equals("day");
         done();
     });
@@ -546,6 +567,21 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🛡 Guard protects himself (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[9]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[9].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[9]._id);
                 done();
             });
     });
