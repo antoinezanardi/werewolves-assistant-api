@@ -183,23 +183,26 @@ exports.assignRoleToPlayers = (players, roles) => {
     return players;
 };
 
-exports.getAvailablePowerfulRolesToPick = (roles, players, leftToPick, side) => roles.filter(role => role.side === side &&
-    role.name !== "villager" && role.name !== "werewolf" && (!role.recommendedMinPlayers || role.recommendedMinPlayers <= players.length) &&
+exports.getAvailableRolesToPick = (roles, players, leftToPick, side, options) => roles.filter(role => role.side === side &&
+    !options["forbidden-roles"].includes(role.name) &&
+    (!options["are-powerful-villager-roles-prioritized"] || role.name !== "villager") &&
+    (!options["are-powerful-werewolf-roles-prioritized"] || role.name !== "werewolf") &&
+    (!role.recommendedMinPlayers || !options["are-recommended-min-players-respected"] || role.recommendedMinPlayers <= players.length) &&
     (!role.minInGame || role.minInGame <= leftToPick));
 
-exports.getVillagerRoles = (players, werewolfRoles) => {
+exports.getVillagerRoles = (players, werewolfRoles, options) => {
     const villagerRoles = [];
     const villagerCount = players.length - werewolfRoles.length;
     const villagerRole = getRoles().find(role => role.name === "villager");
-    let availablePowerfulVillagerRoles = getRoles();
+    let availableVillagerRoles = getRoles();
     for (let i = 0; i < villagerCount; i++) {
         const leftToPick = villagerCount - i;
-        availablePowerfulVillagerRoles = this.getAvailablePowerfulRolesToPick(availablePowerfulVillagerRoles, players, leftToPick, "villagers");
-        if (!availablePowerfulVillagerRoles.length) {
+        availableVillagerRoles = this.getAvailableRolesToPick(availableVillagerRoles, players, leftToPick, "villagers", options);
+        if (!availableVillagerRoles.length) {
             villagerRoles.push(JSON.parse(JSON.stringify(villagerRole)));
             villagerRole.maxInGame--;
         } else {
-            const randomRole = this.pickRandomRole(availablePowerfulVillagerRoles);
+            const randomRole = this.pickRandomRole(availableVillagerRoles);
             if (randomRole.minInGame) {
                 for (let j = 0; j < randomRole.minInGame; j++) {
                     villagerRoles.push(randomRole);
@@ -241,19 +244,19 @@ exports.getWerewolfCount = players => {
     return werewolfCount;
 };
 
-exports.getWerewolfRoles = players => {
+exports.getWerewolfRoles = (players, options) => {
     const werewolfRoles = [];
     const werewolfCount = this.getWerewolfCount(players);
     const werewolfRole = getRoles().find(role => role.name === "werewolf");
-    let availablePowerfulWerewolfRoles = getRoles();
+    let availableWerewolfRoles = getRoles();
     for (let i = 0; i < werewolfCount; i++) {
         const leftToPick = werewolfCount - i;
-        availablePowerfulWerewolfRoles = this.getAvailablePowerfulRolesToPick(availablePowerfulWerewolfRoles, players, leftToPick, "werewolves");
-        if (!availablePowerfulWerewolfRoles.length) {
+        availableWerewolfRoles = this.getAvailableRolesToPick(availableWerewolfRoles, players, leftToPick, "werewolves", options);
+        if (!availableWerewolfRoles.length) {
             werewolfRoles.push(JSON.parse(JSON.stringify(werewolfRole)));
             werewolfRole.maxInGame--;
         } else {
-            const randomRole = this.pickRandomRole(availablePowerfulWerewolfRoles);
+            const randomRole = this.pickRandomRole(availableWerewolfRoles);
             werewolfRoles.push(randomRole);
         }
     }
@@ -263,11 +266,12 @@ exports.getWerewolfRoles = players => {
 exports.getGameRepartition = (req, res) => {
     try {
         const { query } = checkRequestData(req);
-        this.checkUniqueNameInPlayers(query.players);
-        const werewolfRoles = this.getWerewolfRoles(query.players);
-        const villagerRoles = this.getVillagerRoles(query.players, werewolfRoles);
-        this.assignRoleToPlayers(query.players, [...villagerRoles, ...werewolfRoles]);
-        res.status(200).json({ players: query.players });
+        const { players, ...options } = query;
+        this.checkUniqueNameInPlayers(players);
+        const werewolfRoles = this.getWerewolfRoles(players, options);
+        const villagerRoles = this.getVillagerRoles(players, werewolfRoles, options);
+        this.assignRoleToPlayers(players, [...villagerRoles, ...werewolfRoles]);
+        res.status(200).json({ players });
     } catch (e) {
         sendError(res, e);
     }

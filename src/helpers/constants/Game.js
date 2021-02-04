@@ -10,6 +10,8 @@ exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"
 
 exports.wonByPossibilities = ["werewolves", "villagers", "lovers", "pied-piper"];
 
+exports.gameRepartitionForbiddenRoleNames = roleNames.filter(roleName => roleName !== "villager" && roleName !== "werewolf");
+
 exports.populate = [
     { path: "gameMaster", select: "-password" },
     { path: "history", limit: 3 },

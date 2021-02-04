@@ -3,7 +3,10 @@ const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
 const GameHistory = require("../controllers/GameHistory");
 const { getRoles, getSideNames } = require("../helpers/functions/Role");
-const { getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses } = require("../helpers/functions/Game");
+const {
+    getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses,
+    getGameRepartitionForbiddenRoleNames,
+} = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
 const { basicLimiter } = require("../helpers/constants/Route");
 
@@ -78,6 +81,10 @@ module.exports = app => {
      *
      * @apiParam (Query String Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Query String Parameters) {String} players.name Player's name. Must be unique in the array.
+     * @apiParam {Query String Parameters} [forbidden-roles=[]] Roles that won't be given by game repartition. All roles can be forbidden except `villager` and `werewolf`. (_See [Codes - Player Roles](#player-roles)_)
+     * @apiParam {Query String Parameters} [are-recommended-min-players-respected=true] If set to `true`, game repartition will make sure that roles distributed respect the recommend min players in the game.
+     * @apiParam {Query String Parameters} [are-powerful-villager-roles-prioritized=true] If set to `true`, villagers with powers will be given to players before simple villagers.
+     * @apiParam {Query String Parameters} [are-powerful-werewolf-roles-prioritized=true] If set to `true`, werewolves with powers will be given to players before simple werewolves.
      * @apiPermission Basic
      * @apiPermission JWT
      * @apiSuccess {Object[]} players
@@ -95,10 +102,36 @@ module.exports = app => {
             .isArray().withMessage("Must be a valid array")
             .custom(value => value.length >= 4 && value.length <= 40 ? Promise.resolve() : Promise.reject(new Error()))
             .withMessage("Must contain between 4 and 40 players"),
+        query("forbidden-roles")
+            .default([])
+            .customSanitizer(forbiddenRoles => {
+                if (Array.isArray(forbiddenRoles)) {
+                    return forbiddenRoles;
+                }
+                return typeof forbiddenRoles === "object" && forbiddenRoles !== null ? Object.values(forbiddenRoles).map(value => value) : [];
+            })
+            .isArray().withMessage("Must be a valid array")
+            .custom(roles => {
+                const forbiddenRoles = getGameRepartitionForbiddenRoleNames();
+                return roles.every(role => forbiddenRoles.includes(role)) ? Promise.resolve() : Promise.reject(new Error());
+            })
+            .withMessage(`Each forbidden role must be equal to one of the following values: ${getGameRepartitionForbiddenRoleNames()}`),
         query("players.*.name")
             .isString().withMessage("Must be a valid string")
             .trim()
             .notEmpty().withMessage("Can't be empty"),
+        query("are-recommended-min-players-respected")
+            .default(true)
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        query("are-powerful-villager-roles-prioritized")
+            .default(true)
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        query("are-powerful-werewolf-roles-prioritized")
+            .default(true)
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
     ], Game.getGameRepartition);
 
     /**
