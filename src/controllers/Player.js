@@ -182,7 +182,7 @@ exports.insertActionBeforeAllVote = (game, waiting) => {
     }
 };
 
-exports.applyConsequencesDependingOnKilledPlayerRole = (player, action, game, options) => {
+exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, game, gameHistoryEntry, options) => {
     const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
@@ -191,6 +191,10 @@ exports.applyConsequencesDependingOnKilledPlayerRole = (player, action, game, op
             if (isAlive && side.original === "villagers") {
                 this.addPlayerAttribute(_id, "powerless", game);
             }
+        }
+        const idiotPlayer = getPlayerWithRole("idiot", game);
+        if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
+            await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
         }
     } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1) {
         this.insertActionBeforeAllVote(game, { for: "scapegoat", to: "ban-voting" });
@@ -254,7 +258,7 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
                 }
                 this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             }
-            this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, options);
+            await this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, gameHistoryEntry, options);
             await this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
             this.purgePlayerAttributes(player);
         }

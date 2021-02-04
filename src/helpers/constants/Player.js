@@ -42,4 +42,5 @@ exports.murderedPossibilities = [
     { by: "sheriff", of: "settle-votes" },
     { by: "all", of: "vote" },
     { by: "cupid", of: "charm" },
+    { by: "all", of: "reconsider" },
 ];

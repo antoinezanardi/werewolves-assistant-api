@@ -30,6 +30,12 @@ const gameOptions = {
                 default: false,
             },
         },
+        idiot: {
+            doesDieOnAncientDeath: {
+                type: Boolean,
+                default: true,
+            },
+        },
         twoSisters: {
             wakingUpInterval: {
                 type: Number,
