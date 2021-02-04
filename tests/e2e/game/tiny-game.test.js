@@ -13,7 +13,7 @@ const credentials = { email: "test@test.fr", password: "secret" };
 let players = [
     { name: "Dag", role: "werewolf" },
     { name: "Dig", role: "werewolf" },
-    { name: "Deg", role: "werewolf" },
+    { name: "Deg", role: "big-bad-wolf" },
     { name: "Dog", role: "villager" },
 ];
 let token, game;
@@ -88,6 +88,28 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🐺 Big bad wolf can't eat a target because there is no one left (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[3]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🐺 Big bad wolf skips (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "big-bad-wolf", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;

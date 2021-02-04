@@ -7,7 +7,7 @@ const {
 } = require("../helpers/functions/Player");
 const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
-    getRemainingPlayersToCharm,
+    getRemainingPlayersToCharm, getRemainingPlayersToEat,
 } = require("../helpers/functions/Game");
 const { generateError } = require("../helpers/functions/Error");
 
@@ -409,8 +409,12 @@ exports.scapegoatPlays = async(play, game) => {
 
 exports.bigBadWolfPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "big-bad-wolf" });
+    const targetsExpectedLength = !getRemainingPlayersToEat(game).length ? 0 : 1;
+    const options = { expectedLength: targetsExpectedLength, canBeUnset: !targetsExpectedLength, canBeEmpty: !targetsExpectedLength, play };
+    await this.checkAndFillTargets(targets, game, options);
+    if (targets?.length) {
+        this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "big-bad-wolf" });
+    }
 };
 
 exports.dogWolfPlays = (play, game) => {

@@ -10,6 +10,7 @@
 
 * [#112](https://github.com/antoinezanardi/werewolves-assistant-api/issues/112) - Ancient is not infected if he already lost his first life, protected by guard and revived by the witch.
 * [#114](https://github.com/antoinezanardi/werewolves-assistant-api/issues/114) - `recommendedMinPlayers` is not used for random game composition for werewolves.
+* [#115](https://github.com/antoinezanardi/werewolves-assistant-api/issues/115) - No targets for big bad wolf.
 
 ### ♻️ Refactoring
 
