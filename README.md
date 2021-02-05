@@ -43,7 +43,7 @@ Two versions are available for testing this API:
 Both APIs are running on a server with the following configuration:
 - **OS**: `Debian GNU/Linux 10 (buster)` 
 - **NodeJS**: `v14.15.4`
-- **NPM**: `v6.14.10`
+- **NPM**: `v7.5.2`
 - **MongoDB shell version**: `v4.4.3` 
 
 The MongoDB database is protected under username and password authentication.
@@ -93,6 +93,12 @@ Each change when a new version comes up is listed in the <a href="https://github
 Also, you can keep up with changes by watching releases with the **Watch GitHub button** at the top of this page.
 
 Current release on **main API** is [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/).
+
+✨ <a href="https://werewolves-assistant-api.antoinezanardi.fr" target="_blank">**Main API**</a> is updated when commits are merged into the `master` branch.
+
+🔧 <a href="https://sandbox.werewolves-assistant-api.antoinezanardi.fr" target="_blank">**Sandbox API**</a> is updated when commits are merged into the `staging` branch.
+
+**[Travis](https://travis-ci.com)** helps the project to be automatically updated by deploying new versions for both **Sandbox** and **Main** APIs. Please refer to the **[.travis.yml file](https://github.com/antoinezanardi/werewolves-assistant-api/blob/master/.travis.yml)** for more details.
 
 #### 🏷️ <a href="https://github.com/antoinezanardi/werewolves-assistant-api/releases" target="_blank">All releases for this project are available here</a>. 
 
