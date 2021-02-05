@@ -17,6 +17,7 @@
 
 ### ♻️ Refactoring
 
+* [#124](https://github.com/antoinezanardi/werewolves-assistant-api/issues/124) - Change sheriff enabled option property name.
 
 ### 📚 Documentation
 

@@ -9,7 +9,7 @@ const { getPlayerActions } = require("../../helpers/functions/Player");
 const gameOptions = {
     roles: {
         sheriff: {
-            enabled: {
+            isEnabled: {
                 type: Boolean,
                 default: true,
             },

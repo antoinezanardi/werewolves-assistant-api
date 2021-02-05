@@ -39,7 +39,7 @@ exports.findFields = ["status"];
 
 exports.defaultGameOptions = {
     roles: {
-        sheriff: { enabled: true, hasDoubledVote: true },
+        sheriff: { isEnabled: true, hasDoubledVote: true },
         seer: { isTalkative: true },
         littleGirl: { isProtectedByGuard: false },
         idiot: { doesDieOnAncientDeath: true },

@@ -407,7 +407,7 @@ describe("K - Game options", () => {
                 ],
                 options: {
                     roles: {
-                        sheriff: { enabled: false },
+                        sheriff: { isEnabled: false },
                         littleGirl: { isProtectedByGuard: true },
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
@@ -418,7 +418,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.options.roles.sheriff.enabled).to.be.false;
+                expect(game.options.roles.sheriff.isEnabled).to.be.false;
                 done();
             });
     });

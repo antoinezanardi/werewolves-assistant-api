@@ -422,14 +422,14 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
 };
 
 exports.isSheriffCallableDuringTheNight = game => {
-    const isSheriffEnabled = getProp(game, "options.roles.sheriff.enabled", true);
+    const isSheriffEnabled = getProp(game, "options.roles.sheriff.isEnabled", true);
     const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
     return isSheriffEnabled && !!sheriffPlayer && sheriffPlayer.isAlive;
 };
 
 exports.isSourceCallableDuringTheNight = (game, source) => {
     if (source === "all") {
-        return getProp(game, "options.roles.sheriff.enabled", true);
+        return getProp(game, "options.roles.sheriff.isEnabled", true);
     } else if (source === "sheriff") {
         return this.isSheriffCallableDuringTheNight(game);
     }

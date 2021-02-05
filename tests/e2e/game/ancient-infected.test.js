@@ -46,7 +46,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players, options: { roles: { sheriff: { enabled: false } } } })
+            .send({ players, options: { roles: { sheriff: { isEnabled: false } } } })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
