@@ -22,6 +22,7 @@
 ### ♻️ Refactoring
 
 * [#124](https://github.com/antoinezanardi/werewolves-assistant-api/issues/124) - Change sheriff enabled option property name.
+* [#125](https://github.com/antoinezanardi/werewolves-assistant-api/issues/125) - Change `potion` structure for plays and game history.
 
 ### 📚 Documentation
 

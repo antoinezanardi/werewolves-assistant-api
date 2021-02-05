@@ -198,7 +198,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, potion: { life: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, hasDrankLifePotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;

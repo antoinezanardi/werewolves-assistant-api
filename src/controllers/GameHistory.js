@@ -67,9 +67,9 @@ exports.create = async(data, options = {}) => {
 
 exports.deleteMany = search => GameHistory.deleteMany(search);
 
-exports.isLifePotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.life": true });
+exports.isLifePotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.hasDrankLifePotion": true });
 
-exports.isDeathPotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.potion.death": true });
+exports.isDeathPotionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.hasDrankDeathPotion": true });
 
 exports.isInfectionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.isInfected": true });
 

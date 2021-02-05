@@ -28,10 +28,8 @@ const playSchema = new Schema({
                     type: Player,
                     required: true,
                 },
-                potion: {
-                    life: { type: Boolean },
-                    death: { type: Boolean },
-                },
+                hasDrankLifePotion: { type: Boolean },
+                hasDrankDeathPotion: { type: Boolean },
                 isInfected: { type: Boolean },
             },
         ],

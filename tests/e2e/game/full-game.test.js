@@ -1214,24 +1214,12 @@ describe("B - Full game of 23 players with all roles", () => {
                 done();
             });
     });
-    it("🪄 Witch can't use potion if one target doesn't have `potion` field (POST /games/:id/play)", done => {
+    it("🪄 Witch can't use potion if one target have both `hasDrankLifePotion` and `hasDrankDeathPotion` fields set to `true` (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id }] })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_TARGET_STRUCTURE");
-                done();
-            });
-    });
-    it("🪄 Witch can't use potion if one target have both `potion.life` and `potion.death` fields set to `true` (POST /games/:id/play)", done => {
-        players = game.players;
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, potion: { life: true, death: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, hasDrankLifePotion: true, hasDrankDeathPotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_TARGET_STRUCTURE");
@@ -1242,7 +1230,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: new mongoose.Types.ObjectId(), potion: { life: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: new mongoose.Types.ObjectId(), hasDrankLifePotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1254,7 +1242,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, potion: { life: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, hasDrankLifePotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_LIFE_POTION_USE");
@@ -1268,8 +1256,8 @@ describe("B - Full game of 23 players with all roles", () => {
             .set({ Authorization: `Bearer ${token}` })
             .send({
                 source: "witch", action: "use-potion", targets: [
-                    { player: players[2]._id, potion: { life: true } },
-                    { player: players[2]._id, potion: { death: true } },
+                    { player: players[2]._id, hasDrankLifePotion: true },
+                    { player: players[2]._id, hasDrankDeathPotion: true },
                 ],
             })
             .end((err, res) => {
@@ -1285,8 +1273,8 @@ describe("B - Full game of 23 players with all roles", () => {
             .set({ Authorization: `Bearer ${token}` })
             .send({
                 source: "witch", action: "use-potion", targets: [
-                    { player: players[0]._id, potion: { death: true } },
-                    { player: players[1]._id, potion: { death: true } },
+                    { player: players[0]._id, hasDrankDeathPotion: true },
+                    { player: players[1]._id, hasDrankDeathPotion: true },
                 ],
             })
             .end((err, res) => {
@@ -1300,13 +1288,13 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, potion: { life: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, hasDrankLifePotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
-                expect(game.history[0].play.targets[0].potion.life).to.be.true;
+                expect(game.history[0].play.targets[0].hasDrankLifePotion).to.be.true;
                 done();
             });
     });
@@ -1876,7 +1864,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[20]._id, potion: { death: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[20]._id, hasDrankDeathPotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NOT_TARGETABLE");
@@ -1888,7 +1876,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, potion: { life: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, hasDrankLifePotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("ONLY_ONE_LIFE_POTION");
@@ -1900,13 +1888,13 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, potion: { death: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, hasDrankDeathPotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[0].potion.death).to.be.true;
+                expect(game.history[0].play.targets[0].hasDrankDeathPotion).to.be.true;
                 done();
             });
     });
@@ -2277,7 +2265,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, potion: { death: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, hasDrankDeathPotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("ONLY_ONE_DEATH_POTION");

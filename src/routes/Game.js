@@ -289,9 +289,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Object[]} [targets] Player(s) affected by the play. Required when **action** is `use-potion`, `eat`, `look`, `protect`, `shoot`, `mark`, `delegate` or `settle-votes`.
      * @apiParam (Request Body Parameters) {ObjectId} targets.player Player's id.
      * @apiParam (Request Body Parameters) {Boolean} [targets.isInfected] Only if there is vile-father-of-wolves in the game and the action is `eat` from `werewolves`. Set to `true` and the werewolves victim will instantly join the `werewolves` side if possible.
-     * @apiParam (Request Body Parameters) {Object} [targets.potion] Only for the `witch` actions.
-     * @apiParam (Request Body Parameters) {Boolean} [targets.potion.life] Set to `true` if the `witch` saves target's life from werewolves meal.
-     * @apiParam (Request Body Parameters) {Boolean} [targets.potion.death] Set to `true` if the `witch` kills the target.
+     * @apiParam (Request Body Parameters) {Boolean} [targets.hasDrankLifePotion] Set to `true` if the `witch` saves target's life from werewolves meal.
+     * @apiParam (Request Body Parameters) {Boolean} [targets.hasDrankDeathPotion] Set to `true` if the `witch` kills the target.
      * @apiParam (Request Body Parameters) {Object[]} [votes] Required when **action** is `elect-sheriff` or `vote`.
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
@@ -314,11 +313,11 @@ module.exports = app => {
             .toBoolean(),
         body("targets.*.player")
             .isMongoId().withMessage("Must be a valid MongoId"),
-        body("targets.*.potion.life")
+        body("targets.*.hasDrankLifePotion")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
-        body("targets.*.potion.death")
+        body("targets.*.hasDrankDeathPotion")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

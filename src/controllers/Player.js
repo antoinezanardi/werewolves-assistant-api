@@ -13,8 +13,8 @@ const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
     if (action === "use-potion") {
-        const savedTarget = targets.filter(({ potion }) => potion.life);
-        const murderedTarget = targets.filter(({ potion }) => potion.death);
+        const savedTarget = targets.filter(({ hasDrankLifePotion }) => hasDrankLifePotion);
+        const murderedTarget = targets.filter(({ hasDrankDeathPotion }) => hasDrankDeathPotion);
         if (savedTarget.length > 1 || savedTarget.length && await GameHistory.isLifePotionUsed(game._id)) {
             throw generateError("ONLY_ONE_LIFE_POTION", "Witch can only use one life potion per game.");
         } else if (murderedTarget.length > 1 || murderedTarget.length && await GameHistory.isDeathPotionUsed(game._id)) {
@@ -60,7 +60,7 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
         throw generateError("CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
     } else if (action === "eat") {
         await this.checkEatTarget(target, game, source);
-    } else if (action === "use-potion" && target.potion.life && !doesPlayerHaveAttribute(target.player, "eaten")) {
+    } else if (action === "use-potion" && target.hasDrankLifePotion && !doesPlayerHaveAttribute(target.player, "eaten")) {
         throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by werewolves.`);
     } else if (action === "protect") {
         const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
@@ -95,9 +95,7 @@ exports.checkTargetStructure = (target, action) => {
     if (target.player === undefined) {
         throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "player" is missing.`);
     } else if (action === "use-potion") {
-        if (target.potion === undefined || target.potion.life === undefined && target.potion.death === undefined) {
-            throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "potion" with either "potion.life" or "potion.death" are missing.`);
-        } else if (target.potion.life && target.potion.death) {
+        if (target.hasDrankLifePotion && target.hasDrankDeathPotion) {
             throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Witch can't use life and death potions on the same target.`);
         }
     }
@@ -227,7 +225,7 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
     const ancientSavedByWitchPlaySearch = {
         "gameId": gameHistoryEntry.gameId,
         "play.source.name": "witch",
-        "play.targets": { $elemMatch: { "player.role.current": "ancient", "potion.life": true } },
+        "play.targets": { $elemMatch: { "player.role.current": "ancient", "hasDrankLifePotion": true } },
     };
     const ancientSavedByGuardPlaySearch = {
         "gameId": gameHistoryEntry.gameId,
@@ -522,9 +520,9 @@ exports.witchPlays = async(play, game) => {
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, play });
     if (targets) {
         for (const target of targets) {
-            if (target.potion.life) {
+            if (target.hasDrankLifePotion) {
                 this.addPlayerAttribute(target.player._id, "drank-life-potion", game);
-            } else if (target.potion.death) {
+            } else if (target.hasDrankDeathPotion) {
                 this.addPlayerAttribute(target.player._id, "drank-death-potion", game);
             }
         }
