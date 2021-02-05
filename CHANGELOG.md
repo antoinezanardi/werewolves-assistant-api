@@ -7,6 +7,7 @@
 * [#113](https://github.com/antoinezanardi/werewolves-assistant-api/issues/113) - Add option for raven mark penalty.
 * [#116](https://github.com/antoinezanardi/werewolves-assistant-api/issues/116) - Options for game's random repartition.
 * [#117](https://github.com/antoinezanardi/werewolves-assistant-api/issues/117) - Add guard protection on little girl option.
+* [#118](https://github.com/antoinezanardi/werewolves-assistant-api/issues/118) - Add idiot dies on ancient death option.
 
 ### 🐛 Bug fixes
 
@@ -23,7 +24,7 @@
 ### 📦 Packages
 
 * `@sentry/node` updated to version `6.1.0`.
-* `chhai` updated to version `4.3.0`.
+* `chai` updated to version `4.3.0`.
 * `mongoose` updated to version `5.11.15`.
 
 ---

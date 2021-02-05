@@ -15,6 +15,7 @@ let players = [
     { name: "Dog", role: "werewolf" },
     { name: "D€g", role: "ancient" },
     { name: "Dôg", role: "scapegoat" },
+    { name: "D∂g", role: "idiot" },
 ];
 let token, game;
 
@@ -155,17 +156,32 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
     });
-    it("👪 All vote for the guard (POST /games/:id/play)", done => {
+    it("👪 All vote for the idiot, which is only revealed (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[1]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[1].isAlive).to.be.false;
-                expect(game.players[1].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[5].isAlive).to.be.true;
+                expect(game.players[5].role.isRevealed).to.be.true;
+                done();
+            });
+    });
+    it("🛡 Guard protects himself (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[1]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[1].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
                 done();
             });
     });
@@ -203,6 +219,21 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 done();
             });
     });
+    it("🛡 Guard protects the idiot (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[5]._id);
+                done();
+            });
+    });
     it("🐺 Werewolf eats the ancient again, again and again ! (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
@@ -217,10 +248,12 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 done();
             });
     });
-    it("☀️ Sun is rising and ancient is finally dead", done => {
+    it("☀️ Sun is rising and ancient is finally dead and idiot too because he was already revealed", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[3].isAlive).to.be.false;
         expect(game.players[3].role.isRevealed).to.be.true;
+        expect(game.players[5].isAlive).to.be.false;
+        expect(game.players[5].murdered).to.deep.equals({ by: "all", of: "reconsider" });
         done();
     });
 });

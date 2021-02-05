@@ -65,7 +65,7 @@ describe("B - Full game of 23 players with all roles", () => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players })
+            .send({ players, options: { roles: { idiot: { doesDieOnAncientDeath: false } } } })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -3088,7 +3088,7 @@ describe("B - Full game of 23 players with all roles", () => {
                 done();
             });
     });
-    it("☀️ Sun is rising, ancient is dead this time", done => {
+    it("☀️ Sun is rising, ancient is dead this time and idiot is still alive because of game option", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[19].role.isRevealed).to.be.true;
         expect(game.players[19].isAlive).to.be.false;

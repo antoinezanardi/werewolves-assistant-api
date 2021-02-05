@@ -186,10 +186,12 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
     const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
-    } else if (player.role.current === "ancient" && ancientRevengeActions.includes(action)) {
-        for (const { _id, isAlive, side } of game.players) {
-            if (isAlive && side.original === "villagers") {
-                this.addPlayerAttribute(_id, "powerless", game);
+    } else if (player.role.current === "ancient") {
+        if (ancientRevengeActions.includes(action)) {
+            for (const { _id, isAlive, side } of game.players) {
+                if (isAlive && side.original === "villagers") {
+                    this.addPlayerAttribute(_id, "powerless", game);
+                }
             }
         }
         const idiotPlayer = getPlayerWithRole("idiot", game);
