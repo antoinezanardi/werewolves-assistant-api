@@ -502,6 +502,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("need-settlement");
                 expect(game.players[0].isAlive).to.be.true;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[5].isAlive).to.be.true;
@@ -549,6 +550,7 @@ describe("K - Game options", () => {
                 expect(game.players[0].isAlive).to.be.true;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[5].isAlive).to.be.true;
+                expect(game.history[0].play.votesResult).to.equals("no-death");
                 expect(game.history[0].deadPlayers).to.not.exist;
                 done();
             });
@@ -615,6 +617,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("need-settlement");
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[2].isAlive).to.be.true;
                 done();
@@ -636,6 +639,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[2].isAlive).to.be.false;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
                 done();

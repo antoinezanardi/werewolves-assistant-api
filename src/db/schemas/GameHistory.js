@@ -1,19 +1,19 @@
 const { Schema } = require("mongoose");
 const Player = require("./Player");
-const { gamePhases, waitingForPossibilities } = require("../../helpers/constants/Game");
-const { playerActions } = require("../../helpers/constants/Player");
+const { getGamePhases, getWaitingForPossibilities, getVotesResults } = require("../../helpers/functions/Game");
+const { getPlayerActions } = require("../../helpers/functions/Player");
 const { getSideNames } = require("../../helpers/functions/Role");
 
 const playSchema = new Schema({
     action: {
         type: String,
-        enum: playerActions,
+        enum: getPlayerActions(),
         required: true,
     },
     source: {
         name: {
             type: String,
-            enum: waitingForPossibilities,
+            enum: getWaitingForPossibilities(),
             required: true,
         },
         players: {
@@ -54,6 +54,10 @@ const playSchema = new Schema({
         _id: false,
         default: undefined,
     },
+    votesResult: {
+        type: String,
+        enum: getVotesResults(),
+    },
     side: {
         type: String,
         enum: getSideNames(),
@@ -77,7 +81,7 @@ const gameHistorySchema = new Schema({
     },
     phase: {
         type: String,
-        enum: gamePhases,
+        enum: getGamePhases(),
         required: true,
     },
     tick: {

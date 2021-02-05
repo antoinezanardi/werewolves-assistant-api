@@ -203,6 +203,17 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
     }
 };
 
+exports.fillMurderedData = (player, action, gameHistoryEntry, options) => {
+    const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
+    if (murdered) {
+        player.murdered = murdered;
+        if (options.forcedSource) {
+            player.murdered.by = options.forcedSource;
+        }
+        this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+    }
+};
+
 exports.isAncientKillable = async(action, gameHistoryEntry) => {
     if (action !== "eat") {
         return true;
@@ -252,17 +263,15 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
         }
         if (await this.isPlayerKillable(player, action, alreadyRevealed, gameHistoryEntry)) {
             player.isAlive = false;
-            const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
-            if (murdered) {
-                player.murdered = murdered;
-                if (options.forcedSource) {
-                    player.murdered.by = options.forcedSource;
-                }
-                this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+            this.fillMurderedData(player, action, gameHistoryEntry, options);
+            if (action === "vote") {
+                gameHistoryEntry.play.votesResult = "death";
             }
             await this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, gameHistoryEntry, options);
             await this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
             this.purgePlayerAttributes(player);
+        } else if (action === "vote") {
+            gameHistoryEntry.play.votesResult = "no-death";
         }
     }
 };
@@ -540,11 +549,12 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
             await this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
         } else if (sheriffPlayer?.isAlive) {
             game.waiting.push({ for: "sheriff", to: "settle-votes" });
+            gameHistoryEntry.play.votesResult = "need-settlement";
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
-            const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
-            if (!lastVotePlay || lastVotePlay.turn !== game.turn) {
-                game.waiting.push({ for: "all", to: "vote" });
-            }
+            game.waiting.push({ for: "all", to: "vote" });
+            gameHistoryEntry.play.votesResult = "need-settlement";
+        } else {
+            gameHistoryEntry.play.votesResult = "no-death";
         }
     } else {
         await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
@@ -557,6 +567,7 @@ exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
     this.addPlayerAttribute(nominatedPlayers[0]._id, "sheriff", game);
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
+    gameHistoryEntry.play.votesResult = "election";
 };
 
 exports.allPlay = async(play, game, gameHistoryEntry) => {

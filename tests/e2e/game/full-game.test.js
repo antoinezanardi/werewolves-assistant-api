@@ -254,6 +254,7 @@ describe("B - Full game of 23 players with all roles", () => {
                 expect(game.history[0].play.votes).to.exist;
                 expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
                 expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
+                expect(game.history[0].play.votesResult).to.equals("election");
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(game.players[7]._id);
                 expect(game.history[0].play.source.name).to.equal("all");
@@ -1593,7 +1594,7 @@ describe("B - Full game of 23 players with all roles", () => {
                 done();
             });
     });
-    it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🪶 and little girl, the sheriff, has double vote] (POST /games/:id/play)", done => {
+    it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🪶 and little girl, the sheriff, has double vote], then scapegoat dies (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -1616,6 +1617,7 @@ describe("B - Full game of 23 players with all roles", () => {
                 expect(game.players[5].isAlive).to.be.true;
                 expect(game.players[6].isAlive).to.be.true;
                 expect(game.history[0].play.votes).to.exist;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.equals(game.players[20]._id);
                 done();
@@ -2061,6 +2063,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("need-settlement");
                 expect(game.players[8].isAlive).to.be.true;
                 expect(game.players[22].isAlive).to.be.true;
                 done();
@@ -2416,6 +2419,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[4].isAlive).to.be.false;
                 expect(game.players[4].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
@@ -2686,6 +2690,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[15].isAlive).to.be.false;
                 expect(game.players[15].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
@@ -2775,6 +2780,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[18].isAlive).to.be.false;
                 expect(game.players[18].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
@@ -2866,6 +2872,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[17].isAlive).to.be.false;
                 expect(game.players[17].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
@@ -2943,6 +2950,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[16].isAlive).to.be.false;
                 expect(game.players[16].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
@@ -3036,6 +3044,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("no-death");
                 expect(game.players[21].role.isRevealed).to.be.true;
                 expect(game.players[21].attributes).to.deep.include({ name: "cant-vote", source: "all" });
                 expect(game.players[21].isAlive).to.be.true;
@@ -3121,6 +3130,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[21].isAlive).to.be.false;
                 expect(game.players[21].murdered).to.deep.equals({ by: "all", of: "vote" });
                 expect(game.players[21].attributes).to.deep.includes({ name: "sheriff", source: "sheriff" });
@@ -3187,6 +3197,7 @@ describe("B - Full game of 23 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.players[0].isAlive).to.be.false;
                 expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();

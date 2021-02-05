@@ -170,6 +170,7 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 | **votes***                                         | Object[]                  | Votes of the play.                                                                                                                                                               |
 | &emsp;⮑ from                                      | [Player](#player-class)   | Vote's source.                                                                                                                                                                   |
 | &emsp;⮑ for                                       | [Player](#player-class)   | Vote's target.                                                                                                                                                                   |
+| **votesResult***                                   | String                    | Only if `votes` are set, define the results. Can be either `election`, `need-settlement`, `death` or `no-death`.                                                                 |
 | **side***                                          | String                    | Only available for the `dog-wolf`. Is equal to `villagers` or `werewolves` depending on the chosen side.                                                                         |
 
 ## <a id="error-class"></a>⚠️ API Error

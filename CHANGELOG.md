@@ -9,6 +9,10 @@
 * [#117](https://github.com/antoinezanardi/werewolves-assistant-api/issues/117) - Add guard protection on little girl option.
 * [#118](https://github.com/antoinezanardi/werewolves-assistant-api/issues/118) - Add idiot dies on ancient death option.
 
+### 🌟 Enhancements
+
+* [#121](https://github.com/antoinezanardi/werewolves-assistant-api/issues/121) - Add `votesResult` in Game history plays.
+
 ### 🐛 Bug fixes
 
 * [#112](https://github.com/antoinezanardi/werewolves-assistant-api/issues/112) - Ancient is not infected if he already lost his first life, protected by guard and revived by the witch.

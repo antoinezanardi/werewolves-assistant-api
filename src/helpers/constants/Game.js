@@ -48,3 +48,5 @@ exports.defaultGameOptions = {
         raven: { markPenalty: 2 },
     },
 };
+
+exports.votesResults = ["election", "need-settlement", "death", "no-death"];

@@ -1,6 +1,6 @@
 const {
     patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions,
-    gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames,
+    gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames, votesResults,
 } = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
 
@@ -89,3 +89,5 @@ exports.filterOutSourcesFromWaitingQueue = (game, sources) => {
 };
 
 exports.getGameRepartitionForbiddenRoleNames = () => JSON.parse(JSON.stringify(gameRepartitionForbiddenRoleNames));
+
+exports.getVotesResults = () => JSON.parse(JSON.stringify(votesResults));
