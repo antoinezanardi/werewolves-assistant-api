@@ -20,6 +20,7 @@
 
 ### 📚 Documentation
 
+* [#122](https://github.com/antoinezanardi/werewolves-assistant-api/issues/122) - Set `side` to optional field in APIDoc for GameHistory Class.
 
 ### 📦 Packages
 
