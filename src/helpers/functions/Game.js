@@ -15,11 +15,17 @@ exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive
 exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
                                     game.players.every(player => doesPlayerHaveAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
 
+exports.isWhiteWerewolfOnlyAlive = game => !!this.getPlayerWithRole("white-werewolf", game) &&
+    game.players.every(({ isAlive, role }) => role.current === "white-werewolf" && isAlive || role.current !== "white-werewolf" && !isAlive);
+
 exports.getRemainingPlayersToCharm = game => game.players.filter(({ role, attributes, isAlive }) => isAlive &&
     role.current !== "pied-piper" && !doesPlayerHaveAttribute({ attributes }, "charmed"));
 
-exports.getRemainingPlayersToEat = game => game.players.filter(({ side, attributes, isAlive }) => isAlive &&
+exports.getRemainingVillagersToEat = game => game.players.filter(({ side, attributes, isAlive }) => isAlive &&
     side.current !== "werewolves" && !doesPlayerHaveAttribute({ attributes }, "eaten"));
+
+exports.getRemainingWerewolvesToEat = game => game.players.filter(({ side, role, isAlive }) => isAlive && side.current === "werewolves" &&
+    role.current !== "white-werewolf");
 
 exports.hasPiedPiperWon = game => {
     const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
@@ -30,7 +36,7 @@ exports.hasPiedPiperWon = game => {
 
 exports.isGameDone = game => this.areAllPlayersDead(game) ||
         (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game) ||
-            this.hasPiedPiperWon(game)) && !this.isActionInWaitingQueue(game, "shoot");
+            this.hasPiedPiperWon(game) || this.isWhiteWerewolfOnlyAlive(game)) && !this.isActionInWaitingQueue(game, "shoot");
 
 exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) => to === action);
 

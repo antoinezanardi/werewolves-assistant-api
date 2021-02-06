@@ -34,10 +34,12 @@ let players = [
     { name: "Dg", role: "scapegoat" },
     { name: "Døg", role: "idiot" },
     { name: "D≠g", role: "pied-piper" },
+    { name: "D•g", role: "white-werewolf" },
+    { name: "D¥g", role: "werewolf" },
 ];
 let token, game;
 
-describe("B - Full game of 23 players with all roles", () => {
+describe("B - Full game of 25 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {

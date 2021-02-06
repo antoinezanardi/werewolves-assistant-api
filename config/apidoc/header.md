@@ -36,13 +36,14 @@ During the game, the `waiting` queue tells the game master what are the upcoming
 
 Each time a play is performed, `tick` increments and `phase` is set according to the current state. Game's `turn` increases after each succession of a `night` and a `day`.
 
-Game ends when one of the following conditions is met:
+Game ends when one of the following conditions is met, in this order of priority:
 
+- All players are dead. 
+- Players with the `in-love` attribute are the only survivors.
+- The pied piper is alive, not infected by the vile father of wolves or powerless, and all other survivors have the `charmed` attribute.
+- The white werewolf is the only survivor.
 - All players on `villagers` side are dead. 
 - All players on `werewolves` side are dead. 
-- Players with the `lovers` attribute are the only survivors.
-- The pied piper is in the game, alive, not infected by the vile father of wolves or powerless, and all other survivors have the `charmed` attribute.
-- All players are dead. 
 
 At the end of the game, winner(s) are set in the `won` property.
 
@@ -79,7 +80,7 @@ When game's status is `done` or `canceled`, it can be reviewed by the game maste
 | &emsp;&emsp;&emsp;⮑ markPenalty                                              | Number                                | Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.                                                                                                         |
 | history                                                                       | [GameHistory[]](#game-history-class)  | Game's history. Limited by default to `3` entries. (_See: [Classes - Game History Entry](#game-history-class)_)                                                                                                                                                                               |
 | **won***                                                                      | Object                                | Winner(s) of the game when status is `done`.                                                                                                                                                                                                                                                  |
-| &emsp;⮑ by                                                                   | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers`, `pied-piper` or null if nobody won_)                                                                                                                                                                   |
+| &emsp;⮑ by                                                                   | String                                | Can be either a group or a role. (_Possibilities: `werewolves`, `villagers`, `lovers`, `pied-piper`, `white-werewolf` or null if nobody won_)                                                                                                                                                                   |
 | **&emsp;⮑ players***                                                         | [Player[]](#player-class)             | List of player(s) who won. (_See: [Classes - Player](#player-class)_)                                                                                                                                                                                                                         |
 | **review***                                                                   | Object                                | Game master can attach a game review only if its status is set to `canceled` or `done`.                                                                                                                                                                                                       |
 | &emsp;⮑ rating                                                               | Number                                | Review's rating, from 0 to 5.                                                                                                                                                                                                                                                                 |

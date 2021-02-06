@@ -9,7 +9,7 @@ const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
-    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon,
+    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon, isWhiteWerewolfOnlyAlive,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -333,6 +333,8 @@ exports.checkGameWinners = game => {
             game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
         } else if (hasPiedPiperWon(game)) {
             game.won = { by: "pied-piper", players: getPlayersWithRole("pied-piper", game) };
+        } else if (isWhiteWerewolfOnlyAlive(game)) {
+            game.won = { by: "white-werewolf", players: getPlayersWithRole("white-werewolf", game) };
         } else if (!isVillagerSideAlive(game)) {
             game.won = { by: "werewolves", players: getPlayersWithSide("werewolves", game) };
         } else if (!isWerewolfSideAlive(game)) {
@@ -387,6 +389,13 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
 };
+
+exports.isWhiteWerewolfCallableDuringTheNight = async game => {
+    const whiteWerewolfPlayer = getPlayerWithRole("white-werewolf", game);
+    const lastWhiteWerewolfPlay = await GameHistory.getLastWhiteWerewolfPlay(game._id);
+    return whiteWerewolfPlayer?.isAlive && (!lastWhiteWerewolfPlay || game.turn - lastWhiteWerewolfPlay.turn > 1);
+};
+
 exports.areThreeBrothersCallableDuringTheNight = async game => {
     const brothersWakingUpInterval = game.options.roles.threeBrothers.wakingUpInterval;
     const lastBrothersPlay = await GameHistory.getLastBrothersPlay(game._id);
@@ -395,6 +404,7 @@ exports.areThreeBrothersCallableDuringTheNight = async game => {
     return brotherPlayers.filter(brother => brother.isAlive).length >= 2 &&
         (!lastBrothersPlay || turnsSinceLastBrothersPlay >= brothersWakingUpInterval && brothersWakingUpInterval);
 };
+
 exports.areTwoSistersCallableDuringTheNight = async game => {
     const sistersWakingUpInterval = game.options.roles.twoSisters.wakingUpInterval;
     const lastSistersPlay = await GameHistory.getLastSistersPlay(game._id);
@@ -417,6 +427,8 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
         return player.isAlive && areAllWerewolvesAlive(game);
     } else if (role === "pied-piper") {
         return player.isAlive && player.side.current === "villagers";
+    } else if (role === "white-werewolf") {
+        return this.isWhiteWerewolfCallableDuringTheNight(game);
     }
     return game.tick === 1 ? !!player : !!player && player.isAlive;
 };
@@ -490,6 +502,7 @@ exports.generatePlayMethods = () => ({
     "scapegoat": Player.scapegoatPlays,
     "pied-piper": Player.piedPiperPlays,
     "charmed": () => undefined,
+    "white-werewolf": Player.whiteWerewolfPlays,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({

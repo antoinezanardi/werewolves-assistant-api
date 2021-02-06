@@ -6,6 +6,7 @@ exports.roles = [
     { name: "werewolf", side: "werewolves", maxInGame: 39 },
     { name: "big-bad-wolf", side: "werewolves", maxInGame: 1, recommendedMinPlayers: 15 },
     { name: "vile-father-of-wolves", side: "werewolves", maxInGame: 1, recommendedMinPlayers: 12 },
+    { name: "white-werewolf", side: "werewolves", maxInGame: 1, recommendedMinPlayers: 12 },
     { name: "villager", side: "villagers", maxInGame: 39 },
     { name: "villager-villager", side: "villagers", maxInGame: 1 },
     { name: "seer", side: "villagers", maxInGame: 1 },

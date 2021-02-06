@@ -89,6 +89,8 @@ exports.getLastSistersPlay = gameId => this.findOne({ gameId, "play.source.name"
 
 exports.getLastBrothersPlay = gameId => this.findOne({ gameId, "play.source.name": "three-brothers" }, null, { sort: { createdAt: -1 } });
 
+exports.getLastWhiteWerewolfPlay = gameId => this.findOne({ gameId, "play.source.name": "white-werewolf" }, null, { sort: { createdAt: -1 } });
+
 exports.getPreviousPlay = gameId => this.findOne({ gameId }, null, { sort: { createdAt: -1 } });
 
 exports.getFindSearch = query => {

@@ -195,4 +195,12 @@ exports.errorMetadata = {
         code: 48,
         HTTPCode: 400,
     },
+    MUST_EAT_WEREWOLF: {
+        code: 49,
+        HTTPCode: 400,
+    },
+    CANT_EAT_HIMSELF: {
+        code: 50,
+        HTTPCode: 400,
+    },
 };

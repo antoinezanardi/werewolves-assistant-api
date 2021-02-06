@@ -7,7 +7,7 @@ const {
 } = require("../helpers/functions/Player");
 const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
-    getRemainingPlayersToCharm, getRemainingPlayersToEat,
+    getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat,
 } = require("../helpers/functions/Game");
 const { generateError } = require("../helpers/functions/Error");
 
@@ -39,8 +39,12 @@ exports.checkPiedPiperTargets = target => {
 };
 
 exports.checkEatTarget = async(target, game, source) => {
-    if (target.player.side.current === "werewolves") {
-        throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with group "werewolves".`);
+    if (source !== "white-werewolf" && target.player.side.current === "werewolves") {
+        throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with current side "werewolves".`);
+    } else if (source === "white-werewolf" && target.player.side.current !== "werewolves") {
+        throw generateError("MUST_EAT_WEREWOLF", `Werewolves target can't be a player with current side "villager".`);
+    } else if (source === "white-werewolf" && target.player.role.current === "white-werewolf") {
+        throw generateError("CANT_EAT_HIMSELF", `White werewolf can't eat himself.`);
     } else if (source === "big-bad-wolf" && doesPlayerHaveAttribute(target.player, "eaten")) {
         throw generateError("TARGET_ALREADY_EATEN", `This target is already planned to be eaten by the "werewolves", the big bad wolf can't eat it.`);
     } else if (target.isInfected) {
@@ -403,6 +407,15 @@ exports.checkAndFillVotes = async(votes, game, options) => {
     }
 };
 
+exports.whiteWerewolfPlays = async(play, game) => {
+    const { targets } = play;
+    const targetsExpectedLength = !getRemainingWerewolvesToEat(game).length ? 0 : 1;
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: targetsExpectedLength, play });
+    if (targets?.length) {
+        this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "white-werewolf" });
+    }
+};
+
 exports.piedPiperPlays = async(play, game) => {
     const { targets } = play;
     const targetsExpectedLength = getRemainingPlayersToCharm(game).length === 1 ? 1 : 2;
@@ -422,7 +435,7 @@ exports.scapegoatPlays = async(play, game) => {
 
 exports.bigBadWolfPlays = async(play, game) => {
     const { targets } = play;
-    const targetsExpectedLength = !getRemainingPlayersToEat(game).length ? 0 : 1;
+    const targetsExpectedLength = !getRemainingVillagersToEat(game).length ? 0 : 1;
     const options = { expectedLength: targetsExpectedLength, canBeUnset: !targetsExpectedLength, canBeEmpty: !targetsExpectedLength, play };
     await this.checkAndFillTargets(targets, game, options);
     if (targets?.length) {
