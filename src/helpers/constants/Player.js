@@ -2,6 +2,7 @@ exports.playerAttributes = [
     { name: "sheriff", source: "all" },
     { name: "seen", source: "seer", remainingPhases: 1 },
     { name: "eaten", source: "werewolves", remainingPhases: 1 },
+    { name: "eaten", source: "white-werewolf", remainingPhases: 1 },
     { name: "eaten", source: "big-bad-wolf", remainingPhases: 1 },
     { name: "infected", source: "vile-father-of-wolves", remainingPhases: 1 },
     { name: "drank-life-potion", source: "witch", remainingPhases: 1 },

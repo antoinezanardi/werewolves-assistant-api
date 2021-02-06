@@ -90,7 +90,7 @@ describe("G - Game where player is killed twice during the night", () => {
                 done();
             });
     });
-    it("🪄 Witch use death potion on villager (POST /games/:id/play)", done => {
+    it("🪄 Witch uses death potion on villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)

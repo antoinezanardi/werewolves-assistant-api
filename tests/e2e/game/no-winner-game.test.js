@@ -94,7 +94,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 done();
             });
     });
-    it("🪄 Witch use life potion on villager (POST /games/:id/play)", done => {
+    it("🪄 Witch uses life potion on villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -145,7 +145,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 done();
             });
     });
-    it("🪄 Witch use death potion on hunter (POST /games/:id/play)", done => {
+    it("🪄 Witch uses death potion on hunter (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)

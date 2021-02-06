@@ -64,8 +64,11 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
         throw generateError("CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
     } else if (action === "eat") {
         await this.checkEatTarget(target, game, source);
-    } else if (action === "use-potion" && target.hasDrankLifePotion && !doesPlayerHaveAttribute(target.player, "eaten")) {
-        throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by werewolves.`);
+    } else if (action === "use-potion" && target.hasDrankLifePotion) {
+        const eatenAttribute = getPlayerAttribute(target.player, "eaten");
+        if (!eatenAttribute || eatenAttribute.source === "white-werewolf") {
+            throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by "werewolves" of "big-bad-wolf".`);
+        }
     } else if (action === "protect") {
         const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
         if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString()) {

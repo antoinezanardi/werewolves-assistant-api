@@ -194,7 +194,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 done();
             });
     });
-    it("🪄 Witch use her life potion on ancient (POST /games/:id/play)", done => {
+    it("🪄 Witch uses her life potion on ancient (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })

@@ -90,7 +90,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 done();
             });
     });
-    it("🪄 Witch use life potion on ancient (POST /games/:id/play)", done => {
+    it("🪄 Witch uses life potion on ancient (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
