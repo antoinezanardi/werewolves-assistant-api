@@ -36,10 +36,11 @@ let players = [
     { name: "D≠g", role: "pied-piper" },
     { name: "D•g", role: "white-werewolf" },
     { name: "D¥g", role: "werewolf" },
+    { name: "D‰g", role: "stuttering-judge" },
 ];
 let token, game;
 
-describe("B - Full game of 25 players with all roles", () => {
+describe("B - Full game of 26 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -324,6 +325,17 @@ describe("B - Full game of 25 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "cupid", to: "charm" });
         done();
     });
+    it("👼 Cupid can't choose side if action is not 'choose-side' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "cupid", action: "charm", side: "werewolves" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_SIDE_CHOICE");
+                done();
+            });
+    });
     it("👼 Cupid can't charm if play's source is not 'cupid' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -431,6 +443,57 @@ describe("B - Full game of 25 players with all roles", () => {
                 done();
             });
     });
+    it("👼 Cupid can't infect a player (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[7]._id, isInfected: true },
+                    { player: players[9]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_INFECTION");
+                done();
+            });
+    });
+    it("👼 Cupid can't use life potion on a target (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[7]._id, hasDrankLifePotion: true },
+                    { player: players[9]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_POTION");
+                done();
+            });
+    });
+    it("👼 Cupid can't use death potion on a target (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[7]._id },
+                    { player: players[9]._id, hasDrankDeathPotion: true },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_POTION");
+                done();
+            });
+    });
     it("👼 Cupid charms himself and the little girl (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
@@ -492,6 +555,43 @@ describe("B - Full game of 25 players with all roles", () => {
                 game = res.body;
                 expect(res).to.have.status(200);
                 expect(game.history).to.be.an("array").to.have.lengthOf(3);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'stuttering-judge' to 'choose-sign'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "stuttering-judge", to: "choose-sign" });
+        done();
+    });
+    it("⚖️ Stuttering judge can't choose sign if play's source is not 'stuttering-judge' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "choose-sign" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge can't choose sign if play's action is not 'choose-sign' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "vote" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "choose-sign" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });
@@ -2506,12 +2606,12 @@ describe("B - Full game of 25 players with all roles", () => {
                 done();
             });
     });
-    it("👪 All vote for hunter (POST /games/:id/play)", done => {
+    it("👪 All vote for hunter and stuttering judge request another vote (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }], doesJudgeRequestAnotherVote: true })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -2651,6 +2751,37 @@ describe("B - Full game of 25 players with all roles", () => {
                 done();
             });
     });
+    it("🎲 Game is waiting for 'all' to 'vote'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        done();
+    });
+    it("⚖️ Stuttering judge can't request another vote if he already requested it (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }], doesJudgeRequestAnotherVote: true })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ONLY_ONE_SECOND_VOTE_REQUEST");
+                done();
+            });
+    });
+    it("👪 All vote for the stuttering judge (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[25]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.players[25].isAlive).to.be.false;
+                expect(game.players[25].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
     it("🌙 Night falls", done => {
         expect(game.phase).to.equals("night");
         expect(game.turn).to.equals(4);
@@ -2663,7 +2794,7 @@ describe("B - Full game of 25 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history.length).to.equals(39);
+                expect(game.history.length).to.equals(41);
                 done();
             });
     });
@@ -2674,7 +2805,7 @@ describe("B - Full game of 25 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 const history = res.body;
-                expect(history.length).to.equals(39);
+                expect(history.length).to.equals(41);
                 done();
             });
     });
@@ -2776,6 +2907,18 @@ describe("B - Full game of 25 players with all roles", () => {
         expect(game.phase).to.equals("day");
         expect(game.players[0].isAlive).to.be.true;
         done();
+    });
+    it("⚖️ Stuttering judge can't request another vote if he is dead (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[15]._id }], doesJudgeRequestAnotherVote: true })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("STUTTERING_JUDGE_ABSENT");
+                done();
+            });
     });
     it("👪 All vote for wild child (POST /games/:id/play)", done => {
         players = game.players;

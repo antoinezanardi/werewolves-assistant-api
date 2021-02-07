@@ -503,6 +503,7 @@ exports.generatePlayMethods = () => ({
     "pied-piper": Player.piedPiperPlays,
     "charmed": () => undefined,
     "white-werewolf": Player.whiteWerewolfPlays,
+    "stuttering-judge": () => undefined,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({
@@ -529,6 +530,10 @@ exports.checkPlay = async play => {
         throw generateError("BAD_PLAY_SOURCE", `Game is waiting for "${game.waiting[0].for}", not "${play.source}"`);
     } else if (game.waiting[0].to !== play.action) {
         throw generateError("BAD_PLAY_ACTION", `Game is waiting for "${game.waiting[0].for}" to "${game.waiting[0].to}", not "${play.action}"`);
+    } else if (play.side && play.action !== "choose-side") {
+        throw generateError("BAD_PLAY_ACTION_FOR_SIDE_CHOICE", `"side" can be set only if action is "choose-side", not "${play.action}"`);
+    } else if (play.doesJudgeRequestAnotherVote && play.action !== "vote" && play.action !== "settle-votes") {
+        throw generateError("BAD_PLAY_ACTION_FOR_JUDGE_REQUEST", `"doesJudgeRequestAnotherVote" can be set only if action is "vote", not "${play.action}"`);
     }
 };
 

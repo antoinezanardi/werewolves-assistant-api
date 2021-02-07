@@ -107,6 +107,18 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
     });
+    it("⚖️ Stuttering judge can't request another vote if he is absent from the game (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }], doesJudgeRequestAnotherVote: true })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("STUTTERING_JUDGE_ABSENT");
+                done();
+            });
+    });
     it("👪 All vote for the witch (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)

@@ -19,4 +19,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./unkillable-ancient.test");
     require("./ancient-infected.test");
     require("./game-won-by-white-werewolf.test");
+    require("./endless-votes.test");
 });

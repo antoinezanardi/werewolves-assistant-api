@@ -56,6 +56,7 @@ const playSchema = new Schema({
         type: String,
         enum: getVotesResults(),
     },
+    doesJudgeRequestAnotherVote: { type: Boolean },
     side: {
         type: String,
         enum: getSideNames(),

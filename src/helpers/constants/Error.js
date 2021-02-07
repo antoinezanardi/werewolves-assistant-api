@@ -203,4 +203,32 @@ exports.errorMetadata = {
         code: 50,
         HTTPCode: 400,
     },
+    STUTTERING_JUDGE_ABSENT: {
+        code: 51,
+        HTTPCode: 400,
+    },
+    STUTTERING_JUDGE_POWERLESS: {
+        code: 52,
+        HTTPCode: 400,
+    },
+    ONLY_ONE_SECOND_VOTE_REQUEST: {
+        code: 53,
+        HTTPCode: 400,
+    },
+    BAD_PLAY_ACTION_FOR_SIDE_CHOICE: {
+        code: 54,
+        HTTPCode: 400,
+    },
+    BAD_PLAY_ACTION_FOR_JUDGE_REQUEST: {
+        code: 55,
+        HTTPCode: 400,
+    },
+    BAD_PLAY_ACTION_FOR_INFECTION: {
+        code: 56,
+        HTTPCode: 400,
+    },
+    BAD_PLAY_ACTION_FOR_POTION: {
+        code: 57,
+        HTTPCode: 400,
+    },
 };

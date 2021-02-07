@@ -26,6 +26,7 @@ let players = [
     { name: "Dœg", role: "scapegoat" },
     { name: "D•g", role: "pied-piper" },
     { name: "Dêg", role: "idiot" },
+    { name: "D|g", role: "stuttering-judge" },
 ];
 let token, game;
 
@@ -88,6 +89,17 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.history[0].play.source.name).to.equal("all");
                 expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(players.length);
                 expect(game.history[0].deadPlayers).to.not.exist;
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "choose-sign" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });
@@ -260,6 +272,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[13].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[14].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[15].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[16].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 done();
             });
     });
@@ -310,6 +323,23 @@ describe("L - Game with various villagers who loose their power because they kil
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge can't request another vote if he is powerless (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[5]._id, for: players[15]._id },
+                    { from: players[7]._id, for: players[6]._id },
+                ], doesJudgeRequestAnotherVote: true,
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("STUTTERING_JUDGE_POWERLESS");
                 done();
             });
     });

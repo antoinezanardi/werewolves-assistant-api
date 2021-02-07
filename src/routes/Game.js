@@ -294,6 +294,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Object[]} [votes] Required when **action** is `elect-sheriff` or `vote`.
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
+     * @apiParam (Request Body Parameters) {Boolean} [doesJudgeRequestAnotherVote] Only if there is vile-father-of-wolves in the game and the action is `eat` from `werewolves`. Set to `true` and the werewolves victim will instantly join the `werewolves` side if possible.
      * @apiParam (Request Body Parameters) {String={"villagers","werewolves"}} [side] Side chosen by the dog-wolf. Required when **action** is `choose-side`.
      * @apiUse GameResponse
      */
@@ -328,6 +329,10 @@ module.exports = app => {
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("votes.*.for")
             .isMongoId().withMessage("Must be a valid MongoId"),
+        body("doesJudgeRequestAnotherVote")
+            .optional()
+            .isBoolean().withMessage("Must be an valid boolean")
+            .toBoolean(),
         body("side")
             .optional()
             .isString().withMessage("Must be a valid string")

@@ -101,6 +101,10 @@ exports.checkAndFillPlayerTarget = (target, game) => {
 exports.checkTargetStructure = (target, action) => {
     if (target.player === undefined) {
         throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "player" is missing.`);
+    } else if (target.isInfected && action !== "eat") {
+        throw generateError("BAD_PLAY_ACTION_FOR_INFECTION", `"isInfected" can be set on target only if play's action is "eat".`);
+    } else if ((target.hasDrankLifePotion || target.hasDrankDeathPotion) && action !== "use-potion") {
+        throw generateError("BAD_PLAY_ACTION_FOR_POTION", `"hasDrankLifePotion" or "hasDrankDeathPotion" can be set on target only if play's action is "use-potion".`);
     } else if (action === "use-potion") {
         if (target.hasDrankLifePotion && target.hasDrankDeathPotion) {
             throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Witch can't use life and death potions on the same target.`);
@@ -397,11 +401,25 @@ exports.checkVotesSourceAndTarget = async(votes, game) => {
     this.checkPlayerMultipleVotes(votes, game);
 };
 
+exports.checkJudgeSecondVoteRequest = async game => {
+    const stutteringJudgePlayer = getPlayerWithRole("stuttering-judge", game);
+    if (!stutteringJudgePlayer || !stutteringJudgePlayer.isAlive) {
+        throw generateError("STUTTERING_JUDGE_ABSENT", "Second vote can't be requested if stuttering judge is absent from the game.");
+    } else if (doesPlayerHaveAttribute(stutteringJudgePlayer, "powerless")) {
+        throw generateError("STUTTERING_JUDGE_POWERLESS", "Stuttering judge is powerless and so can't request another vote.");
+    } else if (await GameHistory.isSecondVoteRequestUsed(game._id)) {
+        throw generateError("ONLY_ONE_SECOND_VOTE_REQUEST", "Second vote request has been already made.");
+    }
+};
+
 exports.checkAndFillVotes = async(votes, game, options) => {
     if (!votes || !Array.isArray(votes)) {
         throw generateError("VOTES_REQUIRED", "`votes` need to be set");
     } else if (!votes.length) {
         throw generateError("VOTES_CANT_BE_EMPTY", "`votes` can't be empty");
+    }
+    if (options.doesJudgeRequestAnotherVote) {
+        await this.checkJudgeSecondVoteRequest(game, options);
     }
     await this.checkVotesSourceAndTarget(votes, game, options);
     for (let i = 0; i < votes.length; i++) {
@@ -552,8 +570,8 @@ exports.seerPlays = async(play, game) => {
 };
 
 exports.allVote = async(play, game, gameHistoryEntry) => {
-    const { votes, action } = play;
-    await this.checkAndFillVotes(votes, game, { action });
+    const { votes, action, doesJudgeRequestAnotherVote } = play;
+    await this.checkAndFillVotes(votes, game, { action, doesJudgeRequestAnotherVote });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
     const scapegoatPlayer = getPlayerWithRole("scapegoat", game);
@@ -572,6 +590,9 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
         }
     } else {
         await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
+    }
+    if (play.doesJudgeRequestAnotherVote) {
+        game.waiting.push({ for: "all", to: "vote" });
     }
 };
 

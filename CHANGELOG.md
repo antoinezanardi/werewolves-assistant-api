@@ -9,6 +9,7 @@
 * [#117](https://github.com/antoinezanardi/werewolves-assistant-api/issues/117) - Add guard protection on little girl option.
 * [#118](https://github.com/antoinezanardi/werewolves-assistant-api/issues/118) - Add idiot dies on ancient death option.
 * [#119](https://github.com/antoinezanardi/werewolves-assistant-api/issues/119) - Implement White Werewolf role.
+* [#120](https://github.com/antoinezanardi/werewolves-assistant-api/issues/120) - Implement Stuttering Judge role.
 
 ### 🌟 Enhancements
 
