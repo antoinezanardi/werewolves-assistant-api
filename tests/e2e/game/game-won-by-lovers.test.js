@@ -69,7 +69,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
                 done();
             });
     });
-    it("👼 Cupid charms the little girl and the werewolf (POST /games/:id/play)", done => {
+    it("🏹 Cupid charms the little girl and the werewolf (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)

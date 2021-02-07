@@ -133,7 +133,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
                 done();
             });
     });
-    it("👼 Pied piper can't charm just two targets if only one can be charmed (POST /games/:id/play)", done => {
+    it("🏹 Pied piper can't charm just two targets if only one can be charmed (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)

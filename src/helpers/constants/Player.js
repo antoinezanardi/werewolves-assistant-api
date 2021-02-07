@@ -40,6 +40,7 @@ exports.murderedPossibilities = [
     { by: "witch", of: "use-potion" },
     { by: "werewolves", of: "eat" },
     { by: "big-bad-wolf", of: "eat" },
+    { by: "white-werewolf", of: "eat" },
     { by: "hunter", of: "shoot" },
     { by: "sheriff", of: "settle-votes" },
     { by: "all", of: "vote" },

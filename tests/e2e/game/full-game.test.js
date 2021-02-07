@@ -325,7 +325,7 @@ describe("B - Full game of 26 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "cupid", to: "charm" });
         done();
     });
-    it("👼 Cupid can't choose side if action is not 'choose-side' (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't choose side if action is not 'choose-side' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -336,7 +336,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm if play's source is not 'cupid' (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm if play's source is not 'cupid' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -347,7 +347,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm if play's action is not 'charm' (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm if play's action is not 'charm' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -358,7 +358,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm if targets are not set (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm if targets are not set (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -369,7 +369,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm if targets are empty (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm if targets are empty (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -380,7 +380,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm just one target (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm just one target (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -392,7 +392,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm more than two targets (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm more than two targets (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -410,7 +410,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm unknown targets (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm unknown targets (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -426,7 +426,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't charm the same targets (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't charm the same targets (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -443,7 +443,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't infect a player (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't infect a player (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -460,7 +460,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't use life potion on a target (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't use life potion on a target (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -477,7 +477,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid can't use death potion on a target (POST /games/:id/play)", done => {
+    it("🏹 Cupid can't use death potion on a target (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
@@ -494,7 +494,7 @@ describe("B - Full game of 26 players with all roles", () => {
                 done();
             });
     });
-    it("👼 Cupid charms himself and the little girl (POST /games/:id/play)", done => {
+    it("🏹 Cupid charms himself and the little girl (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
