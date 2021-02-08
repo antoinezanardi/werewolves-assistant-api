@@ -23,6 +23,7 @@ exports.roles = [
     { name: "three-brothers", side: "villagers", minInGame: 3, maxInGame: 3, recommendedMinPlayers: 15 },
     { name: "wild-child", side: "villagers", maxInGame: 1 },
     { name: "dog-wolf", side: "villagers", maxInGame: 1 },
+    { name: "angel", side: "villagers", maxInGame: 1 },
     { name: "pied-piper", side: "villagers", maxInGame: 1, recommendedMinPlayers: 12 },
     { name: "raven", side: "villagers", maxInGame: 1 },
 ];

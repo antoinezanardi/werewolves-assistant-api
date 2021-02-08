@@ -34,7 +34,13 @@ exports.hasPiedPiperWon = game => {
         !remainingPlayersToCharm.length;
 };
 
-exports.isGameDone = game => this.areAllPlayersDead(game) ||
+exports.hasAngelWon = game => {
+    const angel = this.getPlayerWithRole("angel", game);
+    return !!angel && !angel.isAlive && !doesPlayerHaveAttribute(angel, "powerless") && game.turn === 1 &&
+        ((angel.murdered.of === "vote" || angel.murdered.of === "settle-votes") && game.phase === "night" || angel.murdered.of === "eat");
+};
+
+exports.isGameDone = game => this.areAllPlayersDead(game) || this.hasAngelWon(game) ||
         (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game) ||
             this.hasPiedPiperWon(game) || this.isWhiteWerewolfOnlyAlive(game)) && !this.isActionInWaitingQueue(game, "shoot");
 

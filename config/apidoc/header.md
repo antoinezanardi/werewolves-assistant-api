@@ -39,6 +39,7 @@ Each time a play is performed, `tick` increments and `phase` is set according to
 Game ends when one of the following conditions is met, in this order of priority:
 
 - All players are dead. 
+- The angel is dead from the first `vote` or eaten by the `werewolves` during the first night. 
 - Players with the `in-love` attribute are the only survivors.
 - The pied piper is alive, not infected by the vile father of wolves or powerless, and all other survivors have the `charmed` attribute.
 - The white werewolf is the only survivor.

@@ -60,175 +60,179 @@ exports.errorMetadata = {
         HTTPCode: 400,
     },
     VOTES_CANT_BE_EMPTY: {
-        code: 15,
-        HTTPCode: 400,
-    },
-    BAD_VOTE_STRUCTURE: {
         code: 16,
         HTTPCode: 400,
     },
-    SAME_VOTE_SOURCE_AND_TARGET: {
+    BAD_VOTE_STRUCTURE: {
         code: 17,
         HTTPCode: 400,
     },
-    CANT_VOTE: {
+    SAME_VOTE_SOURCE_AND_TARGET: {
         code: 18,
         HTTPCode: 400,
     },
-    CANT_BE_VOTE_TARGET: {
+    CANT_VOTE: {
         code: 19,
         HTTPCode: 400,
     },
-    CANT_VOTE_MULTIPLE_TIMES: {
+    CANT_BE_VOTE_TARGET: {
         code: 20,
         HTTPCode: 400,
     },
-    TIE_IN_VOTES: {
+    CANT_VOTE_MULTIPLE_TIMES: {
         code: 21,
         HTTPCode: 400,
     },
-    TARGETS_REQUIRED: {
+    TIE_IN_VOTES: {
         code: 22,
         HTTPCode: 400,
     },
-    TARGETS_CANT_BE_EMPTY: {
+    TARGETS_REQUIRED: {
         code: 23,
         HTTPCode: 400,
     },
-    BAD_TARGETS_LENGTH: {
+    TARGETS_CANT_BE_EMPTY: {
         code: 24,
         HTTPCode: 400,
     },
-    BAD_TARGET_STRUCTURE: {
+    BAD_TARGETS_LENGTH: {
         code: 25,
         HTTPCode: 400,
     },
-    NOT_TARGETABLE: {
+    BAD_TARGET_STRUCTURE: {
         code: 26,
         HTTPCode: 400,
     },
-    CANT_LOOK_AT_HERSELF: {
+    NOT_TARGETABLE: {
         code: 27,
         HTTPCode: 400,
     },
-    CANT_EAT_EACH_OTHER: {
+    CANT_LOOK_AT_HERSELF: {
         code: 28,
         HTTPCode: 400,
     },
-    BAD_LIFE_POTION_USE: {
+    CANT_EAT_EACH_OTHER: {
         code: 29,
         HTTPCode: 400,
     },
-    ONLY_ONE_LIFE_POTION: {
+    BAD_LIFE_POTION_USE: {
         code: 30,
         HTTPCode: 400,
     },
-    ONLY_ONE_DEATH_POTION: {
+    ONLY_ONE_LIFE_POTION: {
         code: 31,
         HTTPCode: 400,
     },
-    NON_UNIQUE_TARGETS: {
+    ONLY_ONE_DEATH_POTION: {
         code: 32,
         HTTPCode: 400,
     },
-    CANT_PROTECT_TWICE: {
+    NON_UNIQUE_TARGETS: {
         code: 33,
         HTTPCode: 400,
     },
-    CANT_BE_CHOSEN_AS_TIEBREAKER: {
+    CANT_PROTECT_TWICE: {
         code: 34,
         HTTPCode: 400,
     },
-    NO_MORE_PLAY_ALLOWED: {
+    CANT_BE_CHOSEN_AS_TIEBREAKER: {
         code: 35,
         HTTPCode: 400,
     },
-    CANT_BE_RESET: {
+    NO_MORE_PLAY_ALLOWED: {
         code: 36,
         HTTPCode: 400,
     },
-    TOO_MANY_REQUESTS: {
+    CANT_BE_RESET: {
         code: 37,
+        HTTPCode: 400,
+    },
+    TOO_MANY_REQUESTS: {
+        code: 38,
         HTTPCode: 429,
     },
     SISTERS_MUST_BE_TWO: {
-        code: 38,
-        HTTPCode: 400,
-    },
-    BROTHERS_MUST_BE_THREE: {
         code: 39,
         HTTPCode: 400,
     },
-    WILD_CHILD_CANT_CHOOSE_HIMSELF: {
+    BROTHERS_MUST_BE_THREE: {
         code: 40,
         HTTPCode: 400,
     },
-    DOG_WOLF_MUST_CHOOSE_SIDE: {
+    WILD_CHILD_CANT_CHOOSE_HIMSELF: {
         code: 41,
         HTTPCode: 400,
     },
-    TARGET_ALREADY_EATEN: {
+    DOG_WOLF_MUST_CHOOSE_SIDE: {
         code: 42,
         HTTPCode: 400,
     },
-    TARGET_MUST_BE_EATEN_BY_WEREWOLVES: {
+    TARGET_ALREADY_EATEN: {
         code: 43,
         HTTPCode: 400,
     },
-    ABSENT_VILE_FATHER_OF_WOLVES: {
+    TARGET_MUST_BE_EATEN_BY_WEREWOLVES: {
         code: 44,
         HTTPCode: 400,
     },
-    ONLY_ONE_INFECTION: {
+    ABSENT_VILE_FATHER_OF_WOLVES: {
         code: 45,
         HTTPCode: 400,
     },
-    CANT_CHARM_HIMSELF: {
+    ONLY_ONE_INFECTION: {
         code: 46,
         HTTPCode: 400,
     },
-    ALREADY_CHARMED: {
+    CANT_CHARM_HIMSELF: {
         code: 47,
         HTTPCode: 400,
     },
-    CANT_VOTE_ALREADY: {
+    ALREADY_CHARMED: {
         code: 48,
         HTTPCode: 400,
     },
-    MUST_EAT_WEREWOLF: {
+    CANT_VOTE_ALREADY: {
         code: 49,
         HTTPCode: 400,
     },
-    CANT_EAT_HIMSELF: {
+    MUST_EAT_WEREWOLF: {
         code: 50,
         HTTPCode: 400,
     },
-    STUTTERING_JUDGE_ABSENT: {
+    CANT_EAT_HIMSELF: {
         code: 51,
         HTTPCode: 400,
     },
-    STUTTERING_JUDGE_POWERLESS: {
+    STUTTERING_JUDGE_ABSENT: {
         code: 52,
         HTTPCode: 400,
     },
-    ONLY_ONE_SECOND_VOTE_REQUEST: {
+    STUTTERING_JUDGE_POWERLESS: {
         code: 53,
         HTTPCode: 400,
     },
-    BAD_PLAY_ACTION_FOR_SIDE_CHOICE: {
+    ONLY_ONE_SECOND_VOTE_REQUEST: {
         code: 54,
         HTTPCode: 400,
     },
-    BAD_PLAY_ACTION_FOR_JUDGE_REQUEST: {
+    BAD_PLAY_ACTION_FOR_SIDE_CHOICE: {
         code: 55,
         HTTPCode: 400,
     },
-    BAD_PLAY_ACTION_FOR_INFECTION: {
+    BAD_PLAY_ACTION_FOR_JUDGE_REQUEST: {
         code: 56,
         HTTPCode: 400,
     },
-    BAD_PLAY_ACTION_FOR_POTION: {
+    BAD_PLAY_ACTION_FOR_INFECTION: {
         code: 57,
+        HTTPCode: 400,
+    },
+    BAD_PLAY_ACTION_FOR_POTION: {
+        code: 58,
+        HTTPCode: 400,
+    },
+    STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET: {
+        code: 59,
         HTTPCode: 400,
     },
 };

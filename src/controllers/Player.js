@@ -9,6 +9,7 @@ const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
     getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat,
 } = require("../helpers/functions/Game");
+const { getVillagerRoles } = require("../helpers/functions/Role");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -182,12 +183,20 @@ exports.applyConsequencesDependingOnKilledPlayerAttributes = async(player, game,
     }
 };
 
-exports.insertActionBeforeAllVote = (game, waiting) => {
+exports.insertActionBeforeAllVote = (game, play) => {
     const waitingForAllToVoteIdx = game.waiting.findIndex(({ to }) => to === "vote");
     if (waitingForAllToVoteIdx !== -1 && waitingForAllToVoteIdx !== 0) {
-        game.waiting.splice(waitingForAllToVoteIdx, 0, waiting);
+        game.waiting.splice(waitingForAllToVoteIdx, 0, play);
     } else {
-        game.waiting.push(waiting);
+        game.waiting.push(play);
+    }
+};
+
+exports.insertActionImmediately = (game, play) => {
+    if (game.waiting.length) {
+        game.waiting.splice(1, 0, play);
+    } else {
+        game.waiting.push(play);
     }
 };
 
@@ -202,6 +211,8 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
                     this.addPlayerAttribute(_id, "powerless", game);
                 }
             }
+            const villagerRoleNames = getVillagerRoles().map(({ name }) => name);
+            filterOutSourcesFromWaitingQueue(game, [...villagerRoleNames, "charmed", "lovers"]);
         }
         const idiotPlayer = getPlayerWithRole("idiot", game);
         if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
@@ -407,6 +418,8 @@ exports.checkJudgeSecondVoteRequest = async game => {
         throw generateError("STUTTERING_JUDGE_ABSENT", "Second vote can't be requested if stuttering judge is absent from the game.");
     } else if (doesPlayerHaveAttribute(stutteringJudgePlayer, "powerless")) {
         throw generateError("STUTTERING_JUDGE_POWERLESS", "Stuttering judge is powerless and so can't request another vote.");
+    } else if (!await GameHistory.didJudgeChooseSign(game._id)) {
+        throw generateError("STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET", `Stuttering judge didn't choose his sign yet and so can't request another vote.`);
     } else if (await GameHistory.isSecondVoteRequestUsed(game._id)) {
         throw generateError("ONLY_ONE_SECOND_VOTE_REQUEST", "Second vote request has been already made.");
     }
@@ -580,10 +593,10 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
         if (scapegoatPlayer?.isAlive && !doesPlayerHaveAttribute(scapegoatPlayer, "powerless")) {
             await this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
         } else if (sheriffPlayer?.isAlive) {
-            game.waiting.push({ for: "sheriff", to: "settle-votes" });
+            this.insertActionImmediately(game, { for: "sheriff", to: "settle-votes" });
             gameHistoryEntry.play.votesResult = "need-settlement";
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
-            game.waiting.push({ for: "all", to: "vote" });
+            this.insertActionImmediately(game, { for: "all", to: "vote" });
             gameHistoryEntry.play.votesResult = "need-settlement";
         } else {
             gameHistoryEntry.play.votesResult = "no-death";

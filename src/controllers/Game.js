@@ -9,7 +9,7 @@ const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
-    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon, isWhiteWerewolfOnlyAlive,
+    getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon, isWhiteWerewolfOnlyAlive, hasAngelWon,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -329,6 +329,8 @@ exports.checkGameWinners = game => {
     if (isGameDone(game)) {
         if (areAllPlayersDead(game)) {
             game.won = { by: null };
+        } else if (hasAngelWon(game)) {
+            game.won = { by: "angel", players: getPlayersWithRole("angel", game) };
         } else if (areLoversTheOnlyAlive(game)) {
             game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
         } else if (hasPiedPiperWon(game)) {
@@ -439,9 +441,13 @@ exports.isSheriffCallableDuringTheNight = game => {
     return isSheriffEnabled && !!sheriffPlayer && sheriffPlayer.isAlive;
 };
 
-exports.isSourceCallableDuringTheNight = (game, source) => {
+exports.isSourceCallableDuringTheNight = (game, source, action) => {
     if (source === "all") {
-        return getProp(game, "options.roles.sheriff.isEnabled", true);
+        if (action === "elect-sheriff") {
+            return getProp(game, "options.roles.sheriff.isEnabled", true);
+        } else if (action === "vote") {
+            return !!getPlayerWithRole("angel", game);
+        }
     } else if (source === "sheriff") {
         return this.isSheriffCallableDuringTheNight(game);
     }
@@ -455,7 +461,7 @@ exports.fillWaitingQueueWithNightActions = async game => {
         game.waiting = [];
     }
     for (const { source, action } of actionsOrder) {
-        if (await this.isSourceCallableDuringTheNight(game, source)) {
+        if (await this.isSourceCallableDuringTheNight(game, source, action)) {
             game.waiting.push({ for: source, to: action });
         }
     }

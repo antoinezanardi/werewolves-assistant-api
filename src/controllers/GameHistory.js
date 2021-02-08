@@ -73,6 +73,8 @@ exports.isDeathPotionUsed = async gameId => !!await this.findOne({ gameId, "play
 
 exports.isInfectionUsed = async gameId => !!await this.findOne({ gameId, "play.targets.isInfected": true });
 
+exports.didJudgeChooseSign = async gameId => !!await this.findOne({ gameId, "play.action": "choose-sign", "play.source.name": "stuttering-judge" });
+
 exports.isSecondVoteRequestUsed = async gameId => !!await this.findOne({ gameId, "play.doesJudgeRequestAnotherVote": true });
 
 exports.getLastNightPlay = gameId => {

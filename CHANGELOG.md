@@ -10,6 +10,7 @@
 * [#118](https://github.com/antoinezanardi/werewolves-assistant-api/issues/118) - Add idiot dies on ancient death option.
 * [#119](https://github.com/antoinezanardi/werewolves-assistant-api/issues/119) - Implement White Werewolf role.
 * [#120](https://github.com/antoinezanardi/werewolves-assistant-api/issues/120) - Implement Stuttering Judge role.
+* [#126](https://github.com/antoinezanardi/werewolves-assistant-api/issues/126) - Implement Angel role.
 
 ### 🌟 Enhancements
 
@@ -37,6 +38,7 @@
 
 * `@sentry/node` updated to version `6.1.0`.
 * `chai` updated to version `4.3.0`.
+* `express-rate-limit` updated to version `5.2.5`.
 * `mongoose` updated to version `5.11.15`.
 
 ---

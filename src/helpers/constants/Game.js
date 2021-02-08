@@ -19,6 +19,7 @@ exports.populate = [
 
 exports.turnNightActionsOrder = [
     { source: "all", action: "elect-sheriff", isFirstNightOnly: true },
+    { source: "all", action: "vote", isFirstNightOnly: true },
     { source: "dog-wolf", action: "choose-side", isFirstNightOnly: true },
     { source: "cupid", action: "charm", isFirstNightOnly: true },
     { source: "lovers", action: "meet-each-other", isFirstNightOnly: true },
