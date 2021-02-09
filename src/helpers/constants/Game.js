@@ -53,3 +53,5 @@ exports.defaultGameOptions = {
 };
 
 exports.votesResults = ["election", "need-settlement", "death", "no-death"];
+
+exports.additionalCardsForRoleNames = ["thief"];

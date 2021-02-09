@@ -33,6 +33,7 @@
 * [#123](https://github.com/antoinezanardi/werewolves-assistant-api/issues/123) - Bad ancient description.
 * [#128](https://github.com/antoinezanardi/werewolves-assistant-api/issues/128) - Update README.md with CI.
 * [#129](https://github.com/antoinezanardi/werewolves-assistant-api/issues/129) - Add Player Deaths section in APIDoc.
+* [#130](https://github.com/antoinezanardi/werewolves-assistant-api/issues/130) - Add `Limits` for each role in the documentation.
 
 ### 📦 Packages
 

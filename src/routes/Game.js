@@ -2,10 +2,10 @@ const passport = require("passport");
 const { param, body, query } = require("express-validator");
 const Game = require("../controllers/Game");
 const GameHistory = require("../controllers/GameHistory");
-const { getRoles, getSideNames } = require("../helpers/functions/Role");
+const { getRoleNames, getSideNames } = require("../helpers/functions/Role");
 const {
     getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses,
-    getGameRepartitionForbiddenRoleNames,
+    getGameRepartitionForbiddenRoleNames, getAdditionalCardsForRoleNames,
 } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
 const { basicLimiter } = require("../helpers/constants/Route");
@@ -19,10 +19,15 @@ module.exports = app => {
      * @apiSuccess {Number} turn=1 Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {Number} tick=1 Starting at `1`, tick increments each time a play is made.
-     * @apiSuccess {Object[]} waiting Queue of upcoming actions.
+     * @apiSuccess {Object[]} [waiting] Queue of upcoming actions.
      * @apiSuccess {String} waiting.for Can be either a group, a role or the sheriff. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (Possibilities: [Codes - Player Actions](#player-actions)_)
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
+     * @apiSuccess {Object[]} [additionalCards] Game's additional cards. Set if `thief` is in the game.
+     * @apiSuccess {ObjectId} additionalCards._id Additional card's ID.
+     * @apiSuccess {String} additionalCards.role Additional card's role name. (_See: [Codes - Player Roles](#player-roles)_)
+     * @apiSuccess {String} additionalCards.for Additional card's recipient. Set to `thief`.
+     * @apiSuccess {Boolean} additionalCards.isUsed If set to `true`, card has been used by its recipient.
      * @apiSuccess {Object} options Game's options.
      * @apiSuccess {Object} options.roles Game roles options.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
@@ -161,8 +166,11 @@ module.exports = app => {
      *
      * @apiPermission JWT
      * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 40 players.
-     * @apiParam (Request Body Parameters) {String{>=30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
+     * @apiParam (Request Body Parameters) {String{>= 1 && <= 30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
+     * @apiParam (Request Body Parameters) {Object[]} [additionalCards] Game's additional cards. Must be set if role `thief` is in the game and contain 2 cards.
+     * @apiParam (Request Body Parameters) {String} additionalCards.role Additional card's role. The role must be still available compared to the game's composition. (_See [Codes - Player Roles](#player-roles)_)
+     * @apiParam (Request Body Parameters) {String} additionalCards.for Additional card's recipient. Must be equal to `thief`.
      * @apiParam (Request Body Parameters) {Object} [options] Game's options.
      * @apiParam (Request Body Parameters) {Object} [options.roles] Game roles options.
      * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game sheriff role's options.
@@ -193,7 +201,17 @@ module.exports = app => {
             .isLength({ min: 1, max: 30 }).withMessage("Must be between 1 and 30 characters long"),
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
-            .isIn(getRoles().map(({ name }) => name)).withMessage(`Must be equal to one of the following values: ${getRoles().map(({ name }) => name)}`),
+            .isIn(getRoleNames()).withMessage(`Must be equal to one of the following values: ${getRoleNames()}`),
+        body("additionalCards")
+            .optional()
+            .isArray().withMessage("Must be a valid array")
+            .isLength({ min: 2, max: 2 }).withMessage("Must contain 2 cards"),
+        body("additionalCards.*.role")
+            .isString().withMessage("Must be a valid string")
+            .isIn(getRoleNames()).withMessage(`Must be equal to one of the following values: ${getRoleNames()}`),
+        body("additionalCards.*.for")
+            .isString().withMessage("Must be a valid string")
+            .isIn(getAdditionalCardsForRoleNames()).withMessage(`Must be equal to one of the following values: ${getAdditionalCardsForRoleNames()}`),
         body("options.roles.sheriff.isEnabled")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
