@@ -173,8 +173,8 @@ Description for each case below :
 | 36   | NO_MORE_PLAY_ALLOWED                   |    400    | No more play are allowed because game's status is "done" or "canceled".                                   |
 | 37   | CANT_BE_RESET                          |    400    | Game can't be reset because game's status is "done" or "canceled".                                        |
 | 38   | TOO_MANY_REQUESTS                      |    429    | Too many requests have been done on this route. Try again later.                                          |
-| 39   | SISTERS_MUST_BE_TWO                    |    400    | There must be exactly two sisters in game composition if at least one is chosen by a player.              |
-| 40   | BROTHERS_MUST_BE_THREE                 |    400    | There must be exactly three sisters in game composition if at least one is chosen by a player.            |
+| 39   | TOO_MUCH_PLAYERS_WITH_ROLE             |    400    | Too many players have chosen the same role and exceed the limit of this role in the game.                 |
+| 40   | MIN_PLAYERS_NOT_REACHED_FOR_ROLE       |    400    | One player chose a role and this role didn't reach its player minimum in the game.                        |
 | 41   | WILD_CHILD_CANT_CHOOSE_HIMSELF         |    400    | Wild child can't choose himself as a model.                                                               |
 | 42   | DOG_WOLF_MUST_CHOOSE_SIDE              |    400    | Dog-wolf must choose a side between `villagers` and `werewolves`.                                         |
 | 43   | TARGET_ALREADY_EATEN                   |    400    | This target is already planned to be eaten by the `werewolves`, the big bad wolf can't eat it.            |

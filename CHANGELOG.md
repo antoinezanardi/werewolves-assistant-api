@@ -15,6 +15,7 @@
 ### 🌟 Enhancements
 
 * [#121](https://github.com/antoinezanardi/werewolves-assistant-api/issues/121) - Add `votesResult` in Game history plays.
+* [#131](https://github.com/antoinezanardi/werewolves-assistant-api/issues/131) - Check role availability in game creation.
 
 ### 🐛 Bug fixes
 

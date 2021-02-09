@@ -64,16 +64,21 @@ exports.fillTickData = game => {
 };
 
 exports.checkRolesCompatibility = players => {
-    if (!players.filter(({ side }) => side.current === "werewolves").length) {
+    if (!getPlayersWithSide("werewolves", { players }).length) {
         throw generateError("NO_WEREWOLF_IN_GAME_COMPOSITION", "No player has the `werewolf` role in game composition.");
-    } else if (!players.filter(({ side }) => side.current === "villagers").length) {
+    } else if (!getPlayersWithSide("villagers", { players }).length) {
         throw generateError("NO_VILLAGER_IN_GAME_COMPOSITION", "No player has the `villager` role in game composition.");
-    } else if (getPlayerWithRole("two-sisters", { players }) &&
-        players.filter(({ role }) => role.current === "two-sisters").length !== 2) {
-        throw generateError("SISTERS_MUST_BE_TWO", `There must be exactly two sisters in game composition if at least one is chosen by a player.`);
-    } else if (getPlayerWithRole("three-brothers", { players }) &&
-        players.filter(({ role }) => role.current === "three-brothers").length !== 3) {
-        throw generateError("BROTHERS_MUST_BE_THREE", `There must be exactly three brothers in game composition if at least one is chosen by a player.`);
+    }
+    const roles = getRoles();
+    for (const role of roles) {
+        const playersWithRole = getPlayersWithRole(role.name, { players });
+        if (playersWithRole.length) {
+            if (role.maxInGame && playersWithRole.length > role.maxInGame) {
+                throw generateError("TOO_MUCH_PLAYERS_WITH_ROLE", `There are too many players (${playersWithRole.length}) with the role "${role.name}" which limit is ${role.maxInGame}`);
+            } else if (role.minInGame && playersWithRole.length < role.minInGame) {
+                throw generateError("MIN_PLAYERS_NOT_REACHED_FOR_ROLE", `There are too less players (${playersWithRole.length}) with the role "${role.name}" which minimum is ${role.minInGame}`);
+            }
+        }
     }
 };
 

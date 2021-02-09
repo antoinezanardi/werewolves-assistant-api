@@ -151,11 +151,11 @@ exports.errorMetadata = {
         code: 38,
         HTTPCode: 429,
     },
-    SISTERS_MUST_BE_TWO: {
+    TOO_MUCH_PLAYERS_WITH_ROLE: {
         code: 39,
         HTTPCode: 400,
     },
-    BROTHERS_MUST_BE_THREE: {
+    MIN_PLAYERS_NOT_REACHED_FOR_ROLE: {
         code: 40,
         HTTPCode: 400,
     },

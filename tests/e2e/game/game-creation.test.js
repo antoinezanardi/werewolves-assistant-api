@@ -211,6 +211,17 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("🛡 Can't create game with two guards (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Dœgd", role: "guard" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                done();
+            });
+    });
     it("👭 Can't create game a with only one sister (POST /games)", done => {
         chai.request(app)
             .post("/games")
@@ -218,7 +229,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithOnlyOneSister })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("SISTERS_MUST_BE_TWO");
+                expect(res.body.type).to.equals("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
                 done();
             });
     });
@@ -229,7 +240,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithOnlyTwoBrothers })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BROTHERS_MUST_BE_THREE");
+                expect(res.body.type).to.equals("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
                 done();
             });
     });
