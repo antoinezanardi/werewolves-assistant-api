@@ -1,5 +1,6 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
+const AdditionalCardSchema = require("./AdditionalCard");
 const {
     getGameStatuses, getWaitingForPossibilities, getGamePhases, getWonByPossibilities,
     getDefaultGameOptions,
@@ -9,7 +10,7 @@ const { getPlayerActions } = require("../../helpers/functions/Player");
 const gameOptions = {
     roles: {
         sheriff: {
-            enabled: {
+            isEnabled: {
                 type: Boolean,
                 default: true,
             },
@@ -20,6 +21,18 @@ const gameOptions = {
         },
         seer: {
             isTalkative: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        littleGirl: {
+            isProtectedByGuard: {
+                type: Boolean,
+                default: false,
+            },
+        },
+        idiot: {
+            doesDieOnAncientDeath: {
                 type: Boolean,
                 default: true,
             },
@@ -37,6 +50,14 @@ const gameOptions = {
                 type: Number,
                 default: 2,
                 min: 0,
+                max: 5,
+            },
+        },
+        raven: {
+            markPenalty: {
+                type: Number,
+                default: 2,
+                min: 1,
                 max: 5,
             },
         },
@@ -134,6 +155,10 @@ const GameSchema = new Schema({
     options: {
         type: gameOptions,
         default: getDefaultGameOptions(),
+    },
+    additionalCards: {
+        type: [AdditionalCardSchema],
+        default: undefined,
     },
     won: {
         type: WonSchema,

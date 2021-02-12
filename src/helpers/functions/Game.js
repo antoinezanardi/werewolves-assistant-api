@@ -1,6 +1,6 @@
 const {
     patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions,
-    gamePhases, wonByPossibilities,
+    gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames, votesResults, additionalCardsForRoleNames, additionalCardsThiefRoleNames,
 } = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
 
@@ -15,8 +15,17 @@ exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive
 exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
                                     game.players.every(player => doesPlayerHaveAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
 
+exports.isWhiteWerewolfOnlyAlive = game => !!this.getPlayerWithRole("white-werewolf", game) &&
+    game.players.every(({ isAlive, role }) => role.current === "white-werewolf" && isAlive || role.current !== "white-werewolf" && !isAlive);
+
 exports.getRemainingPlayersToCharm = game => game.players.filter(({ role, attributes, isAlive }) => isAlive &&
     role.current !== "pied-piper" && !doesPlayerHaveAttribute({ attributes }, "charmed"));
+
+exports.getRemainingVillagersToEat = game => game.players.filter(({ side, attributes, isAlive }) => isAlive &&
+    side.current !== "werewolves" && !doesPlayerHaveAttribute({ attributes }, "eaten"));
+
+exports.getRemainingWerewolvesToEat = game => game.players.filter(({ side, role, isAlive }) => isAlive && side.current === "werewolves" &&
+    role.current !== "white-werewolf");
 
 exports.hasPiedPiperWon = game => {
     const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
@@ -25,9 +34,15 @@ exports.hasPiedPiperWon = game => {
         !remainingPlayersToCharm.length;
 };
 
-exports.isGameDone = game => this.areAllPlayersDead(game) ||
+exports.hasAngelWon = game => {
+    const angel = this.getPlayerWithRole("angel", game);
+    return !!angel && !angel.isAlive && !doesPlayerHaveAttribute(angel, "powerless") && game.turn === 1 &&
+        ((angel.murdered.of === "vote" || angel.murdered.of === "settle-votes") && game.phase === "night" || angel.murdered.of === "eat");
+};
+
+exports.isGameDone = game => this.areAllPlayersDead(game) || this.hasAngelWon(game) ||
         (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game) ||
-            this.hasPiedPiperWon(game)) && !this.isActionInWaitingQueue(game, "shoot");
+            this.hasPiedPiperWon(game) || this.isWhiteWerewolfOnlyAlive(game)) && !this.isActionInWaitingQueue(game, "shoot");
 
 exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) => to === action);
 
@@ -37,7 +52,7 @@ exports.getWaitingForPossibilities = () => JSON.parse(JSON.stringify(waitingForP
 
 exports.getGameStatuses = () => JSON.parse(JSON.stringify(gameStatuses));
 
-exports.getGameTurNightActionsOrder = () => JSON.parse(JSON.stringify(turnNightActionsOrder));
+exports.getGameTurnNightActionsOrder = () => JSON.parse(JSON.stringify(turnNightActionsOrder));
 
 exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(player => doesPlayerHaveAttribute(player, attributeName));
 
@@ -84,3 +99,11 @@ exports.isVotePossible = game => game.players.some(player => player.isAlive && !
 exports.filterOutSourcesFromWaitingQueue = (game, sources) => {
     game.waiting = game.waiting.filter(({ for: source }) => !sources.includes(source));
 };
+
+exports.getGameRepartitionForbiddenRoleNames = () => JSON.parse(JSON.stringify(gameRepartitionForbiddenRoleNames));
+
+exports.getVotesResults = () => JSON.parse(JSON.stringify(votesResults));
+
+exports.getAdditionalCardsForRoleNames = () => JSON.parse(JSON.stringify(additionalCardsForRoleNames));
+
+exports.getAdditionalCardsThiefRoleNames = () => JSON.parse(JSON.stringify(additionalCardsThiefRoleNames));

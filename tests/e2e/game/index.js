@@ -17,4 +17,9 @@ describe("E2E - 🎲 Game tests", () => {
     require("./game-won-by-pied-piper.test");
     require("./pied-piper-infected.test");
     require("./unkillable-ancient.test");
+    require("./ancient-infected.test");
+    require("./game-won-by-white-werewolf.test");
+    require("./endless-votes.test");
+    require("./game-won-by-angel.test");
+    require("./thief-steals.test");
 });

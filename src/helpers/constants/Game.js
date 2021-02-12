@@ -1,4 +1,4 @@
-const { roleNames, groupNames } = require("./Role");
+const { roleNames, groupNames, roles } = require("./Role");
 
 exports.gamePhases = ["day", "night"];
 
@@ -10,6 +10,8 @@ exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"
 
 exports.wonByPossibilities = ["werewolves", "villagers", "lovers", "pied-piper"];
 
+exports.gameRepartitionForbiddenRoleNames = roleNames.filter(roleName => roleName !== "villager" && roleName !== "werewolf");
+
 exports.populate = [
     { path: "gameMaster", select: "-password" },
     { path: "history", limit: 3 },
@@ -17,9 +19,12 @@ exports.populate = [
 
 exports.turnNightActionsOrder = [
     { source: "all", action: "elect-sheriff", isFirstNightOnly: true },
+    { source: "all", action: "vote", isFirstNightOnly: true },
+    { source: "thief", action: "choose-card", isFirstNightOnly: true },
     { source: "dog-wolf", action: "choose-side", isFirstNightOnly: true },
     { source: "cupid", action: "charm", isFirstNightOnly: true },
     { source: "lovers", action: "meet-each-other", isFirstNightOnly: true },
+    { source: "stuttering-judge", action: "choose-sign", isFirstNightOnly: true },
     { source: "seer", action: "look" },
     { source: "two-sisters", action: "meet-each-other" },
     { source: "three-brothers", action: "meet-each-other" },
@@ -27,6 +32,7 @@ exports.turnNightActionsOrder = [
     { source: "raven", action: "mark" },
     { source: "guard", action: "protect" },
     { source: "werewolves", action: "eat" },
+    { source: "white-werewolf", action: "eat" },
     { source: "big-bad-wolf", action: "eat" },
     { source: "witch", action: "use-potion" },
     { source: "pied-piper", action: "charm" },
@@ -37,9 +43,18 @@ exports.findFields = ["status"];
 
 exports.defaultGameOptions = {
     roles: {
-        sheriff: { enabled: true, hasDoubledVote: true },
+        sheriff: { isEnabled: true, hasDoubledVote: true },
         seer: { isTalkative: true },
+        littleGirl: { isProtectedByGuard: false },
+        idiot: { doesDieOnAncientDeath: true },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },
+        raven: { markPenalty: 2 },
     },
 };
+
+exports.votesResults = ["election", "need-settlement", "death", "no-death"];
+
+exports.additionalCardsForRoleNames = ["thief"];
+
+exports.additionalCardsThiefRoleNames = roles.filter(({ minInGame }) => !minInGame).map(({ name }) => name);

@@ -14,6 +14,7 @@ let players = [
     { name: "Dyg", role: "villager" },
     { name: "Deg", role: "werewolf" },
     { name: "Dog", role: "werewolf" },
+    { name: "Dœg", role: "angel" },
 ];
 let token, game;
 
@@ -76,6 +77,22 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 done();
             });
     });
+    it("👪 All vote for one werewolf (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].isAlive).to.be.false;
+                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
+                expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
+                done();
+            });
+    });
     it("🪶 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
@@ -111,19 +128,23 @@ describe("F - Game where raven marks a player who dies during the night", () => 
         expect(game.players[1].attributes).to.not.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
         done();
     });
-    it("👪 One vote only for raven, dead villager is not nominated despite the fact he has two votes (POST /games/:id/play)", done => {
+    it("👪 One vote only for angel, dead villager is not nominated despite the fact he has two votes (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[0]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].isAlive).to.be.false;
-                expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[4].isAlive).to.be.false;
+                expect(game.players[4].murdered).to.deep.equals({ by: "all", of: "vote" });
                 expect(game.players[1].attributes).to.not.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
                 done();
             });
+    });
+    it("🎲 Game is still playing because angel died from the SECOND vote", done => {
+        expect(game.status).to.equals("playing");
+        done();
     });
 });

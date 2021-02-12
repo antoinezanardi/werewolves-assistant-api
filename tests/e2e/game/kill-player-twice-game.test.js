@@ -90,18 +90,18 @@ describe("G - Game where player is killed twice during the night", () => {
                 done();
             });
     });
-    it("🪄 Witch use death potion on villager (POST /games/:id/play)", done => {
+    it("🪄 Witch uses death potion on villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, potion: { death: true } }] })
+            .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, hasDrankDeathPotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[0].potion.death).to.be.true;
+                expect(game.history[0].play.targets[0].hasDrankDeathPotion).to.be.true;
                 done();
             });
     });

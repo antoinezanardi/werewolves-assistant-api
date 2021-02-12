@@ -211,6 +211,17 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("🛡 Can't create game with two guards (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Dœgd", role: "guard" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                done();
+            });
+    });
     it("👭 Can't create game a with only one sister (POST /games)", done => {
         chai.request(app)
             .post("/games")
@@ -218,7 +229,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithOnlyOneSister })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("SISTERS_MUST_BE_TWO");
+                expect(res.body.type).to.equals("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
                 done();
             });
     });
@@ -229,7 +240,67 @@ describe("A - Game creation", () => {
             .send({ players: playersWithOnlyTwoBrothers })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BROTHERS_MUST_BE_THREE");
+                expect(res.body.type).to.equals("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when there is no thief in game (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players, additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ADDITIONAL_CARDS_NOT_ALLOWED");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when one additional role card is forbidden for thief (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [{ role: "two-sisters", for: "thief" }, { role: "witch", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when one additional role card makes exceed the max in game for this role (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when one additional role card makes exceed the max in game for this role (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [
+                    { role: "wild-child", for: "thief" },
+                    { role: "wild-child", for: "thief" },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                done();
+            });
+    });
+    it("🃏 Can't create game without additional cards if thief is in the game (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NEED_ADDITIONAL_CARDS_FOR_THIEF");
                 done();
             });
     });

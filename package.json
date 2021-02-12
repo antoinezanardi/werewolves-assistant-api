@@ -1,6 +1,6 @@
 {
   "name": "werewolwes-assistant-api",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Back end for the werewolves assistant",
   "main": "app.js",
   "scripts": {

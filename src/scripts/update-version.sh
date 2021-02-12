@@ -2,7 +2,7 @@ printf "Current version: ";
 awk -F'\"' '/\"version\": \".+\"/{ print $4; exit; }' package.json;
 printf "New version: ";
 read -r newVersion;
-if [[ ! "$newVersion" =~ [0-9]\.[0-9]\.[0-9] ]]; then
+if [[ ! "$newVersion" =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
     echo "Invalid version format. Must be like \"[0-9].[0-9].[0-9]\"";
     exit;
 fi
