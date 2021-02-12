@@ -8,7 +8,7 @@ env:
 install:
     - npm install
     - npm run lint
-    - npm run test
+    - npm test
 addons:
     ssh_known_hosts: vps514431.ovh.net
 deploy:
