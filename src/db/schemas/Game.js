@@ -1,10 +1,10 @@
 const { Schema } = require("mongoose");
 const PlayerSchema = require("./Player");
+const AdditionalCardSchema = require("./AdditionalCard");
 const {
     getGameStatuses, getWaitingForPossibilities, getGamePhases, getWonByPossibilities,
-    getDefaultGameOptions, getAdditionalCardsForRoleNames,
+    getDefaultGameOptions,
 } = require("../../helpers/functions/Game");
-const { getRoleNames } = require("../../helpers/functions/Role");
 const { getPlayerActions } = require("../../helpers/functions/Player");
 
 const gameOptions = {
@@ -92,26 +92,6 @@ const ReviewSchema = new Schema({
     },
 }, {
     _id: false,
-    timestamps: false,
-    versionKey: false,
-});
-
-const AdditionalCardSchema = new Schema({
-    role: {
-        type: String,
-        enum: getRoleNames(),
-        required: true,
-    },
-    for: {
-        type: String,
-        enum: getAdditionalCardsForRoleNames(),
-        required: true,
-    },
-    isUsed: {
-        type: Boolean,
-        default: false,
-    },
-}, {
     timestamps: false,
     versionKey: false,
 });

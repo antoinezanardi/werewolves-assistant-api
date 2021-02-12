@@ -244,6 +244,66 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("🃏 Can't create game with additional cards when there is no thief in game (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players, additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ADDITIONAL_CARDS_NOT_ALLOWED");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when one additional role card is forbidden for thief (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [{ role: "two-sisters", for: "thief" }, { role: "witch", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when one additional role card makes exceed the max in game for this role (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                done();
+            });
+    });
+    it("🃏 Can't create game with additional cards when one additional role card makes exceed the max in game for this role (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [
+                    { role: "wild-child", for: "thief" },
+                    { role: "wild-child", for: "thief" },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                done();
+            });
+    });
+    it("🃏 Can't create game without additional cards if thief is in the game (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NEED_ADDITIONAL_CARDS_FOR_THIEF");
+                done();
+            });
+    });
     it("🎲 User1 creates game with JWT auth (POST /games)", done => {
         chai.request(app)
             .post("/games")

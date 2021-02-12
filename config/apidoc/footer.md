@@ -133,64 +133,70 @@ If you have an error from the API, you'll get a generic structure. (_See: [Class
 
 Description for each case below :   
 
-| Code | Type                                   | HTTP Code |                 Description                                                                               |
-|:----:|:--------------------------------------:|:---------:|-----------------------------------------------------------------------------------------------------------|
-| 1    | BAD_REQUEST                            |    400    | You provided incorrect params.                                                                            |
-| 2    | UNAUTHORIZED                           |    401    | You're not authorized.                                                                                    |
-| 3    | EMAIL_EXISTS                           |    400    | The email provided already exists.                                                                        |
-| 4    | NOT_FOUND                              |    404    | The requested resource is not found.                                                                      |
-| 5    | INTERNAL_SERVER_ERROR                  |    500    | The server got an error, this is not your fault.                                                          |
-| 6    | BAD_TOKEN                              |    400    | You provided a bad or malformed token.                                                                    |
-| 7    | BAD_CREDENTIALS                        |    401    | The credentials provided don't match any in database.                                                     |
-| 8    | PLAYERS_NAME_NOT_UNIQUE                |    400    | Players provided don't have unique `name`.                                                                |
-| 9    | NO_WEREWOLF_IN_GAME_COMPOSITION        |    400    | There is no werewolf in game composition.                                                                 |
-| 10   | NO_VILLAGER_IN_GAME_COMPOSITION        |    400    | There is no villager in game composition.                                                                 |
-| 11   | GAME_MASTER_HAS_ON_GOING_GAMES         |    400    | Game master has already on-going game(s).                                                                 |
-| 12   | GAME_DOESNT_BELONG_TO_USER             |    401    | This game doesn't belong to user.                                                                         |
-| 13   | BAD_PLAY_SOURCE                        |    400    | Play's source provided is not the one expected.                                                           |
-| 14   | BAD_PLAY_ACTION                        |    400    | Play's action provided is not the one expected.                                                           |
-| 15   | VOTES_REQUIRED                         |    400    | Play needs votes to be set.                                                                               |
-| 16   | VOTES_CANT_BE_EMPTY                    |    400    | Play's votes can't be an empty array.                                                                     |
-| 17   | BAD_VOTE_STRUCTURE                     |    400    | One of play's vote has a bad structure. (_See: [Classes - Play](#play-class)_)                            |
-| 18   | SAME_VOTE_SOURCE_AND_TARGET            |    400    | Play's vote can't have the same source and target.                                                        |
-| 19   | CANT_VOTE                              |    400    | Player can't be source of a vote.                                                                         |
-| 20   | CANT_BE_VOTE_TARGET                    |    400    | Player can't be target of a vote.                                                                         |
-| 21   | CANT_VOTE_MULTIPLE_TIMES               |    400    | Player can't vote more than once.                                                                         |
-| 22   | TIE_IN_VOTES                           |    400    | Tie in votes is not allowed for this action.                                                              |
-| 23   | TARGETS_REQUIRED                       |    400    | Plays needs targets to be set.                                                                            |
-| 24   | TARGETS_CANT_BE_EMPTY                  |    400    | Play's targets can't be an empty array.                                                                   |
-| 25   | BAD_TARGETS_LENGTH                     |    400    | Play's targets length does not match the one expected.                                                    |
-| 26   | BAD_TARGET_STRUCTURE                   |    400    | One of play's target has a bad structure. (_See: [Classes - Play](#play-class)_                           |
-| 27   | NOT_TARGETABLE                         |    400    | Player can't be a target.                                                                                 |
-| 28   | CANT_LOOK_AT_HERSELF                   |    400    | Seer can't look at herself.                                                                               |
-| 29   | CANT_EAT_EACH_OTHER                    |    400    | Werewolves target can't be a player with group "werewolves".                                              |
-| 30   | BAD_LIFE_POTION_USE                    |    400    | Witch can only use life potion on a target eaten by werewolves.                                           |
-| 31   | ONLY_ONE_LIFE_POTION                   |    400    | Witch can only use one life potion per game.                                                              |
-| 32   | ONLY_ONE_DEATH_POTION                  |    400    | Witch can only use one death potion per game.                                                             |
-| 33   | NON_UNIQUE_TARGETS                     |    400    | Multiple targets are pointing the same player.                                                            |
-| 34   | CANT_PROTECT_TWICE                     |    400    | Guard can't protect the same player twice in a row.                                                       |
-| 35   | CANT_BE_CHOSEN_AS_TIEBREAKER           |    400    | Player is not part of the tiebreaker choice for the sheriff.                                              |
-| 36   | NO_MORE_PLAY_ALLOWED                   |    400    | No more play are allowed because game's status is "done" or "canceled".                                   |
-| 37   | CANT_BE_RESET                          |    400    | Game can't be reset because game's status is "done" or "canceled".                                        |
-| 38   | TOO_MANY_REQUESTS                      |    429    | Too many requests have been done on this route. Try again later.                                          |
-| 39   | TOO_MUCH_PLAYERS_WITH_ROLE             |    400    | Too many players have chosen the same role and exceed the limit of this role in the game.                 |
-| 40   | MIN_PLAYERS_NOT_REACHED_FOR_ROLE       |    400    | One player chose a role and this role didn't reach its player minimum in the game.                        |
-| 41   | WILD_CHILD_CANT_CHOOSE_HIMSELF         |    400    | Wild child can't choose himself as a model.                                                               |
-| 42   | DOG_WOLF_MUST_CHOOSE_SIDE              |    400    | Dog-wolf must choose a side between `villagers` and `werewolves`.                                         |
-| 43   | TARGET_ALREADY_EATEN                   |    400    | This target is already planned to be eaten by the `werewolves`, the big bad wolf can't eat it.            |
-| 44   | TARGET_MUST_BE_EATEN_BY_WEREWOLVES     |    400    | Target must be eaten by the werewolves in order to be infected.                                           |
-| 45   | ABSENT_VILE_FATHER_OF_WOLVES           |    400    | Target can't be infected because the vile father of wolves is either not in the game or dead.             |
-| 46   | ONLY_ONE_INFECTION                     |    400    | Vile father of wolves can infect only one target per game.                                                |
-| 47   | CANT_CHARM_HIMSELF                     |    400    | Pied piper can't charm himself.                                                                           |
-| 48   | ALREADY_CHARMED                        |    400    | Target is already charmed by the pied piper and can't be charmed twice.                                   |
-| 49   | CANT_VOTE_ALREADY                      |    400    | Player is already banned and so can't vote.                                                               |
-| 50   | MUST_EAT_WEREWOLF                      |    400    | Werewolves target can't be a player with current side "villager".                                         |
-| 51   | CANT_EAT_HIMSELF                       |    400    | White werewolf can't eat himself.                                                                         |
-| 52   | STUTTERING_JUDGE_ABSENT                |    400    | Second vote can't be requested if stuttering judge is absent from the game.                               |
-| 53   | STUTTERING_JUDGE_POWERLESS             |    400    | Stuttering judge is powerless and so can't request another vote.                                          |
-| 54   | ONLY_ONE_SECOND_VOTE_REQUEST           |    400    | Second vote request has been already made.                                                                |
-| 55   | BAD_PLAY_ACTION_FOR_SIDE_CHOICE        |    400    | `side` can be set only if play's action is `choose-side`.                                                 |
-| 56   | BAD_PLAY_ACTION_FOR_JUDGE_REQUEST      |    400    | `doesJudgeRequestAnotherVote` can be set only if play's action is `vote`.                                 |
-| 57   | BAD_PLAY_ACTION_FOR_INFECTION          |    400    | `isInfected` can be set on target only if play's action is `eat`.                                         |
-| 58   | BAD_PLAY_ACTION_FOR_POTION             |    400    | `hasDrankLifePotion` or `hasDrankDeathPotion` can be set on target only if play's action is `use-potion`. |
-| 59   | STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET |    400    | Stuttering judge didn't choose his sign yet and so can't request another vote.                            |
+| Code | Type                                       | HTTP Code |                 Description                                                                               |
+|:----:|:------------------------------------------:|:---------:|-----------------------------------------------------------------------------------------------------------|
+| 1    | BAD_REQUEST                                |    400    | You provided incorrect params.                                                                            |
+| 2    | UNAUTHORIZED                               |    401    | You're not authorized.                                                                                    |
+| 3    | EMAIL_EXISTS                               |    400    | The email provided already exists.                                                                        |
+| 4    | NOT_FOUND                                  |    404    | The requested resource is not found.                                                                      |
+| 5    | INTERNAL_SERVER_ERROR                      |    500    | The server got an error, this is not your fault.                                                          |
+| 6    | BAD_TOKEN                                  |    400    | You provided a bad or malformed token.                                                                    |
+| 7    | BAD_CREDENTIALS                            |    401    | The credentials provided don't match any in database.                                                     |
+| 8    | PLAYERS_NAME_NOT_UNIQUE                    |    400    | Players provided don't have unique `name`.                                                                |
+| 9    | NO_WEREWOLF_IN_GAME_COMPOSITION            |    400    | There is no werewolf in game composition.                                                                 |
+| 10   | NO_VILLAGER_IN_GAME_COMPOSITION            |    400    | There is no villager in game composition.                                                                 |
+| 11   | GAME_MASTER_HAS_ON_GOING_GAMES             |    400    | Game master has already on-going game(s).                                                                 |
+| 12   | GAME_DOESNT_BELONG_TO_USER                 |    401    | This game doesn't belong to user.                                                                         |
+| 13   | BAD_PLAY_SOURCE                            |    400    | Play's source provided is not the one expected.                                                           |
+| 14   | BAD_PLAY_ACTION                            |    400    | Play's action provided is not the one expected.                                                           |
+| 15   | VOTES_REQUIRED                             |    400    | Play needs votes to be set.                                                                               |
+| 16   | VOTES_CANT_BE_EMPTY                        |    400    | Play's votes can't be an empty array.                                                                     |
+| 17   | BAD_VOTE_STRUCTURE                         |    400    | One of play's vote has a bad structure. (_See: [Classes - Play](#play-class)_)                            |
+| 18   | SAME_VOTE_SOURCE_AND_TARGET                |    400    | Play's vote can't have the same source and target.                                                        |
+| 19   | CANT_VOTE                                  |    400    | Player can't be source of a vote.                                                                         |
+| 20   | CANT_BE_VOTE_TARGET                        |    400    | Player can't be target of a vote.                                                                         |
+| 21   | CANT_VOTE_MULTIPLE_TIMES                   |    400    | Player can't vote more than once.                                                                         |
+| 22   | TIE_IN_VOTES                               |    400    | Tie in votes is not allowed for this action.                                                              |
+| 23   | TARGETS_REQUIRED                           |    400    | Plays needs targets to be set.                                                                            |
+| 24   | TARGETS_CANT_BE_EMPTY                      |    400    | Play's targets can't be an empty array.                                                                   |
+| 25   | BAD_TARGETS_LENGTH                         |    400    | Play's targets length does not match the one expected.                                                    |
+| 26   | BAD_TARGET_STRUCTURE                       |    400    | One of play's target has a bad structure. (_See: [Classes - Play](#play-class)_                           |
+| 27   | NOT_TARGETABLE                             |    400    | Player can't be a target.                                                                                 |
+| 28   | CANT_LOOK_AT_HERSELF                       |    400    | Seer can't look at herself.                                                                               |
+| 29   | CANT_EAT_EACH_OTHER                        |    400    | Werewolves target can't be a player with group "werewolves".                                              |
+| 30   | BAD_LIFE_POTION_USE                        |    400    | Witch can only use life potion on a target eaten by werewolves.                                           |
+| 31   | ONLY_ONE_LIFE_POTION                       |    400    | Witch can only use one life potion per game.                                                              |
+| 32   | ONLY_ONE_DEATH_POTION                      |    400    | Witch can only use one death potion per game.                                                             |
+| 33   | NON_UNIQUE_TARGETS                         |    400    | Multiple targets are pointing the same player.                                                            |
+| 34   | CANT_PROTECT_TWICE                         |    400    | Guard can't protect the same player twice in a row.                                                       |
+| 35   | CANT_BE_CHOSEN_AS_TIEBREAKER               |    400    | Player is not part of the tiebreaker choice for the sheriff.                                              |
+| 36   | NO_MORE_PLAY_ALLOWED                       |    400    | No more play are allowed because game's status is "done" or "canceled".                                   |
+| 37   | CANT_BE_RESET                              |    400    | Game can't be reset because game's status is "done" or "canceled".                                        |
+| 38   | TOO_MANY_REQUESTS                          |    429    | Too many requests have been done on this route. Try again later.                                          |
+| 39   | TOO_MUCH_PLAYERS_WITH_ROLE                 |    400    | Too many players have chosen the same role and exceed the limit of this role in the game.                 |
+| 40   | MIN_PLAYERS_NOT_REACHED_FOR_ROLE           |    400    | One player chose a role and this role didn't reach its player minimum in the game.                        |
+| 41   | WILD_CHILD_CANT_CHOOSE_HIMSELF             |    400    | Wild child can't choose himself as a model.                                                               |
+| 42   | DOG_WOLF_MUST_CHOOSE_SIDE                  |    400    | Dog-wolf must choose a side between `villagers` and `werewolves`.                                         |
+| 43   | TARGET_ALREADY_EATEN                       |    400    | This target is already planned to be eaten by the `werewolves`, the big bad wolf can't eat it.            |
+| 44   | TARGET_MUST_BE_EATEN_BY_WEREWOLVES         |    400    | Target must be eaten by the werewolves in order to be infected.                                           |
+| 45   | ABSENT_VILE_FATHER_OF_WOLVES               |    400    | Target can't be infected because the vile father of wolves is either not in the game or dead.             |
+| 46   | ONLY_ONE_INFECTION                         |    400    | Vile father of wolves can infect only one target per game.                                                |
+| 47   | CANT_CHARM_HIMSELF                         |    400    | Pied piper can't charm himself.                                                                           |
+| 48   | ALREADY_CHARMED                            |    400    | Target is already charmed by the pied piper and can't be charmed twice.                                   |
+| 49   | CANT_VOTE_ALREADY                          |    400    | Player is already banned and so can't vote.                                                               |
+| 50   | MUST_EAT_WEREWOLF                          |    400    | Werewolves target can't be a player with current side "villager".                                         |
+| 51   | CANT_EAT_HIMSELF                           |    400    | White werewolf can't eat himself.                                                                         |
+| 52   | STUTTERING_JUDGE_ABSENT                    |    400    | Second vote can't be requested if stuttering judge is absent from the game.                               |
+| 53   | STUTTERING_JUDGE_POWERLESS                 |    400    | Stuttering judge is powerless and so can't request another vote.                                          |
+| 54   | ONLY_ONE_SECOND_VOTE_REQUEST               |    400    | Second vote request has been already made.                                                                |
+| 55   | BAD_PLAY_ACTION_FOR_SIDE_CHOICE            |    400    | `side` can be set only if play's action is `choose-side`.                                                 |
+| 56   | BAD_PLAY_ACTION_FOR_JUDGE_REQUEST          |    400    | `doesJudgeRequestAnotherVote` can be set only if play's action is `vote`.                                 |
+| 57   | BAD_PLAY_ACTION_FOR_INFECTION              |    400    | `isInfected` can be set on target only if play's action is `eat`.                                         |
+| 58   | BAD_PLAY_ACTION_FOR_POTION                 |    400    | `hasDrankLifePotion` or `hasDrankDeathPotion` can be set on target only if play's action is `use-potion`. |
+| 59   | STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET     |    400    | Stuttering judge didn't choose his sign yet and so can't request another vote.                            |
+| 60   | ADDITIONAL_CARDS_NOT_ALLOWED               |    400    | `additionalCards` is not allowed when there is no `thief` in game.                                        |
+| 61   | FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF   |    400    | Role is not allowed in additional cards for thief.                                                        |
+| 62   | NEED_ADDITIONAL_CARDS_FOR_THIEF            |    400    | When `thief` is in the game, 2 additional cards must be added for him.                                    |
+| 63   | BAD_PLAY_ACTION_FOR_CHOSEN_CARD            |    400    | `chosenCard` can be set only if action is `choose-card`.                                                  |
+| 64   | CHOSEN_CARD_NOT_FOUND                      |    404    | The chosen card is not found in additional cards.                                                         |
+| 65   | THIEF_MUST_STEAL                           |    400    | As all additional cards for thief are on the werewolves side, he must choose one of them.                 |

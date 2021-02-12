@@ -235,4 +235,28 @@ exports.errorMetadata = {
         code: 59,
         HTTPCode: 400,
     },
+    ADDITIONAL_CARDS_NOT_ALLOWED: {
+        code: 60,
+        HTTPCode: 400,
+    },
+    FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF: {
+        code: 61,
+        HTTPCode: 400,
+    },
+    NEED_ADDITIONAL_CARDS_FOR_THIEF: {
+        code: 62,
+        HTTPCode: 400,
+    },
+    BAD_PLAY_ACTION_FOR_CHOSEN_CARD: {
+        code: 63,
+        HTTPCode: 400,
+    },
+    CHOSEN_CARD_NOT_FOUND: {
+        code: 64,
+        HTTPCode: 404,
+    },
+    THIEF_MUST_STEAL: {
+        code: 65,
+        HTTPCode: 400,
+    },
 };

@@ -1,6 +1,6 @@
 const {
     patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions,
-    gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames, votesResults, additionalCardsForRoleNames,
+    gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames, votesResults, additionalCardsForRoleNames, additionalCardsThiefRoleNames,
 } = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
 
@@ -52,7 +52,7 @@ exports.getWaitingForPossibilities = () => JSON.parse(JSON.stringify(waitingForP
 
 exports.getGameStatuses = () => JSON.parse(JSON.stringify(gameStatuses));
 
-exports.getGameTurNightActionsOrder = () => JSON.parse(JSON.stringify(turnNightActionsOrder));
+exports.getGameTurnNightActionsOrder = () => JSON.parse(JSON.stringify(turnNightActionsOrder));
 
 exports.getPlayerWithAttribute = (attributeName, game) => game.players.find(player => doesPlayerHaveAttribute(player, attributeName));
 
@@ -105,3 +105,5 @@ exports.getGameRepartitionForbiddenRoleNames = () => JSON.parse(JSON.stringify(g
 exports.getVotesResults = () => JSON.parse(JSON.stringify(votesResults));
 
 exports.getAdditionalCardsForRoleNames = () => JSON.parse(JSON.stringify(additionalCardsForRoleNames));
+
+exports.getAdditionalCardsThiefRoleNames = () => JSON.parse(JSON.stringify(additionalCardsThiefRoleNames));

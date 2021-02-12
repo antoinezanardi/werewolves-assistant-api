@@ -30,6 +30,11 @@ let players = [
     { name: "D‰g", role: "angel" },
     { name: "DΩg", role: "dog-wolf" },
     { name: "D#g", role: "cupid" },
+    { name: "D±g", role: "thief" },
+];
+const additionalCards = [
+    { role: "werewolf", for: "thief" },
+    { role: "werewolf", for: "thief" },
 ];
 let token, game;
 
@@ -61,7 +66,7 @@ describe("L - Game with various villagers who loose their power because they kil
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players })
+            .send({ players, additionalCards })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -125,6 +130,8 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[16].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[17].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[18].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[19].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[20].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 done();
             });
     });

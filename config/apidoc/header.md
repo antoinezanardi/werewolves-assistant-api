@@ -178,6 +178,7 @@ Each time a play is done by anyone, any group or any side, an entry in game's hi
 | &emsp;⮑ for                                       | [Player](#player-class)   | Vote's target.                                                                                                                                                                   |
 | **votesResult***                                   | String                    | Only if `votes` are set, define the results. Can be either `election`, `need-settlement`, `death` or `no-death`.                                                                 |
 | **doesJudgeRequestAnotherVote***                   | Boolean                   | Only if there is a `stuttering-judge` in the game and `action` is `vote` or `settle-votes`. If set to `true`, there is another vote immediately.                                 |
+| **chosenCard***                                    | ObjectId                  | Only available for `thief`, chosen card id of additional cards. Set if `thief` chose a card or must be set if both additional card are `werewolves` side.                        |
 | **side***                                          | String                    | Only available for the `dog-wolf`. Is equal to `villagers` or `werewolves` depending on the chosen side.                                                                         |
 
 ## <a id="error-class"></a>⚠️ API Error

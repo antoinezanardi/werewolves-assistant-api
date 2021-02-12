@@ -1,10 +1,11 @@
 const { Schema } = require("mongoose");
-const Player = require("./Player");
+const PlayerSchema = require("./Player");
+const AdditionalCardSchema = require("./AdditionalCard");
 const { getGamePhases, getWaitingForPossibilities, getVotesResults } = require("../../helpers/functions/Game");
 const { getPlayerActions } = require("../../helpers/functions/Player");
 const { getSideNames } = require("../../helpers/functions/Role");
 
-const playSchema = new Schema({
+const PlaySchema = new Schema({
     action: {
         type: String,
         enum: getPlayerActions(),
@@ -17,7 +18,7 @@ const playSchema = new Schema({
             required: true,
         },
         players: {
-            type: [Player],
+            type: [PlayerSchema],
             required: true,
         },
     },
@@ -25,7 +26,7 @@ const playSchema = new Schema({
         type: [
             {
                 player: {
-                    type: Player,
+                    type: PlayerSchema,
                     required: true,
                 },
                 hasDrankLifePotion: { type: Boolean },
@@ -40,11 +41,11 @@ const playSchema = new Schema({
         type: [
             {
                 from: {
-                    type: Player,
+                    type: PlayerSchema,
                     required: true,
                 },
                 for: {
-                    type: Player,
+                    type: PlayerSchema,
                     required: true,
                 },
             },
@@ -57,6 +58,7 @@ const playSchema = new Schema({
         enum: getVotesResults(),
     },
     doesJudgeRequestAnotherVote: { type: Boolean },
+    chosenCard: { type: AdditionalCardSchema },
     side: {
         type: String,
         enum: getSideNames(),
@@ -67,7 +69,7 @@ const playSchema = new Schema({
     versionKey: false,
 });
 
-const gameHistorySchema = new Schema({
+const GameHistorySchema = new Schema({
     gameId: {
         type: Schema.Types.ObjectId,
         ref: "games",
@@ -89,15 +91,15 @@ const gameHistorySchema = new Schema({
         required: true,
     },
     play: {
-        type: playSchema,
+        type: PlaySchema,
         required: false,
     },
     deadPlayers: {
-        type: [Player],
+        type: [PlayerSchema],
         default: undefined,
     },
     revealedPlayers: {
-        type: [Player],
+        type: [PlayerSchema],
         default: undefined,
     },
 }, {
@@ -106,4 +108,4 @@ const gameHistorySchema = new Schema({
     collection: "gameHistory",
 });
 
-module.exports = gameHistorySchema;
+module.exports = GameHistorySchema;

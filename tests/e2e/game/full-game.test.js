@@ -38,10 +38,16 @@ let players = [
     { name: "D¥g", role: "werewolf" },
     { name: "D‰g", role: "stuttering-judge" },
     { name: "D#g", role: "angel" },
+    { name: "D±g", role: "thief" },
 ];
+let additionalCards = [
+    { for: "thief", role: "werewolf" },
+    { for: "thief", role: "werewolf" },
+];
+const options = { roles: { idiot: { doesDieOnAncientDeath: false } } };
 let token, game;
 
-describe("B - Full game of 27 players with all roles", () => {
+describe("B - Full game of 28 players with all roles", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -69,10 +75,11 @@ describe("B - Full game of 27 players with all roles", () => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players, options: { roles: { idiot: { doesDieOnAncientDeath: false } } } })
+            .send({ players, options, additionalCards })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                additionalCards = game.additionalCards;
                 done();
             });
     });
@@ -271,7 +278,7 @@ describe("B - Full game of 27 players with all roles", () => {
         expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
         done();
     });
-    it("👪 All can't elect vote if play's source is not 'all' (POST /games/:id/play)", done => {
+    it("👪 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
         chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -306,6 +313,69 @@ describe("B - Full game of 27 players with all roles", () => {
                 expect(game.history[0].play.votesResult).to.equals("death");
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[13]._id);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'thief' to 'choose-card'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "thief", to: "choose-card" });
+        done();
+    });
+    it("🦹 Thief can't choose card if play's source is not 'thief' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "dog-wolf", action: "choose-card" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🦹 Thief can't choose card if play's action is not 'choose-card' (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "shoot" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("🦹 Thief can't skip if the two additional cards are from the 'werewolves' side (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("THIEF_MUST_STEAL");
+                done();
+            });
+    });
+    it("🦹 Thief can't choose an unknown card (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card", chosenCard: new mongoose.Types.ObjectId() })
+            .end((err, res) => {
+                expect(res).to.have.status(404);
+                expect(res.body.type).to.equals("CHOSEN_CARD_NOT_FOUND");
+                done();
+            });
+    });
+    it("🦹 Thief chooses the first werewolf card (POST /games/:id/play)", done => {
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card", chosenCard: additionalCards[0]._id })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                additionalCards = game.additionalCards;
+                expect(game.players[27].role.current).to.equals("werewolf");
+                expect(game.players[27].side.current).to.equals("werewolves");
+                expect(game.history[0].play.chosenCard).to.deep.equals(additionalCards[0]);
                 done();
             });
     });
@@ -517,6 +587,23 @@ describe("B - Full game of 27 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_POTION");
+                done();
+            });
+    });
+    it("🏹 Cupid can't choose a card (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[7]._id },
+                    { player: players[9]._id },
+                ], chosenCard: new mongoose.Types.ObjectId(),
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_CHOSEN_CARD");
                 done();
             });
     });
@@ -2826,7 +2913,7 @@ describe("B - Full game of 27 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history.length).to.equals(41);
+                expect(game.history.length).to.equals(42);
                 done();
             });
     });
@@ -2837,7 +2924,7 @@ describe("B - Full game of 27 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 const history = res.body;
-                expect(history.length).to.equals(41);
+                expect(history.length).to.equals(42);
                 done();
             });
     });
@@ -3507,6 +3594,60 @@ describe("B - Full game of 27 players with all roles", () => {
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.players[0].isAlive).to.be.false;
+                expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🌙 Night falls", done => {
+        expect(game.phase).to.equals("night");
+        expect(game.turn).to.equals(11);
+        done();
+    });
+    it("🛡 Guard protects the thief (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[27]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[27].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[27]._id);
+                done();
+            });
+    });
+    it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                done();
+            });
+    });
+    it("☀️ Sun is rising", done => {
+        expect(game.phase).to.equals("day");
+        expect(game.players[2].isAlive).to.be.false;
+        done();
+    });
+    it("👪 All vote for the thief, which joined the werewolf side by choosing a werewolf card (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[6]._id, for: players[27]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;

@@ -63,7 +63,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
                 done();
             });
     });
-    it("⚖️ Stuttering judge can't request a second vote if action is not 'vote' or 'settle-votes' (POST /games/:id/play)", done => {
+    it("⚖️ Stuttering judge can't request a second vote if action is not 'vote' (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(app)
             .post(`/games/${game._id}/play`)

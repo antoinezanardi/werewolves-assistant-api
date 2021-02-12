@@ -9,7 +9,7 @@ const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
     getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat,
 } = require("../helpers/functions/Game");
-const { getVillagerRoles } = require("../helpers/functions/Role");
+const { getVillagerRoles, getWerewolfRoles, getRoles } = require("../helpers/functions/Role");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
@@ -438,6 +438,33 @@ exports.checkAndFillVotes = async(votes, game, options) => {
     for (let i = 0; i < votes.length; i++) {
         votes[i].from = getPlayerWithId(votes[i].from, game);
         votes[i].for = getPlayerWithId(votes[i].for, game);
+    }
+};
+
+exports.checkAndGetChosenCard = (chosenCardId, game) => {
+    const chosenCard = chosenCardId ? game.additionalCards.find(({ _id }) => _id.toString() === chosenCardId.toString()) : null;
+    const werewolvesRoles = getWerewolfRoles();
+    const thiefAdditionalCards = game.additionalCards.filter(({ for: recipient }) => recipient === "thief");
+    if (chosenCardId && !chosenCard) {
+        throw generateError("CHOSEN_CARD_NOT_FOUND", `The chosen card with id "${chosenCardId}" is not found in additional cards.`);
+    } else if (!chosenCard && thiefAdditionalCards.every(({ role: roleName }) => werewolvesRoles.find(({ name }) => name === roleName))) {
+        throw generateError("THIEF_MUST_STEAL", `As all additional cards for thief are on the werewolves side, he must choose one of them.`);
+    }
+    if (chosenCard) {
+        chosenCard.isUsed = true;
+    }
+    return chosenCard;
+};
+
+exports.thiefPlays = async(play, game, gameHistoryEntry) => {
+    const chosenCard = this.checkAndGetChosenCard(play.chosenCard, game);
+    if (chosenCard) {
+        const thiefPlayer = getPlayerWithRole("thief", game);
+        const chosenRole = getRoles().find(({ name }) => name === chosenCard.role);
+        thiefPlayer.role.current = chosenRole.name;
+        thiefPlayer.side.current = chosenRole.side;
+        gameHistoryEntry.play.chosenCard = chosenCard;
+        await Game.refreshNightWaitingQueue(game);
     }
 };
 

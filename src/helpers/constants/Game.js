@@ -1,4 +1,4 @@
-const { roleNames, groupNames } = require("./Role");
+const { roleNames, groupNames, roles } = require("./Role");
 
 exports.gamePhases = ["day", "night"];
 
@@ -20,6 +20,7 @@ exports.populate = [
 exports.turnNightActionsOrder = [
     { source: "all", action: "elect-sheriff", isFirstNightOnly: true },
     { source: "all", action: "vote", isFirstNightOnly: true },
+    { source: "thief", action: "choose-card", isFirstNightOnly: true },
     { source: "dog-wolf", action: "choose-side", isFirstNightOnly: true },
     { source: "cupid", action: "charm", isFirstNightOnly: true },
     { source: "lovers", action: "meet-each-other", isFirstNightOnly: true },
@@ -55,3 +56,5 @@ exports.defaultGameOptions = {
 exports.votesResults = ["election", "need-settlement", "death", "no-death"];
 
 exports.additionalCardsForRoleNames = ["thief"];
+
+exports.additionalCardsThiefRoleNames = roles.filter(({ minInGame }) => !minInGame).map(({ name }) => name);

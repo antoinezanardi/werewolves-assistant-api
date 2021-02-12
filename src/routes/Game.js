@@ -205,7 +205,8 @@ module.exports = app => {
         body("additionalCards")
             .optional()
             .isArray().withMessage("Must be a valid array")
-            .isLength({ min: 2, max: 2 }).withMessage("Must contain 2 cards"),
+            .custom(value => value.length === 2 ? Promise.resolve() : Promise.reject(new Error()))
+            .withMessage("Must contain 2 cards"),
         body("additionalCards.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getRoleNames()).withMessage(`Must be equal to one of the following values: ${getRoleNames()}`),
@@ -310,9 +311,10 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [targets.hasDrankLifePotion] Set to `true` if the `witch` saves target's life from werewolves meal.
      * @apiParam (Request Body Parameters) {Boolean} [targets.hasDrankDeathPotion] Set to `true` if the `witch` kills the target.
      * @apiParam (Request Body Parameters) {Object[]} [votes] Required when **action** is `elect-sheriff` or `vote`.
-     * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source.
-     * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target.
-     * @apiParam (Request Body Parameters) {Boolean} [doesJudgeRequestAnotherVote] Only if there is vile-father-of-wolves in the game and the action is `eat` from `werewolves`. Set to `true` and the werewolves victim will instantly join the `werewolves` side if possible.
+     * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source id.
+     * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target id.
+     * @apiParam (Request Body Parameters) {Boolean} [doesJudgeRequestAnotherVote]  Only if there is a `stuttering-judge` in the game and `action` is `vote` or `settle-votes`. If set to `true`, there is another vote immediately.
+     * @apiParam (Request Body Parameters) {ObjectId} [chosenCard] Only available for `thief`, chosen card id of additional cards. Set if `thief` chose a card or must be set if both additional card are `werewolves` side.
      * @apiParam (Request Body Parameters) {String={"villagers","werewolves"}} [side] Side chosen by the dog-wolf. Required when **action** is `choose-side`.
      * @apiUse GameResponse
      */
@@ -351,6 +353,9 @@ module.exports = app => {
             .optional()
             .isBoolean().withMessage("Must be an valid boolean")
             .toBoolean(),
+        body("chosenCard")
+            .optional()
+            .isMongoId().withMessage("Must be a valid MongoId"),
         body("side")
             .optional()
             .isString().withMessage("Must be a valid string")

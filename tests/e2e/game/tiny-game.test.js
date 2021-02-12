@@ -14,11 +14,15 @@ let players = [
     { name: "Dag", role: "werewolf" },
     { name: "Dig", role: "werewolf" },
     { name: "Deg", role: "big-bad-wolf" },
-    { name: "Dog", role: "villager" },
+    { name: "Dog", role: "thief" },
+];
+const additionalCards = [
+    { for: "thief", role: "witch" },
+    { for: "thief", role: "seer" },
 ];
 let token, game;
 
-describe("C - Tiny game of 4 players with only werewolves and one poor villager", () => {
+describe("C - Tiny game of 4 players with only werewolves and one poor thief who skips", () => {
     before(done => resetDatabase(done));
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
@@ -46,7 +50,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players })
+            .send({ players, additionalCards })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -79,6 +83,21 @@ describe("C - Tiny game of 4 players with only werewolves and one poor villager"
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🦹️ Thief skips his turn (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[3].role.current).to.equals("thief");
+                expect(game.players[3].side.current).to.equals("villagers");
+                expect(game.history[0].play.chosenCard).to.not.exist;
                 done();
             });
     });
