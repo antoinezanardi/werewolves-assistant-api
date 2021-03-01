@@ -8,6 +8,8 @@ exports.patchableGameStatuses = ["canceled"];
 
 exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"];
 
+exports.waitingForCauses = ["stuttering-judge-request"];
+
 exports.wonByPossibilities = ["werewolves", "villagers", "lovers", "pied-piper"];
 
 exports.gameRepartitionForbiddenRoleNames = roleNames.filter(roleName => roleName !== "villager" && roleName !== "werewolf");

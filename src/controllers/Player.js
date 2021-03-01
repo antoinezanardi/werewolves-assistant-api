@@ -457,13 +457,13 @@ exports.checkAndGetChosenCard = (chosenCardId, game) => {
 };
 
 exports.thiefPlays = async(play, game, gameHistoryEntry) => {
-    const chosenCard = this.checkAndGetChosenCard(play.chosenCard, game);
+    const chosenCard = this.checkAndGetChosenCard(play.card, game);
     if (chosenCard) {
         const thiefPlayer = getPlayerWithRole("thief", game);
         const chosenRole = getRoles().find(({ name }) => name === chosenCard.role);
         thiefPlayer.role.current = chosenRole.name;
         thiefPlayer.side.current = chosenRole.side;
-        gameHistoryEntry.play.chosenCard = chosenCard;
+        gameHistoryEntry.play.card = chosenCard;
         await Game.refreshNightWaitingQueue(game);
     }
 };
@@ -632,7 +632,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
         await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
     }
     if (play.doesJudgeRequestAnotherVote) {
-        game.waiting.push({ for: "all", to: "vote" });
+        game.waiting.push({ for: "all", to: "vote", cause: "stuttering-judge-request" });
     }
 };
 

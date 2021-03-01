@@ -106,7 +106,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
                 expect(game.players[2].isAlive).to.be.true;
                 expect(game.waiting).to.be.an("array").lengthOf(2);
                 expect(game.waiting[0]).to.be.deep.equals({ for: "all", to: "vote" });
-                expect(game.waiting[1]).to.be.deep.equals({ for: "all", to: "vote" });
+                expect(game.waiting[1]).to.be.deep.equals({ for: "all", to: "vote", cause: "stuttering-judge-request" });
                 done();
             });
     });

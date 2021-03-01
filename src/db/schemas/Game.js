@@ -3,7 +3,7 @@ const PlayerSchema = require("./Player");
 const AdditionalCardSchema = require("./AdditionalCard");
 const {
     getGameStatuses, getWaitingForPossibilities, getGamePhases, getWonByPossibilities,
-    getDefaultGameOptions,
+    getDefaultGameOptions, getWaitingForCauses,
 } = require("../../helpers/functions/Game");
 const { getPlayerActions } = require("../../helpers/functions/Player");
 
@@ -106,6 +106,10 @@ const WaitingSchema = new Schema({
         type: String,
         enum: getPlayerActions(),
         required: true,
+    },
+    cause: {
+        type: String,
+        enum: getWaitingForCauses(),
     },
 }, {
     _id: false,

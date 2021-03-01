@@ -593,8 +593,8 @@ exports.checkPlay = async play => {
         throw generateError("BAD_PLAY_ACTION_FOR_SIDE_CHOICE", `"side" can be set only if action is "choose-side", not "${play.action}".`);
     } else if (play.doesJudgeRequestAnotherVote && play.action !== "vote") {
         throw generateError("BAD_PLAY_ACTION_FOR_JUDGE_REQUEST", `"doesJudgeRequestAnotherVote" can be set only if action is "vote", not "${play.action}".`);
-    } else if (play.chosenCard && play.action !== "choose-card") {
-        throw generateError("BAD_PLAY_ACTION_FOR_CHOSEN_CARD", `"chosenCard" can be set only if action is "choose-card", not "${play.action}".`);
+    } else if (play.card && play.action !== "choose-card") {
+        throw generateError("BAD_PLAY_ACTION_FOR_CHOSEN_CARD", `"card" can be set only if action is "choose-card", not "${play.action}".`);
     }
 };
 
