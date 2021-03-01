@@ -434,7 +434,7 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
         return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
     } else if (group === "charmed") {
         const piedPiperPlayer = getPlayerWithRole("pied-piper", game);
-        return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
+        return piedPiperPlayer?.isAlive && piedPiperPlayer.side.current !== "werewolves" && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
