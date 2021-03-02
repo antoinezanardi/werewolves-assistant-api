@@ -9,14 +9,14 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
-let players = [
+const originalPlayers = [
     { name: "Dag", role: "vile-father-of-wolves" },
     { name: "Dig", role: "pied-piper" },
     { name: "Deg", role: "villager" },
     { name: "Dog", role: "villager" },
     { name: "Døg", role: "villager" },
 ];
-let token, game;
+let token, game, players;
 
 describe("O - Tiny game of 5 players in which the pied piper is infected and so, looses his powers and can't win alone", () => {
     before(done => resetDatabase(done));
@@ -46,7 +46,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players })
+            .send({ players: originalPlayers })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -155,6 +155,71 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
         expect(game.status).to.equals("playing");
         expect(game.players.every(({ isAlive, role, attributes }) => !isAlive || role.current === "pied-piper" ||
             attributes?.find(({ name }) => name === "charmed"))).to.be.true;
+        done();
+    });
+    it("🎲 Cancels game (PATCH /games/:id)", done => {
+        chai.request(app)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ status: "canceled" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.status).to.equals("canceled");
+                done();
+            });
+    });
+    it("🎲 Creates game with JWT auth (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: originalPlayers, options: { roles: { sheriff: { isEnabled: false } } } })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🐺 Vile father of wolf infects the pied piper (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id, isInfected: true }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("👪 All vote for the vile father of wolves (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].isAlive).to.be.false;
+                expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🐺 Pied Piper eats a villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(app)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'all' to 'vote'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
         done();
     });
 });

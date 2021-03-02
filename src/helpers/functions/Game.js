@@ -1,5 +1,5 @@
 const {
-    patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions,
+    patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions, waitingForCauses,
     gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames, votesResults, additionalCardsForRoleNames, additionalCardsThiefRoleNames,
 } = require("../constants/Game");
 const { doesPlayerHaveAttribute } = require("./Player");
@@ -49,6 +49,8 @@ exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) =>
 exports.getPatchableGameStatuses = () => JSON.parse(JSON.stringify(patchableGameStatuses));
 
 exports.getWaitingForPossibilities = () => JSON.parse(JSON.stringify(waitingForPossibilities));
+
+exports.getWaitingForCauses = () => JSON.parse(JSON.stringify(waitingForCauses));
 
 exports.getGameStatuses = () => JSON.parse(JSON.stringify(gameStatuses));
 

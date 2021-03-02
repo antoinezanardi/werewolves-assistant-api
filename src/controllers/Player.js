@@ -166,7 +166,7 @@ exports.purgePlayerAttributes = player => {
 exports.applyConsequencesDependingOnKilledPlayerAttributes = async(player, game, gameHistoryEntry) => {
     if (doesPlayerHaveAttribute(player, "sheriff") &&
         (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
-        this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
+        this.insertActionImmediately(game, { for: "sheriff", to: "delegate" });
     }
     if (doesPlayerHaveAttribute(player, "in-love")) {
         const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== player._id.toString() &&
@@ -203,7 +203,7 @@ exports.insertActionImmediately = (game, play) => {
 exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, game, gameHistoryEntry, options) => {
     const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
-        this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
+        this.insertActionImmediately(game, { for: "hunter", to: "shoot" });
     } else if (player.role.current === "ancient") {
         if (ancientRevengeActions.includes(action)) {
             for (const { _id, isAlive, side } of game.players) {
@@ -219,7 +219,7 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
             await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
         }
     } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1) {
-        this.insertActionBeforeAllVote(game, { for: "scapegoat", to: "ban-voting" });
+        this.insertActionImmediately(game, { for: "scapegoat", to: "ban-voting" });
     }
 };
 
@@ -290,6 +290,9 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
             await this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, gameHistoryEntry, options);
             await this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
             this.purgePlayerAttributes(player);
+            if (game.phase === "night") {
+                await Game.refreshNightWaitingQueue(game);
+            }
         } else if (action === "vote") {
             gameHistoryEntry.play.votesResult = "no-death";
         }
@@ -457,13 +460,13 @@ exports.checkAndGetChosenCard = (chosenCardId, game) => {
 };
 
 exports.thiefPlays = async(play, game, gameHistoryEntry) => {
-    const chosenCard = this.checkAndGetChosenCard(play.chosenCard, game);
+    const chosenCard = this.checkAndGetChosenCard(play.card, game);
     if (chosenCard) {
         const thiefPlayer = getPlayerWithRole("thief", game);
         const chosenRole = getRoles().find(({ name }) => name === chosenCard.role);
         thiefPlayer.role.current = chosenRole.name;
         thiefPlayer.side.current = chosenRole.side;
-        gameHistoryEntry.play.chosenCard = chosenCard;
+        gameHistoryEntry.play.card = chosenCard;
         await Game.refreshNightWaitingQueue(game);
     }
 };
@@ -632,7 +635,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
         await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
     }
     if (play.doesJudgeRequestAnotherVote) {
-        game.waiting.push({ for: "all", to: "vote" });
+        game.waiting.push({ for: "all", to: "vote", cause: "stuttering-judge-request" });
     }
 };
 

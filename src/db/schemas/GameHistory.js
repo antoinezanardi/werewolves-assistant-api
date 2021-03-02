@@ -58,7 +58,7 @@ const PlaySchema = new Schema({
         enum: getVotesResults(),
     },
     doesJudgeRequestAnotherVote: { type: Boolean },
-    chosenCard: { type: AdditionalCardSchema },
+    card: { type: AdditionalCardSchema },
     side: {
         type: String,
         enum: getSideNames(),

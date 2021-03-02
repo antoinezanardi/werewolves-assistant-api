@@ -23,6 +23,7 @@
 * [#112](https://github.com/antoinezanardi/werewolves-assistant-api/issues/112) - Ancient is not infected if he already lost his first life, protected by guard and revived by the witch.
 * [#114](https://github.com/antoinezanardi/werewolves-assistant-api/issues/114) - `recommendedMinPlayers` is not used for random game composition for werewolves.
 * [#115](https://github.com/antoinezanardi/werewolves-assistant-api/issues/115) - No targets for big bad wolf.
+* [#133](https://github.com/antoinezanardi/werewolves-assistant-api/issues/133) - Charmed players must not be called during night if Pied Piper is infected.
 
 ### ♻️ Refactoring
 
@@ -39,11 +40,14 @@
 
 ### 📦 Packages
 
-* `@sentry/node` updated to version `6.1.0`.
+* `@sentry/node` updated to version `6.2.1`.
+* `bcrypt` updated to version `5.0.1`.
 * `chai` updated to version `4.3.0`.
-* `express-rate-limit` updated to version `5.2.5`.
+* `eslint` updated to version `7.21.0`.
+* `express-rate-limit` updated to version `5.2.6`.
+* `express-validator` updated to version `6.10.0`.
 * `mocha` updated to version `8.3.0`.
-* `mongoose` updated to version `5.11.15`.
+* `mongoose` updated to version `5.11.18`.
 
 ---
 

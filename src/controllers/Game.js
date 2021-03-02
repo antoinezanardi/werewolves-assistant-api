@@ -378,9 +378,10 @@ exports.checkGameWinners = game => {
 
 exports.refreshNightWaitingQueue = async game => {
     const { waiting: currentWaitingQueue } = game;
-    const currentPlay = currentWaitingQueue[0];
+    const [currentPlay, ...rest] = currentWaitingQueue;
     const fullWaitingQueue = await this.getWaitingQueueWithNightActions(game);
-    const newWaitingQueue = [currentPlay];
+    const preservedActions = ["shoot", "ban-voting", "delegate", "settle-votes"];
+    const newWaitingQueue = [currentPlay, ...rest.filter(({ to: action }) => preservedActions.includes(action))];
     for (const waiting of fullWaitingQueue) {
         const gameHistorySearch = {
             "gameId": game._id, "turn": game.turn, "phase": "night",
@@ -434,7 +435,7 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
         return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
     } else if (group === "charmed") {
         const piedPiperPlayer = getPlayerWithRole("pied-piper", game);
-        return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
+        return piedPiperPlayer?.isAlive && piedPiperPlayer.side.current !== "werewolves" && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
@@ -593,8 +594,8 @@ exports.checkPlay = async play => {
         throw generateError("BAD_PLAY_ACTION_FOR_SIDE_CHOICE", `"side" can be set only if action is "choose-side", not "${play.action}".`);
     } else if (play.doesJudgeRequestAnotherVote && play.action !== "vote") {
         throw generateError("BAD_PLAY_ACTION_FOR_JUDGE_REQUEST", `"doesJudgeRequestAnotherVote" can be set only if action is "vote", not "${play.action}".`);
-    } else if (play.chosenCard && play.action !== "choose-card") {
-        throw generateError("BAD_PLAY_ACTION_FOR_CHOSEN_CARD", `"chosenCard" can be set only if action is "choose-card", not "${play.action}".`);
+    } else if (play.card && play.action !== "choose-card") {
+        throw generateError("BAD_PLAY_ACTION_FOR_CHOSEN_CARD", `"card" can be set only if action is "choose-card", not "${play.action}".`);
     }
 };
 

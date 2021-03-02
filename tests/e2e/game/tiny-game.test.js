@@ -97,7 +97,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
                 game = res.body;
                 expect(game.players[3].role.current).to.equals("thief");
                 expect(game.players[3].side.current).to.equals("villagers");
-                expect(game.history[0].play.chosenCard).to.not.exist;
+                expect(game.history[0].play.card).to.not.exist;
                 done();
             });
     });

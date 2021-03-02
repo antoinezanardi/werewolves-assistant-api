@@ -14,20 +14,17 @@ module.exports = app => {
     /**
      * @apiDefine GameResponse
      * @apiSuccess {MongoId} _id Game's ID.
-     * @apiSuccess {User} gameMaster User who created the game and managing it. (_See: [Models - User](#user-class)_)
-     * @apiSuccess {Player[]} players Players of the game. (_See: [Models - Player](#player-class)_)
+     * @apiSuccess {User} gameMaster User who created the game and managing it. (_See: [Classes - User](#user-class)_)
+     * @apiSuccess {Player[]} players Players of the game. (_See: [Classes - Player](#player-class)_)
      * @apiSuccess {Number} turn=1 Starting at `1`, a turn starts with the first phase (the `night`) and ends with the second phase (the `day`).
      * @apiSuccess {String="day","night"} phase Each turn has two phases, `day` or `night`.
      * @apiSuccess {Number} tick=1 Starting at `1`, tick increments each time a play is made.
      * @apiSuccess {Object[]} [waiting] Queue of upcoming actions.
      * @apiSuccess {String} waiting.for Can be either a group, a role or the sheriff. (_Possibilities: [Codes - Player Groups](#player-groups) or [Codes - Player Roles](#player-roles)_)
      * @apiSuccess {String} waiting.to What action needs to be performed by `waiting.for`. (Possibilities: [Codes - Player Actions](#player-actions)_)
+     * @apiSuccess {String} [waiting.cause] The cause of action. (_Possibilities: `stuttering-judge-request`_)
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
-     * @apiSuccess {Object[]} [additionalCards] Game's additional cards. Set if `thief` is in the game.
-     * @apiSuccess {ObjectId} additionalCards._id Additional card's ID.
-     * @apiSuccess {String} additionalCards.role Additional card's role name. (_See: [Codes - Player Roles](#player-roles)_)
-     * @apiSuccess {String} additionalCards.for Additional card's recipient. Set to `thief`.
-     * @apiSuccess {Boolean} additionalCards.isUsed If set to `true`, card has been used by its recipient.
+     * @apiSuccess {AdditionalCard[]} [additionalCards] Game's additional cards. Set if `thief` is in the game. (_See: [Classes - Additional Card](#game-additional-card-class)_)
      * @apiSuccess {Object} options Game's options.
      * @apiSuccess {Object} options.roles Game roles options.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
@@ -314,7 +311,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {ObjectId} votes.from Vote's source id.
      * @apiParam (Request Body Parameters) {ObjectId} votes.for Vote's target id.
      * @apiParam (Request Body Parameters) {Boolean} [doesJudgeRequestAnotherVote]  Only if there is a `stuttering-judge` in the game and `action` is `vote` or `settle-votes`. If set to `true`, there is another vote immediately.
-     * @apiParam (Request Body Parameters) {ObjectId} [chosenCard] Only available for `thief`, chosen card id of additional cards. Set if `thief` chose a card or must be set if both additional card are `werewolves` side.
+     * @apiParam (Request Body Parameters) {ObjectId} [card] Only available for `thief`, chosen card id of additional cards. Set if `thief` chose a card or must be set if both additional card are `werewolves` side.
      * @apiParam (Request Body Parameters) {String={"villagers","werewolves"}} [side] Side chosen by the dog-wolf. Required when **action** is `choose-side`.
      * @apiUse GameResponse
      */
@@ -353,7 +350,7 @@ module.exports = app => {
             .optional()
             .isBoolean().withMessage("Must be an valid boolean")
             .toBoolean(),
-        body("chosenCard")
+        body("card")
             .optional()
             .isMongoId().withMessage("Must be a valid MongoId"),
         body("side")
