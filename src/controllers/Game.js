@@ -378,9 +378,10 @@ exports.checkGameWinners = game => {
 
 exports.refreshNightWaitingQueue = async game => {
     const { waiting: currentWaitingQueue } = game;
-    const currentPlay = currentWaitingQueue[0];
+    const [currentPlay, ...rest] = currentWaitingQueue;
     const fullWaitingQueue = await this.getWaitingQueueWithNightActions(game);
-    const newWaitingQueue = [currentPlay];
+    const preservedActions = ["shoot", "ban-voting", "delegate", "settle-votes"];
+    const newWaitingQueue = [currentPlay, ...rest.filter(({ to: action }) => preservedActions.includes(action))];
     for (const waiting of fullWaitingQueue) {
         const gameHistorySearch = {
             "gameId": game._id, "turn": game.turn, "phase": "night",

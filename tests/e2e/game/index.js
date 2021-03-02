@@ -22,4 +22,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./endless-votes.test");
     require("./game-won-by-angel.test");
     require("./thief-steals.test");
+    require("./changes-during-night.test");
 });
