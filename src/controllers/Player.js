@@ -7,14 +7,15 @@ const {
 } = require("../helpers/functions/Player");
 const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
-    getRemainingPlayersToCharm,
+    getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat,
 } = require("../helpers/functions/Game");
+const { getVillagerRoles, getWerewolfRoles, getRoles } = require("../helpers/functions/Role");
 const { generateError } = require("../helpers/functions/Error");
 
 exports.checkAllTargetsDependingOnAction = async(targets, game, action) => {
     if (action === "use-potion") {
-        const savedTarget = targets.filter(({ potion }) => potion.life);
-        const murderedTarget = targets.filter(({ potion }) => potion.death);
+        const savedTarget = targets.filter(({ hasDrankLifePotion }) => hasDrankLifePotion);
+        const murderedTarget = targets.filter(({ hasDrankDeathPotion }) => hasDrankDeathPotion);
         if (savedTarget.length > 1 || savedTarget.length && await GameHistory.isLifePotionUsed(game._id)) {
             throw generateError("ONLY_ONE_LIFE_POTION", "Witch can only use one life potion per game.");
         } else if (murderedTarget.length > 1 || murderedTarget.length && await GameHistory.isDeathPotionUsed(game._id)) {
@@ -39,8 +40,12 @@ exports.checkPiedPiperTargets = target => {
 };
 
 exports.checkEatTarget = async(target, game, source) => {
-    if (target.player.side.current === "werewolves") {
-        throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with group "werewolves".`);
+    if (source !== "white-werewolf" && target.player.side.current === "werewolves") {
+        throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with current side "werewolves".`);
+    } else if (source === "white-werewolf" && target.player.side.current !== "werewolves") {
+        throw generateError("MUST_EAT_WEREWOLF", `Werewolves target can't be a player with current side "villager".`);
+    } else if (source === "white-werewolf" && target.player.role.current === "white-werewolf") {
+        throw generateError("CANT_EAT_HIMSELF", `White werewolf can't eat himself.`);
     } else if (source === "big-bad-wolf" && doesPlayerHaveAttribute(target.player, "eaten")) {
         throw generateError("TARGET_ALREADY_EATEN", `This target is already planned to be eaten by the "werewolves", the big bad wolf can't eat it.`);
     } else if (target.isInfected) {
@@ -60,8 +65,11 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
         throw generateError("CANT_LOOK_AT_HERSELF", "Seer can't see herself.");
     } else if (action === "eat") {
         await this.checkEatTarget(target, game, source);
-    } else if (action === "use-potion" && target.potion.life && !doesPlayerHaveAttribute(target.player, "eaten")) {
-        throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by werewolves.`);
+    } else if (action === "use-potion" && target.hasDrankLifePotion) {
+        const eatenAttribute = getPlayerAttribute(target.player, "eaten");
+        if (!eatenAttribute || eatenAttribute.source === "white-werewolf") {
+            throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by "werewolves" of "big-bad-wolf".`);
+        }
     } else if (action === "protect") {
         const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
         if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString()) {
@@ -94,10 +102,12 @@ exports.checkAndFillPlayerTarget = (target, game) => {
 exports.checkTargetStructure = (target, action) => {
     if (target.player === undefined) {
         throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "player" is missing.`);
+    } else if (target.isInfected && action !== "eat") {
+        throw generateError("BAD_PLAY_ACTION_FOR_INFECTION", `"isInfected" can be set on target only if play's action is "eat".`);
+    } else if ((target.hasDrankLifePotion || target.hasDrankDeathPotion) && action !== "use-potion") {
+        throw generateError("BAD_PLAY_ACTION_FOR_POTION", `"hasDrankLifePotion" or "hasDrankDeathPotion" can be set on target only if play's action is "use-potion".`);
     } else if (action === "use-potion") {
-        if (target.potion === undefined || target.potion.life === undefined && target.potion.death === undefined) {
-            throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "potion" with either "potion.life" or "potion.death" are missing.`);
-        } else if (target.potion.life && target.potion.death) {
+        if (target.hasDrankLifePotion && target.hasDrankDeathPotion) {
             throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Witch can't use life and death potions on the same target.`);
         }
     }
@@ -156,7 +166,7 @@ exports.purgePlayerAttributes = player => {
 exports.applyConsequencesDependingOnKilledPlayerAttributes = async(player, game, gameHistoryEntry) => {
     if (doesPlayerHaveAttribute(player, "sheriff") &&
         (player.role.current !== "idiot" || doesPlayerHaveAttribute(player, "powerless"))) {
-        this.insertActionBeforeAllVote(game, { for: "sheriff", to: "delegate" });
+        this.insertActionImmediately(game, { for: "sheriff", to: "delegate" });
     }
     if (doesPlayerHaveAttribute(player, "in-love")) {
         const otherLoverPlayer = game.players.find(({ _id, isAlive, attributes }) => _id.toString() !== player._id.toString() &&
@@ -173,27 +183,54 @@ exports.applyConsequencesDependingOnKilledPlayerAttributes = async(player, game,
     }
 };
 
-exports.insertActionBeforeAllVote = (game, waiting) => {
+exports.insertActionBeforeAllVote = (game, play) => {
     const waitingForAllToVoteIdx = game.waiting.findIndex(({ to }) => to === "vote");
     if (waitingForAllToVoteIdx !== -1 && waitingForAllToVoteIdx !== 0) {
-        game.waiting.splice(waitingForAllToVoteIdx, 0, waiting);
+        game.waiting.splice(waitingForAllToVoteIdx, 0, play);
     } else {
-        game.waiting.push(waiting);
+        game.waiting.push(play);
     }
 };
 
-exports.applyConsequencesDependingOnKilledPlayerRole = (player, action, game, options) => {
+exports.insertActionImmediately = (game, play) => {
+    if (game.waiting.length) {
+        game.waiting.splice(1, 0, play);
+    } else {
+        game.waiting.push(play);
+    }
+};
+
+exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, game, gameHistoryEntry, options) => {
     const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
-        this.insertActionBeforeAllVote(game, { for: "hunter", to: "shoot" });
-    } else if (player.role.current === "ancient" && ancientRevengeActions.includes(action)) {
-        for (const { _id, isAlive, side } of game.players) {
-            if (isAlive && side.original === "villagers") {
-                this.addPlayerAttribute(_id, "powerless", game);
+        this.insertActionImmediately(game, { for: "hunter", to: "shoot" });
+    } else if (player.role.current === "ancient") {
+        if (ancientRevengeActions.includes(action)) {
+            for (const { _id, isAlive, side } of game.players) {
+                if (isAlive && side.original === "villagers") {
+                    this.addPlayerAttribute(_id, "powerless", game);
+                }
             }
+            const villagerRoleNames = getVillagerRoles().map(({ name }) => name);
+            filterOutSourcesFromWaitingQueue(game, [...villagerRoleNames, "charmed", "lovers"]);
+        }
+        const idiotPlayer = getPlayerWithRole("idiot", game);
+        if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
+            await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
         }
     } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1) {
-        this.insertActionBeforeAllVote(game, { for: "scapegoat", to: "ban-voting" });
+        this.insertActionImmediately(game, { for: "scapegoat", to: "ban-voting" });
+    }
+};
+
+exports.fillMurderedData = (player, action, gameHistoryEntry, options) => {
+    const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
+    if (murdered) {
+        player.murdered = murdered;
+        if (options.forcedSource) {
+            player.murdered.by = options.forcedSource;
+        }
+        this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
     }
 };
 
@@ -210,7 +247,7 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
     const ancientSavedByWitchPlaySearch = {
         "gameId": gameHistoryEntry.gameId,
         "play.source.name": "witch",
-        "play.targets": { $elemMatch: { "player.role.current": "ancient", "potion.life": true } },
+        "play.targets": { $elemMatch: { "player.role.current": "ancient", "hasDrankLifePotion": true } },
     };
     const ancientSavedByGuardPlaySearch = {
         "gameId": gameHistoryEntry.gameId,
@@ -234,7 +271,7 @@ exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, 
 
 exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {}) => {
     const player = getPlayerWithId(playerId, game);
-    if (player?.isAlive && (action !== "eat" || canBeEaten(player))) {
+    if (player?.isAlive && (action !== "eat" || canBeEaten(player, game))) {
         const alreadyRevealed = player.role.isRevealed;
         if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, gameHistoryEntry))) {
             player.role.isRevealed = true;
@@ -246,17 +283,18 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
         }
         if (await this.isPlayerKillable(player, action, alreadyRevealed, gameHistoryEntry)) {
             player.isAlive = false;
-            const murdered = getPlayerMurderedPossibilities().find(({ of }) => of === action);
-            if (murdered) {
-                player.murdered = murdered;
-                if (options.forcedSource) {
-                    player.murdered.by = options.forcedSource;
-                }
-                this.insertDeadPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
+            this.fillMurderedData(player, action, gameHistoryEntry, options);
+            if (action === "vote") {
+                gameHistoryEntry.play.votesResult = "death";
             }
-            this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, options);
+            await this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, gameHistoryEntry, options);
             await this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
             this.purgePlayerAttributes(player);
+            if (game.phase === "night") {
+                await Game.refreshNightWaitingQueue(game);
+            }
+        } else if (action === "vote") {
+            gameHistoryEntry.play.votesResult = "no-death";
         }
     }
 };
@@ -313,7 +351,7 @@ exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
         const ravenMarkedPlayers = getPlayerWithAttribute("raven-marked", game);
         if (ravenMarkedPlayers) {
             if (ravenMarkedPlayers.isAlive) {
-                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers._id, game, 2);
+                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers._id, game, game.options.roles.raven.markPenalty);
             }
             this.removePlayerAttribute(ravenMarkedPlayers._id, "raven-marked", game);
         }
@@ -377,16 +415,68 @@ exports.checkVotesSourceAndTarget = async(votes, game) => {
     this.checkPlayerMultipleVotes(votes, game);
 };
 
+exports.checkJudgeSecondVoteRequest = async game => {
+    const stutteringJudgePlayer = getPlayerWithRole("stuttering-judge", game);
+    if (!stutteringJudgePlayer || !stutteringJudgePlayer.isAlive) {
+        throw generateError("STUTTERING_JUDGE_ABSENT", "Second vote can't be requested if stuttering judge is absent from the game.");
+    } else if (doesPlayerHaveAttribute(stutteringJudgePlayer, "powerless")) {
+        throw generateError("STUTTERING_JUDGE_POWERLESS", "Stuttering judge is powerless and so can't request another vote.");
+    } else if (!await GameHistory.didJudgeChooseSign(game._id)) {
+        throw generateError("STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET", `Stuttering judge didn't choose his sign yet and so can't request another vote.`);
+    } else if (await GameHistory.isSecondVoteRequestUsed(game._id)) {
+        throw generateError("ONLY_ONE_SECOND_VOTE_REQUEST", "Second vote request has been already made.");
+    }
+};
+
 exports.checkAndFillVotes = async(votes, game, options) => {
     if (!votes || !Array.isArray(votes)) {
         throw generateError("VOTES_REQUIRED", "`votes` need to be set");
     } else if (!votes.length) {
         throw generateError("VOTES_CANT_BE_EMPTY", "`votes` can't be empty");
     }
+    if (options.doesJudgeRequestAnotherVote) {
+        await this.checkJudgeSecondVoteRequest(game, options);
+    }
     await this.checkVotesSourceAndTarget(votes, game, options);
     for (let i = 0; i < votes.length; i++) {
         votes[i].from = getPlayerWithId(votes[i].from, game);
         votes[i].for = getPlayerWithId(votes[i].for, game);
+    }
+};
+
+exports.checkAndGetChosenCard = (chosenCardId, game) => {
+    const chosenCard = chosenCardId ? game.additionalCards.find(({ _id }) => _id.toString() === chosenCardId.toString()) : null;
+    const werewolvesRoles = getWerewolfRoles();
+    const thiefAdditionalCards = game.additionalCards.filter(({ for: recipient }) => recipient === "thief");
+    if (chosenCardId && !chosenCard) {
+        throw generateError("CHOSEN_CARD_NOT_FOUND", `The chosen card with id "${chosenCardId}" is not found in additional cards.`);
+    } else if (!chosenCard && thiefAdditionalCards.every(({ role: roleName }) => werewolvesRoles.find(({ name }) => name === roleName))) {
+        throw generateError("THIEF_MUST_STEAL", `As all additional cards for thief are on the werewolves side, he must choose one of them.`);
+    }
+    if (chosenCard) {
+        chosenCard.isUsed = true;
+    }
+    return chosenCard;
+};
+
+exports.thiefPlays = async(play, game, gameHistoryEntry) => {
+    const chosenCard = this.checkAndGetChosenCard(play.card, game);
+    if (chosenCard) {
+        const thiefPlayer = getPlayerWithRole("thief", game);
+        const chosenRole = getRoles().find(({ name }) => name === chosenCard.role);
+        thiefPlayer.role.current = chosenRole.name;
+        thiefPlayer.side.current = chosenRole.side;
+        gameHistoryEntry.play.card = chosenCard;
+        await Game.refreshNightWaitingQueue(game);
+    }
+};
+
+exports.whiteWerewolfPlays = async(play, game) => {
+    const { targets } = play;
+    const targetsExpectedLength = !getRemainingWerewolvesToEat(game).length ? 0 : 1;
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: targetsExpectedLength, play });
+    if (targets?.length) {
+        this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "white-werewolf" });
     }
 };
 
@@ -409,8 +499,12 @@ exports.scapegoatPlays = async(play, game) => {
 
 exports.bigBadWolfPlays = async(play, game) => {
     const { targets } = play;
-    await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
-    this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "big-bad-wolf" });
+    const targetsExpectedLength = !getRemainingVillagersToEat(game).length ? 0 : 1;
+    const options = { expectedLength: targetsExpectedLength, canBeUnset: !targetsExpectedLength, canBeEmpty: !targetsExpectedLength, play };
+    await this.checkAndFillTargets(targets, game, options);
+    if (targets?.length) {
+        this.addPlayerAttribute(targets[0].player._id, "eaten", game, { source: "big-bad-wolf" });
+    }
 };
 
 exports.dogWolfPlays = (play, game) => {
@@ -458,13 +552,13 @@ exports.sheriffPlays = async(play, game, gameHistoryEntry) => {
     await sheriffActions[play.action](play, game, gameHistoryEntry);
 };
 
-exports.werewolvesPlay = async(play, game) => {
+exports.werewolvesPlay = async(play, game, gameHistoryEntry) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { expectedLength: 1, play });
     if (targets[0].isInfected) {
         const infectedPlayer = getPlayerWithId(targets[0].player._id, game);
         if (infectedPlayer) {
-            if (infectedPlayer.role.current === "ancient" && !infectedPlayer.role.isRevealed) {
+            if (infectedPlayer.role.current === "ancient" && !await this.isAncientKillable(play.action, gameHistoryEntry)) {
                 this.addPlayerAttribute(targets[0].player._id, "eaten", game);
             } else {
                 infectedPlayer.side.current = "werewolves";
@@ -503,9 +597,9 @@ exports.witchPlays = async(play, game) => {
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, play });
     if (targets) {
         for (const target of targets) {
-            if (target.potion.life) {
+            if (target.hasDrankLifePotion) {
                 this.addPlayerAttribute(target.player._id, "drank-life-potion", game);
-            } else if (target.potion.death) {
+            } else if (target.hasDrankDeathPotion) {
                 this.addPlayerAttribute(target.player._id, "drank-death-potion", game);
             }
         }
@@ -519,8 +613,8 @@ exports.seerPlays = async(play, game) => {
 };
 
 exports.allVote = async(play, game, gameHistoryEntry) => {
-    const { votes, action } = play;
-    await this.checkAndFillVotes(votes, game, { action });
+    const { votes, action, doesJudgeRequestAnotherVote } = play;
+    await this.checkAndFillVotes(votes, game, { action, doesJudgeRequestAnotherVote });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
     const scapegoatPlayer = getPlayerWithRole("scapegoat", game);
@@ -529,15 +623,19 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
         if (scapegoatPlayer?.isAlive && !doesPlayerHaveAttribute(scapegoatPlayer, "powerless")) {
             await this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
         } else if (sheriffPlayer?.isAlive) {
-            game.waiting.push({ for: "sheriff", to: "settle-votes" });
+            this.insertActionImmediately(game, { for: "sheriff", to: "settle-votes" });
+            gameHistoryEntry.play.votesResult = "need-settlement";
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {
-            const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
-            if (!lastVotePlay || lastVotePlay.turn !== game.turn) {
-                game.waiting.push({ for: "all", to: "vote" });
-            }
+            this.insertActionImmediately(game, { for: "all", to: "vote" });
+            gameHistoryEntry.play.votesResult = "need-settlement";
+        } else {
+            gameHistoryEntry.play.votesResult = "no-death";
         }
     } else {
         await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
+    }
+    if (play.doesJudgeRequestAnotherVote) {
+        game.waiting.push({ for: "all", to: "vote", cause: "stuttering-judge-request" });
     }
 };
 
@@ -547,6 +645,7 @@ exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
     this.addPlayerAttribute(nominatedPlayers[0]._id, "sheriff", game);
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
+    gameHistoryEntry.play.votesResult = "election";
 };
 
 exports.allPlay = async(play, game, gameHistoryEntry) => {

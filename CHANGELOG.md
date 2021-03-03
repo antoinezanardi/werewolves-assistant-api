@@ -1,5 +1,56 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.10.0 (2021-03-03)
+
+### 🚀 New features
+
+* [#113](https://github.com/antoinezanardi/werewolves-assistant-api/issues/113) - Add option for raven mark penalty.
+* [#116](https://github.com/antoinezanardi/werewolves-assistant-api/issues/116) - Options for game's random repartition.
+* [#117](https://github.com/antoinezanardi/werewolves-assistant-api/issues/117) - Add guard protection on little girl option.
+* [#118](https://github.com/antoinezanardi/werewolves-assistant-api/issues/118) - Add idiot dies on ancient death option.
+* [#119](https://github.com/antoinezanardi/werewolves-assistant-api/issues/119) - Implement White Werewolf role.
+* [#120](https://github.com/antoinezanardi/werewolves-assistant-api/issues/120) - Implement Stuttering Judge role.
+* [#126](https://github.com/antoinezanardi/werewolves-assistant-api/issues/126) - Implement Angel role.
+* [#127](https://github.com/antoinezanardi/werewolves-assistant-api/issues/127) - Implement Thief Role.
+
+### 🌟 Enhancements
+
+* [#121](https://github.com/antoinezanardi/werewolves-assistant-api/issues/121) - Add `votesResult` in Game history plays.
+* [#131](https://github.com/antoinezanardi/werewolves-assistant-api/issues/131) - Check role availability in game creation.
+
+### 🐛 Bug fixes
+
+* [#112](https://github.com/antoinezanardi/werewolves-assistant-api/issues/112) - Ancient is not infected if he already lost his first life, protected by guard and revived by the witch.
+* [#114](https://github.com/antoinezanardi/werewolves-assistant-api/issues/114) - `recommendedMinPlayers` is not used for random game composition for werewolves.
+* [#115](https://github.com/antoinezanardi/werewolves-assistant-api/issues/115) - No targets for big bad wolf.
+* [#133](https://github.com/antoinezanardi/werewolves-assistant-api/issues/133) - Charmed players must not be called during night if Pied Piper is infected.
+
+### ♻️ Refactoring
+
+* [#124](https://github.com/antoinezanardi/werewolves-assistant-api/issues/124) - Change sheriff enabled option property name.
+* [#125](https://github.com/antoinezanardi/werewolves-assistant-api/issues/125) - Change `potion` structure for plays and game history.
+
+### 📚 Documentation
+
+* [#122](https://github.com/antoinezanardi/werewolves-assistant-api/issues/122) - Set `side` to optional field in APIDoc for GameHistory Class.
+* [#123](https://github.com/antoinezanardi/werewolves-assistant-api/issues/123) - Bad ancient description.
+* [#128](https://github.com/antoinezanardi/werewolves-assistant-api/issues/128) - Update README.md with CI.
+* [#129](https://github.com/antoinezanardi/werewolves-assistant-api/issues/129) - Add Player Deaths section in APIDoc.
+* [#130](https://github.com/antoinezanardi/werewolves-assistant-api/issues/130) - Add `Limits` for each role in the documentation.
+
+### 📦 Packages
+
+* `@sentry/node` updated to version `6.2.1`.
+* `bcrypt` updated to version `5.0.1`.
+* `chai` updated to version `4.3.0`.
+* `eslint` updated to version `7.21.0`.
+* `express-rate-limit` updated to version `5.2.6`.
+* `express-validator` updated to version `6.10.0`.
+* `mocha` updated to version `8.3.0`.
+* `mongoose` updated to version `5.11.18`.
+
+---
+
 ## 0.9.0 (2021-02-01)
 
 ### 🚀 New features
