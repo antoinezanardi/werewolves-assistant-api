@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.10.0 (2021-02-??)
+## 0.10.0 (2021-03-03)
 
 ### 🚀 New features
 
