@@ -107,6 +107,7 @@ exports.checkRolesCompatibility = players => {
 };
 
 exports.fillPlayersData = players => {
+    let position = 0;
     for (const player of players) {
         player.name = filterOutHTMLTags(player.name);
         const role = getRoles().find(playerRole => playerRole.name === player.role);
@@ -115,13 +116,32 @@ exports.fillPlayersData = players => {
         if (role.name === "villager-villager") {
             player.role.isRevealed = true;
         }
+        if (player.position === undefined) {
+            player.position = position;
+        }
         player.isAlive = true;
+        position++;
+    }
+};
+
+exports.checkPlayersPosition = players => {
+    const isOnePlayerPositionNotSet = !!players.find(({ position }) => position === undefined);
+    if (isOnePlayerPositionNotSet && !!players.find(({ position }) => position !== undefined)) {
+        throw generateError("ALL_PLAYERS_POSITION_NOT_SET", `Some players has a position and other not. You must define all position or none of them.`);
+    } else if (!isOnePlayerPositionNotSet) {
+        const playerPositionSet = [...new Set(players.map(({ position }) => position))];
+        const playerMaxPosition = players.length - 1;
+        if (playerPositionSet.length !== players.length) {
+            throw generateError("PLAYERS_POSITION_NOT_UNIQUE", "Players don't all have unique position.");
+        } else if (players.some(({ position }) => position > playerMaxPosition)) {
+            throw generateError("PLAYER_POSITION_TOO_HIGH", `One player's position exceeds the maximum (${playerMaxPosition}).`);
+        }
     }
 };
 
 exports.checkUniqueNameInPlayers = players => {
-    const playerSet = [...new Set(players.map(player => player.name))];
-    if (playerSet.length !== players.length) {
+    const playerNameSet = [...new Set(players.map(({ name }) => name))];
+    if (playerNameSet.length !== players.length) {
         throw generateError("PLAYERS_NAME_NOT_UNIQUE", "Players don't all have unique name.");
     }
 };
@@ -129,6 +149,7 @@ exports.checkUniqueNameInPlayers = players => {
 exports.checkAndFillDataBeforeCreate = async data => {
     await this.checkUserCurrentGames(data.gameMaster);
     this.checkUniqueNameInPlayers(data.players);
+    this.checkPlayersPosition(data.players);
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     this.checkAdditionalCardsData(data);

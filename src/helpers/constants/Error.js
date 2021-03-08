@@ -259,4 +259,16 @@ exports.errorMetadata = {
         code: 65,
         HTTPCode: 400,
     },
+    ALL_PLAYERS_POSITION_NOT_SET: {
+        code: 66,
+        HTTPCode: 400,
+    },
+    PLAYERS_POSITION_NOT_UNIQUE: {
+        code: 67,
+        HTTPCode: 400,
+    },
+    PLAYER_POSITION_TOO_HIGH: {
+        code: 68,
+        HTTPCode: 400,
+    },
 };

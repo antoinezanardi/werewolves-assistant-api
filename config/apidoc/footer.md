@@ -200,3 +200,6 @@ Description for each case below :
 | 63   | BAD_PLAY_ACTION_FOR_CHOSEN_CARD            |    400    | `card` can be set only if action is `choose-card`.                                                        |
 | 64   | CHOSEN_CARD_NOT_FOUND                      |    404    | The chosen card is not found in additional cards.                                                         |
 | 65   | THIEF_MUST_STEAL                           |    400    | As all additional cards for thief are on the werewolves side, he must choose one of them.                 |
+| 66   | ALL_PLAYERS_POSITION_NOT_SET               |    400    | Some players has a position and other not. You must define all position or none of them.                  |
+| 67   | PLAYERS_POSITION_NOT_UNIQUE                |    400    | Players don't all have unique position.                                                                   |
+| 68   | PLAYER_POSITION_TOO_HIGH                   |    400    | One player's position exceeds the maximum.                                                                |

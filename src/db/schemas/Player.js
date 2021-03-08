@@ -31,21 +31,6 @@ const PlayerAttributeSchema = new Schema({
     versionKey: false,
 });
 
-const PlayerPowerSchema = new Schema({
-    action: {
-        type: String,
-        required: true,
-    },
-    used: {
-        type: Boolean,
-        required: true,
-    },
-}, {
-    _id: false,
-    timestamps: false,
-    versionKey: false,
-});
-
 const MurderedSchema = new Schema({
     by: {
         type: String,
@@ -100,9 +85,9 @@ const PlayerSchema = new Schema({
         type: [PlayerAttributeSchema],
         default: undefined,
     },
-    powers: {
-        type: [PlayerPowerSchema],
-        default: undefined,
+    position: {
+        type: Number,
+        min: 0,
     },
     isAlive: {
         type: Boolean,

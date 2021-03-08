@@ -12,12 +12,12 @@ const { expect } = chai;
 const credentials = { email: "test@test.fr", password: "secret" };
 const credentials2 = { email: "test@test.frbis", password: "secret" };
 const players = [
-    { name: "<h1>Dig</h1>", role: "witch" },
-    { name: "Doug", role: "seer" },
-    { name: "Dag", role: "guard" },
-    { name: "Dug", role: "raven" },
-    { name: "Dyg", role: "hunter" },
-    { name: "Deg", role: "werewolf" },
+    { name: "<h1>Dig</h1>", role: "witch", position: 0 },
+    { name: "Doug", role: "seer", position: 1 },
+    { name: "Dag", role: "guard", position: 2 },
+    { name: "Dug", role: "raven", position: 3 },
+    { name: "Dyg", role: "hunter", position: 4 },
+    { name: "Deg", role: "werewolf", position: 5 },
 ];
 const playersWithoutWerewolves = [
     { name: "Dig", role: "witch" },
@@ -211,11 +211,44 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("👪 Can't create game with one player without position and others with a position (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Dœg", role: "werewolf" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("ALL_PLAYERS_POSITION_NOT_SET");
+                done();
+            });
+    });
+    it("👪 Can't create game with two players with the same position (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Dœg", role: "werewolf", position: 5 }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYERS_POSITION_NOT_UNIQUE");
+                done();
+            });
+    });
+    it("👪 Can't create game with one player with a position that exceeds the maximum position (POST /games)", done => {
+        chai.request(app)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Dœg", role: "werewolf", position: 7 }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("PLAYER_POSITION_TOO_HIGH");
+                done();
+            });
+    });
     it("🛡 Can't create game with two guards (POST /games)", done => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players: [...players, { name: "Dœgd", role: "guard" }] })
+            .send({ players: [...players, { name: "Dœg", role: "guard", position: 6 }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
@@ -259,7 +292,7 @@ describe("A - Game creation", () => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [{ role: "two-sisters", for: "thief" }, { role: "witch", for: "thief" }] })
+            .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [{ role: "two-sisters", for: "thief" }, { role: "witch", for: "thief" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF");
@@ -270,7 +303,7 @@ describe("A - Game creation", () => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
+            .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
@@ -282,7 +315,7 @@ describe("A - Game creation", () => {
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
-                players: [...players, { name: "Chipper", role: "thief" }], additionalCards: [
+                players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [
                     { role: "wild-child", for: "thief" },
                     { role: "wild-child", for: "thief" },
                 ],
@@ -297,7 +330,7 @@ describe("A - Game creation", () => {
         chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players: [...players, { name: "Chipper", role: "thief" }] })
+            .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equals("NEED_ADDITIONAL_CARDS_FOR_THIEF");
@@ -324,6 +357,12 @@ describe("A - Game creation", () => {
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.be.true;
                 expect(game.players[0].name).to.equals("Dig");
+                expect(game.players[0].position).to.equals(0);
+                expect(game.players[1].position).to.equals(1);
+                expect(game.players[2].position).to.equals(2);
+                expect(game.players[3].position).to.equals(3);
+                expect(game.players[4].position).to.equals(4);
+                expect(game.players[5].position).to.equals(5);
                 done();
             });
     });

@@ -1,5 +1,28 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.11.0 (2021-04-??)
+
+### 🚀 New features
+
+* [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
+
+### 🌟 Enhancements
+
+### 🐛 Bug fixes
+
+### ♻️ Refactoring
+
+### 📚 Documentation
+
+### 📦 Packages
+
+* `chai` updated to version `4.3.3`.
+* `migrate-mongo` updated to version `8.2.2`.
+* `mocha` updated to version `8.3.1`.
+* `mongoose` updated to version `5.11.19`.
+
+---
+
 ## 0.10.0 (2021-03-03)
 
 ### 🚀 New features
