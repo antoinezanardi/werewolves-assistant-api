@@ -12,6 +12,8 @@
 
 ### ♻️ Refactoring
 
+* [#140](https://github.com/antoinezanardi/werewolves-assistant-api/issues/140) - Extend token's lifetime to infinity.
+
 ### 📚 Documentation
 
 ### 📦 Packages

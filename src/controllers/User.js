@@ -101,7 +101,7 @@ exports.login = (req, res) => {
                 if (loginErr) {
                     res.status(500).send(loginErr);
                 }
-                const token = sign({ userId: user._id, exp: Math.floor(Date.now() / 1000) + 3600 * 24 }, Config.app.JWTSecret);
+                const token = sign({ userId: user._id }, Config.app.JWTSecret);
                 return res.status(200).json({ token });
             });
         })(req, res);
