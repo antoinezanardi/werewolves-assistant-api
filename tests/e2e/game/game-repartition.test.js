@@ -58,13 +58,16 @@ const aLotOfPlayers = [
     { name: "39" },
     { name: "40" },
 ];
-let token;
+let server, token;
 
 describe("E - Game repartition with multiple teams", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -74,7 +77,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -85,7 +88,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("👪 Gets game repartition for 4 players with basic auth (GET /games/repartition)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/repartition?${stringify({ players })}`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .end((err, res) => {
@@ -94,7 +97,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("👪 Gets game repartition for 4 players with JWT auth (GET /games/repartition)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/repartition?${stringify({ players })}`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -103,7 +106,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("👪 Gets game repartition for 40 players with JWT auth (GET /games/repartition)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/repartition?${stringify({ players: aLotOfPlayers })}`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -112,7 +115,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("🔐 Can't get game repartition without auth (GET /games/repartition)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/repartition?${stringify({ players })}`)
             .end((err, res) => {
                 expect(res).to.have.status(401);
@@ -120,7 +123,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("🤼 Can't get game repartition with less than 4 players (GET /games/repartition)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/repartition?${stringify({ players: [{ name: "1" }] })}`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -130,7 +133,7 @@ describe("E - Game repartition with multiple teams", () => {
             });
     });
     it("🤼 Can't get game repartition with more than 40 players (GET /games/repartition)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/repartition?${stringify({ players: [...players, ...aLotOfPlayers] })}`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {

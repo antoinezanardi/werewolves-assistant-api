@@ -16,13 +16,16 @@ let players = [
     { name: "Deg", role: "witch" },
     { name: "Dog", role: "villager" },
 ];
-let token, game;
+let server, token, game;
 
 describe("I - Tiny game of 4 players with no winner at the end", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -32,7 +35,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -43,7 +46,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -54,7 +57,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             });
     });
     it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${new mongoose.Types.ObjectId()}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
@@ -66,7 +69,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("👪 All elect the hunter as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -84,7 +87,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -96,7 +99,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("🪄 Witch uses life potion on villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, hasDrankLifePotion: true }] })
@@ -116,7 +119,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("👪 All vote for villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[3]._id }] })
@@ -135,7 +138,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("🐺 Werewolf eats the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -147,7 +150,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("🪄 Witch uses death potion on hunter (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, hasDrankDeathPotion: true }] })
@@ -166,7 +169,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
     });
     it("🔫 Hunter shoots at the last werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [{ player: players[0]._id }] })

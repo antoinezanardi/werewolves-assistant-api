@@ -5,11 +5,14 @@ const chaiHttp = require("chai-http");
 
 chai.use(chaiHttp);
 const { expect } = chai;
+let server;
 
-describe("Testing main route", () => {
-    before(done => !app.isReady ? app.on("ready", done) : done);
+describe("E2E - Testing main route", () => {
+    before(done => {
+        server = app.listen(3000, done);
+    });
     it("👋 Welcomes user with API name", done => {
-        chai.request(app)
+        chai.request(server)
             .get("/")
             .end((err, res) => {
                 expect(res).to.have.status(200);

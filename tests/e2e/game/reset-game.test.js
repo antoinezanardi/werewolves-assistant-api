@@ -16,13 +16,16 @@ let players = [
     { name: "Deg", role: "werewolf" },
     { name: "Dog", role: "villager" },
 ];
-let token, game;
+let server, token, game;
 
 describe("D - Game Reset", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -32,7 +35,7 @@ describe("D - Game Reset", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -43,7 +46,7 @@ describe("D - Game Reset", () => {
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -54,7 +57,7 @@ describe("D - Game Reset", () => {
             });
     });
     it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${new mongoose.Types.ObjectId()}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
@@ -66,7 +69,7 @@ describe("D - Game Reset", () => {
     });
     it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -83,7 +86,7 @@ describe("D - Game Reset", () => {
             });
     });
     it("♻️ Game is resetting (PATCH /games/:id/reset)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}/reset`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -109,7 +112,7 @@ describe("D - Game Reset", () => {
     });
     it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -127,7 +130,7 @@ describe("D - Game Reset", () => {
     });
     it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -143,7 +146,7 @@ describe("D - Game Reset", () => {
         done();
     });
     it("🔐 Game can't be reset if status is 'done' (PATCH /games/:id/reset)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}/reset`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {

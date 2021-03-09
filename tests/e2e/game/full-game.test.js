@@ -39,19 +39,23 @@ let players = [
     { name: "D‰g", role: "stuttering-judge" },
     { name: "D#g", role: "angel" },
     { name: "D±g", role: "thief" },
+    { name: "DΩg", role: "fox" },
 ];
 let additionalCards = [
     { for: "thief", role: "werewolf" },
     { for: "thief", role: "werewolf" },
 ];
 const options = { roles: { idiot: { doesDieOnAncientDeath: false } } };
-let token, game;
+let server, token, game;
 
-describe("B - Full game of 28 players with all roles", () => {
+describe("B - Full game of 29 players with all roles", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -61,7 +65,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -72,7 +76,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players, options, additionalCards })
@@ -84,7 +88,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${new mongoose.Types.ObjectId()}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
@@ -95,7 +99,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🌟 Can't update game review if its status is `playing` (PATCH /games/:id)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ review: { rating: 3 } })
@@ -117,7 +121,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("👪 All can't elect sheriff if play's source is not 'all' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look" })
@@ -128,7 +132,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if play's action is not 'elect-sheriff' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "look" })
@@ -139,7 +143,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if votes are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
@@ -150,7 +154,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't elect sheriff if votes are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff", votes: [] })
@@ -162,7 +166,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't elect sheriff if one vote has same target and source (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -179,7 +183,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't elect sheriff if one vote has an unknown source (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -196,7 +200,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't elect sheriff if one vote has an unknown target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -213,7 +217,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't elect sheriff if one player votes twice (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -230,7 +234,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't elect sheriff if there is a tie in votes (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -247,7 +251,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All elect the little girl as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -279,7 +283,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("👪 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look" })
@@ -290,7 +294,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't vote if play's action is not 'vote' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "look" })
@@ -301,7 +305,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All vote for one brother (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[13]._id }] })
@@ -321,7 +325,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🦹 Thief can't choose card if play's source is not 'thief' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "dog-wolf", action: "choose-card" })
@@ -332,7 +336,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🦹 Thief can't choose card if play's action is not 'choose-card' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "thief", action: "shoot" })
@@ -343,7 +347,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🦹 Thief can't skip if the two additional cards are from the 'werewolves' side (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "thief", action: "choose-card" })
@@ -354,7 +358,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🦹 Thief can't choose an unknown card (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "thief", action: "choose-card", card: new mongoose.Types.ObjectId() })
@@ -365,7 +369,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🦹 Thief chooses the first werewolf card (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "thief", action: "choose-card", card: additionalCards[0]._id })
@@ -384,7 +388,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🐕 Dog-wolf can't choose side if play's source is not 'dog-wolf' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager-villager", action: "choose-side" })
@@ -395,7 +399,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐕 Dog-wolf can't choose side if play's action is not 'choose-side' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "dog-wolf", action: "shoot" })
@@ -406,7 +410,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐕 Dog-wolf can't choose side if side is not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "dog-wolf", action: "choose-side" })
@@ -417,7 +421,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐕 Dog-wolf chooses `werewolves` side (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "dog-wolf", action: "choose-side", side: "werewolves" })
@@ -439,7 +443,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🏹 Cupid can't choose side if action is not 'choose-side' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "cupid", action: "charm", side: "werewolves" })
@@ -450,7 +454,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🏹 Cupid can't charm if play's source is not 'cupid' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "charm" })
@@ -461,7 +465,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🏹 Cupid can't charm if play's action is not 'charm' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "cupid", action: "shoot" })
@@ -472,7 +476,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🏹 Cupid can't charm if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "cupid", action: "charm" })
@@ -483,7 +487,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🏹 Cupid can't charm if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "cupid", action: "charm", targets: [] })
@@ -495,7 +499,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't charm just one target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "cupid", action: "charm", targets: [{ player: players[0]._id }] })
@@ -507,7 +511,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't charm more than two targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -524,7 +528,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🏹 Cupid can't charm unknown targets (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -541,7 +545,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't charm the same targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -558,7 +562,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't infect a player (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -575,7 +579,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't use life potion on a target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -592,7 +596,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't choose a card (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -609,7 +613,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid can't use death potion on a target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -626,7 +630,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🏹 Cupid charms himself and the little girl (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -650,87 +654,12 @@ describe("B - Full game of 28 players with all roles", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'lovers' to 'meet-each-other'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "lovers", to: "meet-each-other" });
-        done();
-    });
-    it("💕 Lovers can't meet each other if play's source is not 'lovers' (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "meet-each-other" })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
-                done();
-            });
-    });
-    it("💕 Lovers can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "lovers", action: "vote" })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
-                done();
-            });
-    });
-    it("💕 Lovers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "lovers", action: "meet-each-other" })
-            .end((err, res) => {
-                game = res.body;
-                expect(res).to.have.status(200);
-                expect(game.history).to.be.an("array").to.have.lengthOf(3);
-                done();
-            });
-    });
-    it("🎲 Game is waiting for 'stuttering-judge' to 'choose-sign'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "stuttering-judge", to: "choose-sign" });
-        done();
-    });
-    it("⚖️ Stuttering judge can't choose sign if play's source is not 'stuttering-judge' (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "witch", action: "choose-sign" })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
-                done();
-            });
-    });
-    it("⚖️ Stuttering judge can't choose sign if play's action is not 'choose-sign' (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "stuttering-judge", action: "vote" })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
-                done();
-            });
-    });
-    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
-        chai.request(app)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "stuttering-judge", action: "choose-sign" })
-            .end((err, res) => {
-                game = res.body;
-                expect(res).to.have.status(200);
-                done();
-            });
-    });
     it("🎲 Game is waiting for 'seer' to 'look'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "seer", to: "look" });
         done();
     });
     it("🔮 Seer can't look if play's source is not 'seer' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "look" })
@@ -741,7 +670,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔮 Seer can't look if play's action is not 'look' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "elect-sheriff" })
@@ -752,7 +681,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔮 Seer can't look if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look" })
@@ -763,7 +692,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔮 Seer can't look if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [] })
@@ -775,7 +704,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔮 Seer can't look at multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -791,7 +720,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔮 Seer can't look at unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -803,7 +732,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔮 Seer can't look at herself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [{ player: players[1]._id }] })
@@ -815,7 +744,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔮 Seer looks at the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [{ player: players[0]._id }] })
@@ -829,12 +758,114 @@ describe("B - Full game of 28 players with all roles", () => {
                 done();
             });
     });
+    it("🎲 Game is waiting for 'fox' to 'sniff'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+        done();
+    });
+    it("🦊 Fox can't sniff if play's source is not 'fox' (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "sniff" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("🦊 Fox can't sniff if play's action is not 'sniff' (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "eat" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    return;
+    it("🎲 Game is waiting for 'lovers' to 'meet-each-other'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "lovers", to: "meet-each-other" });
+        done();
+    });
+    it("💕 Lovers can't meet each other if play's source is not 'lovers' (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("💕 Lovers can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "lovers", action: "vote" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("💕 Lovers meet each other (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "lovers", action: "meet-each-other" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history).to.be.an("array").to.have.lengthOf(3);
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'stuttering-judge' to 'choose-sign'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "stuttering-judge", to: "choose-sign" });
+        done();
+    });
+    it("⚖️ Stuttering judge can't choose sign if play's source is not 'stuttering-judge' (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "choose-sign" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_SOURCE");
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge can't choose sign if play's action is not 'choose-sign' (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "vote" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_PLAY_ACTION");
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "choose-sign" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                done();
+            });
+    });
     it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
         done();
     });
     it("👭 The two sisters can't meet each other if play's source is not 'two-sisters' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "lovers", action: "meet-each-other" })
@@ -845,7 +876,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👭 The two sisters can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "two-sisters", action: "use-potion" })
@@ -856,7 +887,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "two-sisters", action: "meet-each-other" })
@@ -871,7 +902,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("👨‍👨‍👦 The three brothers can't meet each other if play's source is not 'three-brothers' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "meet-each-other" })
@@ -882,7 +913,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👨‍👨‍👦 The three brothers can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "three-brothers", action: "delegate" })
@@ -893,7 +924,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👨‍👨‍👦 The three brothers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "three-brothers", action: "meet-each-other" })
@@ -908,7 +939,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🐒 Wild child can't choose model if play's source is not 'wild-child' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "little-girl", action: "choose-model" })
@@ -919,7 +950,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐒 Wild child can't choose model if play's action is not 'choose-model' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "wild-child", action: "use-potion" })
@@ -930,7 +961,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐒 Wild child can't choose model if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "wild-child", action: "choose-model" })
@@ -941,7 +972,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐒 Wild child can't choose model if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "wild-child", action: "choose-model", targets: [] })
@@ -953,7 +984,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐒 Wild child can't choose multiple models (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -969,7 +1000,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐒 Wild child can't choose an unknown model (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "wild-child", action: "choose-model", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -981,7 +1012,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐒 Wild child can't choose himself as a model (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "wild-child", action: "choose-model", targets: [{ player: players[15]._id }] })
@@ -993,7 +1024,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐒 Wild child chooses the werewolf as a model (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "wild-child", action: "choose-model", targets: [{ player: players[5]._id }] })
@@ -1011,7 +1042,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🪶 Raven can't mark if play's source is not 'raven' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager", action: "mark" })
@@ -1022,7 +1053,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪶 Raven can't mark if play's action is not 'mark' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "use-potion" })
@@ -1034,7 +1065,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪶 Raven can't mark multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1050,7 +1081,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪶 Raven can't mark an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -1062,7 +1093,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪶 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[6]._id }] })
@@ -1080,7 +1111,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🛡 Guard can't protect if play's source is not 'guard' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "protect" })
@@ -1091,7 +1122,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🛡 Guard can't protect if play's action is not 'protect' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "vote" })
@@ -1102,7 +1133,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🛡 Guard can't protect if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect" })
@@ -1113,7 +1144,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🛡 Guard can't protect if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [] })
@@ -1125,7 +1156,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard can't protect multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1141,7 +1172,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🛡 Guard can't protect an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -1153,7 +1184,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[5]._id }] })
@@ -1171,7 +1202,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🐺 Werewolves can't eat if play's source is not 'werewolves' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "eat" })
@@ -1182,7 +1213,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Werewolves can't eat if play's action is not 'eat' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "shoot" })
@@ -1193,7 +1224,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Werewolves can't eat if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat" })
@@ -1204,7 +1235,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Werewolves can't eat if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [] })
@@ -1216,7 +1247,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves can't eat multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1232,7 +1263,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Werewolves can't eat an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -1244,7 +1275,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves can't eat another werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })
@@ -1256,7 +1287,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves can't eat the dog-wolf because he chose the `werewolves` side (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[16]._id }] })
@@ -1268,7 +1299,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -1286,7 +1317,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🐺 White werewolf can't eat if play's source is not 'white-werewolf' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "eat" })
@@ -1297,7 +1328,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 White werewolf can't eat if play's action is not 'eat' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "shoot" })
@@ -1309,7 +1340,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 White werewolf can't eat multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1325,7 +1356,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 White werewolf can't eat an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -1337,7 +1368,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 White werewolf can't eat a player in the `villagers` side (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: players[0]._id }] })
@@ -1349,7 +1380,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 White werewolf can't eat himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: players[23]._id }] })
@@ -1361,7 +1392,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 White werewolf skips (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [] })
@@ -1376,7 +1407,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🐺 Big bad wolf can't eat if play's source is not 'big-bad-wolf' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "eat" })
@@ -1387,7 +1418,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Big bad wolf can't eat if play's action is not 'eat' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "shoot" })
@@ -1398,7 +1429,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Big bad wolf can't eat if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat" })
@@ -1409,7 +1440,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Big bad wolf can't eat if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [] })
@@ -1421,7 +1452,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf can't eat multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1437,7 +1468,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 Big bad wolf can't eat an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -1449,7 +1480,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf can't eat another werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[5]._id }] })
@@ -1461,7 +1492,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf can't eat the dog-wolf because he chose the `werewolves` side (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[16]._id }] })
@@ -1473,7 +1504,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf can't eat the target chosen by the `werewolves` side (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[2]._id }] })
@@ -1485,7 +1516,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Vile father of wolves can't infect the big bad wolf's target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[14]._id, isInfected: true }] })
@@ -1497,7 +1528,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf eats the third brother (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[14]._id }] })
@@ -1515,7 +1546,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🪄 Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "use-potion" })
@@ -1526,7 +1557,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch can't use potion if play's action is not 'use-potion' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "eat" })
@@ -1538,7 +1569,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use potion if one target have both `hasDrankLifePotion` and `hasDrankDeathPotion` fields set to `true` (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, hasDrankLifePotion: true, hasDrankDeathPotion: true }] })
@@ -1549,7 +1580,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch can't use potion on unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: new mongoose.Types.ObjectId(), hasDrankLifePotion: true }] })
@@ -1561,7 +1592,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use life potion on player not eaten by werewolves (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[0]._id, hasDrankLifePotion: true }] })
@@ -1573,7 +1604,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use life potion and death potion on same target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1590,7 +1621,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use death potion twice (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1607,7 +1638,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch uses life potion on guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, hasDrankLifePotion: true }] })
@@ -1625,7 +1656,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("📣 Pied piper can't charm if play's source is not 'pied-piper' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "cupid", action: "charm" })
@@ -1636,7 +1667,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm if play's action is not 'charm' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "pied-piper", action: "eat" })
@@ -1647,7 +1678,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "pied-piper", action: "charm" })
@@ -1658,7 +1689,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "pied-piper", action: "charm", targets: [] })
@@ -1670,7 +1701,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("📣 Pied piper can't charm only one target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }] })
@@ -1681,7 +1712,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1697,7 +1728,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm himself (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1713,7 +1744,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper charms third brother and witch (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1735,7 +1766,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🕺️ Charmed players can't meet each other if play's source is not 'charmed' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "meet-each-other" })
@@ -1746,7 +1777,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🕺️ Charmed players can't meet each other if play's action is not 'meet-each-other' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "charmed", action: "vote" })
@@ -1757,7 +1788,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "charmed", action: "meet-each-other" })
@@ -1793,7 +1824,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("👪 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "vote" })
@@ -1804,7 +1835,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't vote if play's action is not 'vote' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "eat" })
@@ -1815,7 +1846,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't vote if votes are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote" })
@@ -1826,7 +1857,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("👪 All can't vote if votes are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [] })
@@ -1838,7 +1869,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one vote has same target and source (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1855,7 +1886,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one vote has an unknown source (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1872,7 +1903,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one vote has an unknown target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1889,7 +1920,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one player votes twice (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1906,7 +1937,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 Tie in votes between villager and werewolf [Reason: villager is raven-marked 🪶 and little girl, the sheriff, has double vote], then scapegoat dies (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -1938,7 +1969,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🐐 Scapegoat can't ban voting if play's source is not 'scapegoat' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "ban-voting" })
@@ -1949,7 +1980,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐐 Scapegoat can't ban voting if play's action is not 'settle-votes' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "scapegoat", action: "look" })
@@ -1960,7 +1991,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐐 Scapegoat can't ban voting an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "scapegoat", action: "ban-voting", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -1971,7 +2002,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐐 Scapegoat can't ban voting a dead target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "scapegoat", action: "ban-voting", targets: [{ player: players[20]._id }] })
@@ -1982,7 +2013,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐐 Scapegoat bans voting the witch, the seer and the guard (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2019,7 +2050,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔮 Seer can't look at dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [{ player: players[20]._id }] })
@@ -2031,7 +2062,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔮 Seer looks at the guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "seer", action: "look", targets: [{ player: players[2]._id }] })
@@ -2050,7 +2081,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪶 Raven can't mark a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[20]._id }] })
@@ -2061,7 +2092,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -2078,7 +2109,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard can't protect a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[20]._id }] })
@@ -2090,7 +2121,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard can't protect the same player twice in a row (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[5]._id }] })
@@ -2102,7 +2133,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
@@ -2121,7 +2152,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves can't eat a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[20]._id }] })
@@ -2133,7 +2164,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -2152,7 +2183,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf can't eat a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[20]._id }] })
@@ -2164,7 +2195,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf eats one of the two sisters (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[11]._id }] })
@@ -2183,7 +2214,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use death potion on dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[20]._id, hasDrankDeathPotion: true }] })
@@ -2195,7 +2226,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use life potion twice (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[2]._id, hasDrankLifePotion: true }] })
@@ -2207,7 +2238,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch uses death potion on seer (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, hasDrankDeathPotion: true }] })
@@ -2221,7 +2252,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm a dead player (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2237,7 +2268,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper can't charm an already charmed player (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2253,7 +2284,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📣 Pied piper charms seer and guard (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2275,7 +2306,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "charmed", action: "meet-each-other" })
@@ -2310,7 +2341,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one vote has a dead source (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2327,7 +2358,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one vote has a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2344,7 +2375,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if one voter has the `cant-vote` attribute (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2361,7 +2392,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 Tie in votes between villager-villager and pied piper (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2384,7 +2415,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🎖 Sheriff can't settle votes if play's source is not 'sheriff' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager", action: "settle-votes" })
@@ -2395,7 +2426,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't settle votes if play's action is not 'settle-votes' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "eat" })
@@ -2406,7 +2437,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't settle votes if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes" })
@@ -2417,7 +2448,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't settle votes if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [] })
@@ -2429,7 +2460,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff can't settle votes with multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2445,7 +2476,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't settle votes with unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -2457,7 +2488,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff can't settle votes with player who was not in previous tie in votes (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[0]._id }] })
@@ -2469,7 +2500,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff settles votes by choosing pied piper (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[22]._id }] })
@@ -2501,7 +2532,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪶 Raven marks the hunter (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[4]._id }] })
@@ -2520,7 +2551,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects the little girl (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[7]._id }] })
@@ -2539,7 +2570,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the little girl (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[7]._id }] })
@@ -2558,7 +2589,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 White werewolf skips (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat" })
@@ -2570,7 +2601,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Big bad wolf eats the angel (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[26]._id }] })
@@ -2589,7 +2620,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🪄 Witch can't use death potion twice (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, hasDrankDeathPotion: true }] })
@@ -2600,7 +2631,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion" })
@@ -2626,7 +2657,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🎖 Sheriff can't delegate if play's source is not 'sheriff' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "villager", action: "delegate" })
@@ -2637,7 +2668,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't delegate if play's action is not 'delegate' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "eat" })
@@ -2648,7 +2679,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't delegate if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate" })
@@ -2659,7 +2690,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't delegate if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [] })
@@ -2671,7 +2702,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff can't delegate to multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2687,7 +2718,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🎖 Sheriff can't delegate to unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -2699,7 +2730,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff can't delegate to a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: players[22]._id }] })
@@ -2711,7 +2742,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff delegates to the hunter (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: players[4]._id }] })
@@ -2727,7 +2758,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for hunter and stuttering judge request another vote (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }], doesJudgeRequestAnotherVote: true })
@@ -2751,7 +2782,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff delegates to the raven (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: players[3]._id }] })
@@ -2766,7 +2797,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot if play's source is not 'hunter' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "shoot" })
@@ -2777,7 +2808,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot if play's action is not 'shoot' (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "use-potion" })
@@ -2788,7 +2819,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot if targets are not set (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot" })
@@ -2799,7 +2830,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot if targets are empty (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [] })
@@ -2811,7 +2842,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔫 Hunter can't shoot at multiple targets (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -2827,7 +2858,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🔫 Hunter can't shoot at an unknown target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [{ player: new mongoose.Types.ObjectId() }] })
@@ -2839,7 +2870,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔫 Hunter can't shoot at a dead target (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [{ player: players[22]._id }] })
@@ -2851,7 +2882,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🔫 Hunter shoots at the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [{ player: players[5]._id }] })
@@ -2876,7 +2907,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("⚖️ Stuttering judge can't request another vote if he already requested it (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }], doesJudgeRequestAnotherVote: true })
@@ -2888,7 +2919,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the stuttering judge (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[25]._id }] })
@@ -2907,7 +2938,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🎲 Get game with full history (GET /games/:id?history-limit=0)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/${game._id}?history-limit=0`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -2918,7 +2949,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📜 Get only full game history (GET /games/:id/history)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/${game._id}/history`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -2929,7 +2960,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📜 Get only witch plays in game history (GET /games/:id/history?play-source=witch)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/${game._id}/history?play-source=witch`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -2943,7 +2974,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("📜 Get only choose-side plays in game history (GET /games/:id/history?play-action=choose-side)", done => {
-        chai.request(app)
+        chai.request(server)
             .get(`/games/${game._id}/history?play-action=choose-side`)
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
@@ -2955,7 +2986,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -2968,7 +2999,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
@@ -2983,7 +3014,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves can't eat the wild child because he is a fresh new werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[15]._id }] })
@@ -2995,7 +3026,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the witch, but vile father of wolves infects her before (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[0]._id, isInfected: true }] })
@@ -3011,7 +3042,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion" })
@@ -3029,7 +3060,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("⚖️ Stuttering judge can't request another vote if he is dead (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[15]._id }], doesJudgeRequestAnotherVote: true })
@@ -3041,7 +3072,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for wild child (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[15]._id }] })
@@ -3060,7 +3091,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -3073,7 +3104,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects a werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[24]._id }] })
@@ -3088,7 +3119,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Vile father of wolves can't infect twice (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[10]._id, isInfected: true }] })
@@ -3100,7 +3131,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat one of the two sisters (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[10]._id }] })
@@ -3113,7 +3144,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 White werewolf can't eat a dead target (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: players[5]._id }] })
@@ -3125,7 +3156,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 White werewolf eats one werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: players[24]._id }] })
@@ -3139,7 +3170,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
@@ -3160,7 +3191,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for vile father of wolves (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[18]._id }] })
@@ -3179,7 +3210,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -3192,7 +3223,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
@@ -3207,7 +3238,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Vile father of wolves can't infect because he is dead (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[12]._id, isInfected: true }] })
@@ -3219,7 +3250,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the ancient (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[19]._id }] })
@@ -3232,7 +3263,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
@@ -3252,7 +3283,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the big bad wolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[17]._id }] })
@@ -3271,7 +3302,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -3284,7 +3315,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects the raven (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[3]._id }] })
@@ -3299,7 +3330,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the raven but it's protected by the guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -3312,7 +3343,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🐺 White werewolf eats the dog-wolf (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: players[16]._id }] })
@@ -3323,7 +3354,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
@@ -3343,7 +3374,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the white werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[23]._id }] })
@@ -3362,7 +3393,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -3375,7 +3406,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
@@ -3390,7 +3421,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the raven again (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -3403,7 +3434,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
@@ -3416,7 +3447,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🎖 Sheriff delegates to the idiot (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: players[21]._id }] })
@@ -3437,7 +3468,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the idiot but he doesn't die, only his role is revealed and he can't vote for the rest of the game (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[21]._id }] })
@@ -3458,7 +3489,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[0]._id }] })
@@ -3473,7 +3504,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the ancient again and will die (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[19]._id }] })
@@ -3486,7 +3517,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
@@ -3511,7 +3542,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All can't vote if the idiot who is banned from votes tries anyway (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[21]._id, for: players[0]._id }] })
@@ -3523,7 +3554,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the idiot again, which die this time and doesn't delegate his sheriff power because he's an idiot (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[21]._id }] })
@@ -3544,7 +3575,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[2]._id }] })
@@ -3559,7 +3590,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the last brother (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[12]._id }] })
@@ -3572,7 +3603,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🪄 Witch skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [] })
@@ -3590,7 +3621,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the witch, which joined the werewolf side earlier (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[0]._id }] })
@@ -3610,7 +3641,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🛡 Guard protects the thief (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[27]._id }] })
@@ -3625,7 +3656,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("🐺 Werewolves eat the guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -3644,7 +3675,7 @@ describe("B - Full game of 28 players with all roles", () => {
     });
     it("👪 All vote for the thief, which joined the werewolf side by choosing a werewolf card (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[6]._id, for: players[27]._id }] })
@@ -3663,7 +3694,7 @@ describe("B - Full game of 28 players with all roles", () => {
         done();
     });
     it("🔐 Can't make a play if game's done (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate" })
@@ -3674,7 +3705,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🌟 Can't update game review if `rating` is absent (PATCH /games/:id)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ review: { comment: "That was ok.." } })
@@ -3685,7 +3716,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🌟 Setting game review of 3.5 stars (PATCH /games/:id)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ review: { rating: 3.5, comment: "That was ok..", dysfunctionFound: true } })
@@ -3698,7 +3729,7 @@ describe("B - Full game of 28 players with all roles", () => {
             });
     });
     it("🌟 Can update game review (PATCH /games/:id)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ review: { rating: 3.5, comment: "That was ok..", dysfunctionFound: true } })

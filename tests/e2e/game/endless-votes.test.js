@@ -15,13 +15,16 @@ let players = [
     { name: "Deg", role: "villager" },
     { name: "Dog", role: "villager" },
 ];
-let token, game;
+let server, token, game;
 
 describe("S - Tiny game of 4 players in which there is no sheriff and a stuttering judge which make a lot of consecutive votes", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -31,7 +34,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -42,7 +45,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players, options: { roles: { sheriff: { isEnabled: false } } } })
@@ -53,7 +56,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
             });
     });
     it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "stuttering-judge", action: "choose-sign" })
@@ -65,7 +68,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
     });
     it("⚖️ Stuttering judge can't request a second vote if action is not 'vote' (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }], doesJudgeRequestAnotherVote: true })
@@ -77,7 +80,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
     });
     it("🐺 Werewolf eats a villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -89,7 +92,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
     });
     it("👪 Tie in votes between werewolf and villager and stuttering judge requests another vote (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -112,7 +115,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
     });
     it("👪 All vote for villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[2]._id }] })
@@ -127,7 +130,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
     });
     it("👪 Tie in votes between werewolf and stuttering judge (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -149,7 +152,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
     });
     it("👪 All vote for stuttering judge (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[1]._id }] })

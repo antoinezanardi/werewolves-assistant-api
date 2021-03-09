@@ -20,13 +20,16 @@ const additionalCards = [
     { for: "thief", role: "witch" },
     { for: "thief", role: "seer" },
 ];
-let token, game;
+let server, token, game;
 
 describe("C - Tiny game of 4 players with only werewolves and one poor thief who skips", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -36,7 +39,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -47,7 +50,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players, additionalCards })
@@ -58,7 +61,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             });
     });
     it("🔐 Can't make a play if game's doesn't belong to user (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${new mongoose.Types.ObjectId()}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff" })
@@ -70,7 +73,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
     });
     it("👪 All elect the villager as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -88,7 +91,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
     });
     it("🦹️ Thief skips his turn (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "thief", action: "choose-card" })
@@ -103,7 +106,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
     });
     it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -114,7 +117,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             });
     });
     it("🐺 Big bad wolf can't eat a target because there is no one left (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[3]._id }] })
@@ -125,7 +128,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             });
     });
     it("🐺 Big bad wolf skips (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "big-bad-wolf", action: "eat" })

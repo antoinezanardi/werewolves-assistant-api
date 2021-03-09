@@ -122,6 +122,7 @@ exports.fillPlayersData = players => {
         player.isAlive = true;
         position++;
     }
+    players.sort((a, b) => a.position > b.position ? 1 : -1);
 };
 
 exports.checkPlayersPosition = players => {
@@ -585,6 +586,7 @@ exports.generatePlayMethods = () => ({
     "white-werewolf": Player.whiteWerewolfPlays,
     "stuttering-judge": () => undefined,
     "thief": Player.thiefPlays,
+    "fox": Player.foxPlays,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({

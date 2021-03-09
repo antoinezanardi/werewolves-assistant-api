@@ -7,7 +7,7 @@ const {
 } = require("../helpers/functions/Player");
 const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
-    getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat,
+    getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat, getNearestNeighbor,
 } = require("../helpers/functions/Game");
 const { getVillagerRoles, getWerewolfRoles, getRoles } = require("../helpers/functions/Role");
 const { generateError } = require("../helpers/functions/Error");
@@ -99,6 +99,17 @@ exports.checkAndFillPlayerTarget = (target, game) => {
     target.player = player;
 };
 
+exports.addFoxTargets = (targets, game) => {
+    const leftAliveNeighbor = getNearestNeighbor(targets[0].player, game.players, "left", { isAlive: true });
+    const rightAliveNeighbor = getNearestNeighbor(targets[0].player, game.players, "right", { isAlive: true });
+    if (leftAliveNeighbor) {
+        targets.shift({ player: leftAliveNeighbor._id });
+    }
+    if (rightAliveNeighbor && leftAliveNeighbor !== rightAliveNeighbor) {
+        targets.push({ player: rightAliveNeighbor._id });
+    }
+};
+
 exports.checkTargetStructure = (target, action) => {
     if (target.player === undefined) {
         throw generateError("BAD_TARGET_STRUCTURE", `Bad target structure. Field "player" is missing.`);
@@ -134,10 +145,15 @@ exports.checkAndFillTargets = async(targets, game, options) => {
     if (!targets || !targets.length) {
         return;
     }
-    for (let i = 0; i < targets.length; i++) {
-        this.checkTargetStructure(targets[i], options.play.action);
-        this.checkAndFillPlayerTarget(targets[i], game);
-        await this.checkTargetDependingOnPlay(targets[i], game, options.play);
+    for (const target of targets) {
+        this.checkTargetStructure(target, options.play.action);
+    }
+    if (options.play.action === "sniff") {
+        this.addFoxTargets(targets, game);
+    }
+    for (const target of targets) {
+        this.checkAndFillPlayerTarget(target, game);
+        await this.checkTargetDependingOnPlay(target, game, options.play);
     }
     this.checkUniqueTargets(targets);
     await this.checkAllTargetsDependingOnAction(targets, game, options.play.action);
@@ -441,6 +457,15 @@ exports.checkAndFillVotes = async(votes, game, options) => {
     for (let i = 0; i < votes.length; i++) {
         votes[i].from = getPlayerWithId(votes[i].from, game);
         votes[i].for = getPlayerWithId(votes[i].for, game);
+    }
+};
+
+exports.foxPlays = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, play });
+    if (!targets.find(({ player }) => player.side.current === "werewolves")) {
+        const foxPlayer = getPlayerWithRole("fox", game);
+        this.addPlayerAttribute(foxPlayer._id, "powerless", game, { source: "fox" });
     }
 };
 

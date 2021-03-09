@@ -16,13 +16,16 @@ let players = [
     { name: "Dog", role: "werewolf" },
     { name: "Dœg", role: "angel" },
 ];
-let token, game;
+let server, token, game;
 
 describe("F - Game where raven marks a player who dies during the night", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -32,7 +35,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -43,7 +46,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -55,7 +58,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("👪 All elect the raven as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -79,7 +82,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("👪 All vote for one werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[2]._id }] })
@@ -95,7 +98,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("🪶 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[1]._id }] })
@@ -110,7 +113,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
@@ -130,7 +133,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("👪 One vote only for angel, dead villager is not nominated despite the fact he has two votes (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[4]._id }] })

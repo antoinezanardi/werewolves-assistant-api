@@ -17,13 +17,16 @@ let players = [
     { name: "Dôg", role: "scapegoat" },
     { name: "D∂g", role: "idiot" },
 ];
-let token, game;
+let server, token, game;
 
 describe("P - Game with an ancient who survives from 3 werewolves attacks", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -33,7 +36,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -44,7 +47,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players, options: { roles: { sheriff: { isEnabled: false } } } })
@@ -61,7 +64,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[1]._id }] })
@@ -76,7 +79,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🐺 Werewolf eats the ancient (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -91,7 +94,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
             });
     });
     it("🪄 Witch uses life potion on ancient (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, hasDrankLifePotion: true }] })
@@ -109,7 +112,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("⚖️ Stuttering judge can't request another vote if he is absent from the game (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }], doesJudgeRequestAnotherVote: true })
@@ -121,7 +124,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("👪 All vote for the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }] })
@@ -135,7 +138,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🛡 Guard protects the ancient (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[3]._id }] })
@@ -150,7 +153,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🐺 Werewolf eats the ancient again (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -170,7 +173,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("👪 All vote for the idiot, which is only revealed (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[5]._id }] })
@@ -184,7 +187,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[1]._id }] })
@@ -199,7 +202,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🐺 Werewolf eats the ancient again, again (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
@@ -219,7 +222,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("👪 All vote for the scapegoat (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[2]._id, for: players[4]._id }] })
@@ -233,7 +236,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🛡 Guard protects the idiot (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[5]._id }] })
@@ -248,7 +251,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🐺 Werewolf eats the ancient again, again and again ! (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })

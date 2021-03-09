@@ -19,13 +19,16 @@ const originalPlayers = [
     { name: "Dπg", role: "villager" },
     { name: "Dœg", role: "raven" },
 ];
-let token, game, players;
+let server, token, game, players;
 
 describe("K - Game options", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -35,7 +38,7 @@ describe("K - Game options", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -46,7 +49,7 @@ describe("K - Game options", () => {
             });
     });
     it("🎲 Creates game with brothers and sisters waking up every night, sheriff has regular vote, seer is talkative and raven penalty to 3 with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -74,7 +77,7 @@ describe("K - Game options", () => {
     });
     it("👪 All elect the werewolf as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -90,7 +93,7 @@ describe("K - Game options", () => {
             });
     });
     it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "two-sisters", action: "meet-each-other" })
@@ -101,7 +104,7 @@ describe("K - Game options", () => {
             });
     });
     it("👨‍👨‍👦 The three brothers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "three-brothers", action: "meet-each-other" })
@@ -113,7 +116,7 @@ describe("K - Game options", () => {
     });
     it("🪶 Raven marks the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[0]._id }] })
@@ -128,7 +131,7 @@ describe("K - Game options", () => {
     });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
@@ -144,7 +147,7 @@ describe("K - Game options", () => {
     });
     it("👪 Werewolf (sheriff) and three other players votes for one brother and the brother votes for the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -169,7 +172,7 @@ describe("K - Game options", () => {
     });
     it("🎖 Sheriff settles votes by choosing villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[5]._id }] })
@@ -190,7 +193,7 @@ describe("K - Game options", () => {
         done();
     });
     it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "two-sisters", action: "meet-each-other" })
@@ -205,7 +208,7 @@ describe("K - Game options", () => {
         done();
     });
     it("👨‍👨‍👦 The three brothers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "three-brothers", action: "meet-each-other" })
@@ -217,7 +220,7 @@ describe("K - Game options", () => {
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -229,7 +232,7 @@ describe("K - Game options", () => {
     });
     it("🐺 Werewolf eats one of the two sisters (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
@@ -245,7 +248,7 @@ describe("K - Game options", () => {
     });
     it("👪 Werewolf (sheriff) votes for one of the two remaining brothers (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[4]._id }] })
@@ -266,7 +269,7 @@ describe("K - Game options", () => {
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ status: "canceled" })
@@ -278,7 +281,7 @@ describe("K - Game options", () => {
             });
     });
     it("🎲 Creates game with brothers and sisters never waking up after first night (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -296,7 +299,7 @@ describe("K - Game options", () => {
     });
     it("👪 All elect the werewolf as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -312,7 +315,7 @@ describe("K - Game options", () => {
             });
     });
     it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "two-sisters", action: "meet-each-other" })
@@ -323,7 +326,7 @@ describe("K - Game options", () => {
             });
     });
     it("👨‍👨‍👦 The three brothers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "three-brothers", action: "meet-each-other" })
@@ -335,7 +338,7 @@ describe("K - Game options", () => {
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -347,7 +350,7 @@ describe("K - Game options", () => {
     });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
@@ -363,7 +366,7 @@ describe("K - Game options", () => {
     });
     it("👪 Werewolf (sheriff) votes for one of the two remaining brothers (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[4]._id }] })
@@ -384,7 +387,7 @@ describe("K - Game options", () => {
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
-        chai.request(app)
+        chai.request(server)
             .patch(`/games/${game._id}`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ status: "canceled" })
@@ -396,7 +399,7 @@ describe("K - Game options", () => {
             });
     });
     it("🎲 Creates game with disabled sheriff option, brothers and sisters waking up only the first night, raven penalty to 1 and little girl is protected by guard with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -423,7 +426,7 @@ describe("K - Game options", () => {
             });
     });
     it("👭 The two sisters meet each other already because there is no sheriff to elect (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "two-sisters", action: "meet-each-other" })
@@ -434,7 +437,7 @@ describe("K - Game options", () => {
             });
     });
     it("👨‍👨‍👦 The three brothers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "three-brothers", action: "meet-each-other" })
@@ -446,7 +449,7 @@ describe("K - Game options", () => {
     });
     it("🪶 Raven mark a brother (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[5]._id }] })
@@ -458,7 +461,7 @@ describe("K - Game options", () => {
     });
     it("🛡 Guard protects the little girl (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
@@ -473,7 +476,7 @@ describe("K - Game options", () => {
     });
     it("🐺 Werewolf eats the little girl (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[8]._id }] })
@@ -490,7 +493,7 @@ describe("K - Game options", () => {
     });
     it("👪 Tie in votes between the werewolf and one of the two sisters (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -514,7 +517,7 @@ describe("K - Game options", () => {
         done();
     });
     it("👪 All can't vote if one vote target is not one of the players in the previous tie in votes (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -531,7 +534,7 @@ describe("K - Game options", () => {
     });
     it("👪 Another tie in votes between the werewolf, one of the two sisters and one of the three brothers, then nobody dies (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -562,7 +565,7 @@ describe("K - Game options", () => {
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark" })
@@ -574,7 +577,7 @@ describe("K - Game options", () => {
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "guard", action: "protect", targets: [{ player: players[9]._id }] })
@@ -589,7 +592,7 @@ describe("K - Game options", () => {
     });
     it("🐺 Werewolf eats one of the three brothers (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })
@@ -605,7 +608,7 @@ describe("K - Game options", () => {
     });
     it("👪 Tie in votes between the two sisters (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -625,7 +628,7 @@ describe("K - Game options", () => {
     });
     it("👪 All vote for the second sister (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({

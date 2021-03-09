@@ -36,13 +36,16 @@ const additionalCards = [
     { role: "werewolf", for: "thief" },
     { role: "werewolf", for: "thief" },
 ];
-let token, game;
+let server, token, game;
 
 describe("L - Game with various villagers who loose their power because they kill ancient", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -52,7 +55,7 @@ describe("L - Game with various villagers who loose their power because they kil
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -63,7 +66,7 @@ describe("L - Game with various villagers who loose their power because they kil
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players, additionalCards })
@@ -80,7 +83,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("👪 All elect the idiot as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[0]._id, for: players[15]._id }] })
@@ -102,7 +105,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("👪 All vote for the ancient, revenge is on: all villagers are powerless (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[12]._id }] })
@@ -137,7 +140,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🐺 Werewolf eats the angel (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[17]._id }] })
@@ -156,7 +159,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("👪 All vote for one brother (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[9]._id }] })
@@ -169,7 +172,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🐺 Werewolf eats the guard (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[4]._id }] })
@@ -187,7 +190,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("👪 All vote for the raven (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[3]._id }] })
@@ -205,7 +208,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🐺 Werewolf is the only one called during the night and eats the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -219,7 +222,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("⚖️ Stuttering judge can't request another vote if he is powerless (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -236,7 +239,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("👪 Tie in vote between the idiot and one sister (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -259,7 +262,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🎖 Sheriff settles votes by choosing the sister (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[6]._id }] })
@@ -273,7 +276,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🐺 Werewolf is the only one called during the night and eats the other sister (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[7]._id }] })
@@ -287,7 +290,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("👪 All vote for the idiot who is the sheriff, he dies from votes because he's powerless (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[5]._id, for: players[15]._id }] })
@@ -305,7 +308,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🎖 Sheriff delegates to the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: players[5]._id }] })

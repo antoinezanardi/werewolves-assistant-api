@@ -17,13 +17,16 @@ let players = [
     { name: "Dπg", role: "villager" },
     { name: "Dæg", role: "werewolf" },
 ];
-let token, game;
+let server, token, game;
 
 describe("N - Tiny game of 6 players in which the pied piper charmed everybody, and so wins", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -33,7 +36,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -44,7 +47,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -56,7 +59,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
     });
     it("👪 All elect the pied piper as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[0]._id, for: players[1]._id }] })
@@ -68,7 +71,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
     });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -79,7 +82,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             });
     });
     it("📣 Pied piper charms two villagers (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -97,7 +100,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             });
     });
     it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "charmed", action: "meet-each-other" })
@@ -109,7 +112,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
     });
     it("👪 All vote for werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }] })
@@ -123,7 +126,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
     });
     it("🐺 Werewolf eats the pied piper (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
@@ -135,7 +138,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
     });
     it("🏹 Pied piper can't charm just two targets if only one can be charmed (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }, { player: players[5]._id }] })
@@ -146,7 +149,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             });
     });
     it("📣 Pied piper charms the last werewolf (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "pied-piper", action: "charm", targets: [{ player: players[5]._id }] })

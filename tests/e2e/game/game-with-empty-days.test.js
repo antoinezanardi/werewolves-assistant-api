@@ -17,13 +17,16 @@ let players = [
     { name: "Dyg", role: "villager" },
     { name: "Dπg", role: "villager" },
 ];
-let token, game;
+let server, token, game;
 
 describe("M - Game with empty days because vote is impossible", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -33,7 +36,7 @@ describe("M - Game with empty days because vote is impossible", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -44,7 +47,7 @@ describe("M - Game with empty days because vote is impossible", () => {
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -56,7 +59,7 @@ describe("M - Game with empty days because vote is impossible", () => {
     });
     it("👪 All elect the werewolf as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[1]._id, for: players[0]._id }] })
@@ -78,7 +81,7 @@ describe("M - Game with empty days because vote is impossible", () => {
     });
     it("🐺 Werewolf eats one villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -92,7 +95,7 @@ describe("M - Game with empty days because vote is impossible", () => {
     });
     it("👪 Tie in votes between scapegoat and a villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -110,7 +113,7 @@ describe("M - Game with empty days because vote is impossible", () => {
             });
     });
     it("🐐 Scapegoat bans voting all alive players except one (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -137,7 +140,7 @@ describe("M - Game with empty days because vote is impossible", () => {
     });
     it("🐺 Werewolf eats the only villager who can vote (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })

@@ -35,6 +35,7 @@ exports.playerActions = [
     "ban-voting",
     "choose-sign",
     "choose-card",
+    "sniff",
 ];
 
 exports.murderedPossibilities = [

@@ -16,13 +16,16 @@ const originalPlayers = [
     { name: "Dog", role: "seer" },
     { name: "Dug", role: "witch" },
 ];
-let token, game, players;
+let server, token, game, players;
 
 describe("V - Tiny game of 5 players in which because of the early votes, actions during night change", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -32,7 +35,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -43,7 +46,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players: originalPlayers })
@@ -55,7 +58,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
     });
     it("👪 All elect the hunter as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "elect-sheriff", votes: [{ from: players[1]._id, for: players[2]._id }] })
@@ -67,7 +70,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
     });
     it("👪 All vote for the hunter (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[2]._id }] })
@@ -90,7 +93,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
     });
     it("🎖 Sheriff delegates to the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "sheriff", action: "delegate", targets: [{ player: players[4]._id }] })
@@ -105,7 +108,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
     });
     it("🔫 Hunter shoots at the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [{ player: players[4]._id }] })

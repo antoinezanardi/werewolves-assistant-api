@@ -15,13 +15,16 @@ let players = [
     { name: "Deg", role: "witch" },
     { name: "Dog", role: "villager" },
 ];
-let token, game;
+let server, token, game;
 
 describe("R - Tiny game of 4 players in which the white werewolf is the last survivor, and so wins alone", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -31,7 +34,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -42,7 +45,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players, options: { roles: { sheriff: { isEnabled: false } } } })
@@ -54,7 +57,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
     });
     it("🐺 Werewolf eats the witch (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -66,7 +69,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
     });
     it("🐺 White werewolf eats the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "white-werewolf", action: "eat", targets: [{ player: players[1]._id }] })
@@ -81,7 +84,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
     });
     it("🪄 Witch can't use life potion on player eaten by white-werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, hasDrankLifePotion: true }] })
@@ -93,7 +96,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
     });
     it("🪄 Witch use death potion on villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[3]._id, hasDrankDeathPotion: true }] })
