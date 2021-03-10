@@ -32,6 +32,8 @@ let players = [
     { name: "D#g", role: "cupid" },
     { name: "D±g", role: "thief" },
     { name: "D»g", role: "fox" },
+    { name: "D–g", role: "bear-tamer" },
+    { name: "D∑g", role: "werewolf" },
 ];
 const additionalCards = [
     { role: "werewolf", for: "thief" },
@@ -137,6 +139,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[19].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[20].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[21].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[22].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 done();
             });
     });
@@ -157,6 +160,7 @@ describe("L - Game with various villagers who loose their power because they kil
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[17].isAlive).to.be.false;
+        expect(game.players[22].attributes).to.not.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for one brother (POST /games/:id/play)", done => {

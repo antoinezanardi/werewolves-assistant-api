@@ -6,6 +6,7 @@
 
 * [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
 * [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
+* [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
 
 ### 🌟 Enhancements
 

@@ -16,6 +16,7 @@ exports.playerAttributes = [
     { name: "cant-vote", source: "scapegoat", remainingPhases: 2 },
     { name: "cant-vote", source: "all" },
     { name: "charmed", source: "pied-piper" },
+    { name: "growls", source: "bear-tamer", remainingPhases: 1 },
 ];
 
 exports.playerActions = [

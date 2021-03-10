@@ -698,3 +698,15 @@ exports.drankDeathPotion = async(game, play, gameHistoryEntry) => {
     await this.killPlayer(poisonedPlayer._id, "use-potion", game, gameHistoryEntry);
     this.removePlayerAttribute(poisonedPlayer._id, "drank-death-potion", game);
 };
+
+exports.makeBearTamerGrowls = game => {
+    const bearTamerPlayer = getPlayerWithRole("bear-tamer", game);
+    if (bearTamerPlayer && !doesPlayerHaveAttribute(bearTamerPlayer, "powerless")) {
+        const leftAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "left", { isAlive: true });
+        const rightAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "right", { isAlive: true });
+        if (bearTamerPlayer.side.current === "werewolves" || leftAliveNeighbor?.side.current === "werewolves" ||
+            rightAliveNeighbor?.side.current === "werewolves") {
+            this.addPlayerAttribute(bearTamerPlayer._id, "growls", game);
+        }
+    }
+};

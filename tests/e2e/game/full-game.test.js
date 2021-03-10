@@ -40,6 +40,7 @@ let players = [
     { name: "D#g", role: "angel" },
     { name: "D±g", role: "thief" },
     { name: "DΩg", role: "fox" },
+    { name: "D¿g", role: "bear-tamer" },
 ];
 let additionalCards = [
     { for: "thief", role: "werewolf" },
@@ -48,7 +49,7 @@ let additionalCards = [
 const options = { roles: { idiot: { doesDieOnAncientDeath: false } } };
 let server, token, game;
 
-describe("B - Full game of 29 players with all roles", () => {
+describe("B - Full game of 30 players with all roles", () => {
     before(done => resetDatabase(done));
     before(done => {
         server = app.listen(3000, done);
@@ -1851,6 +1852,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[14].attributes).to.not.deep.include({ name: "eaten", source: "big-bad-wolf", remainingPhases: 1 });
         expect(game.players[5].attributes).to.not.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
         expect(game.players[0].attributes).to.not.deep.include({ name: "seen", source: "seer", remainingPhases: 1 });
+        expect(game.players[29].attributes).to.not.exist;
         expect(game.players[2].isAlive).to.be.true;
         expect(game.players[2].role.isRevealed).to.be.false;
         expect(game.players[14].isAlive).to.be.false;
@@ -2399,6 +2401,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[2].attributes).to.not.deep.include({ name: "seen", source: "seer", remainingPhases: 1 });
         expect(game.players[2].attributes).to.not.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
         expect(game.players[2].attributes).to.not.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+        expect(game.players[29].attributes).to.not.exist;
         expect(game.players[1].isAlive).to.be.false;
         expect(game.players[1].murdered).to.deep.equals({ by: "witch", of: "use-potion" });
         expect(game.players[2].isAlive).to.be.true;
@@ -2748,6 +2751,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[9].isAlive).to.be.false;
         expect(game.players[9].murdered).to.deep.equals({ by: "cupid", of: "charm" });
         expect(game.players[7].attributes).to.not.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
+        expect(game.players[29].attributes).to.not.exist;
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
@@ -3167,6 +3171,7 @@ describe("B - Full game of 29 players with all roles", () => {
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[0].isAlive).to.be.true;
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("⚖️ Stuttering judge can't request another vote if he is dead (POST /games/:id/play)", done => {
@@ -3213,7 +3218,7 @@ describe("B - Full game of 29 players with all roles", () => {
                 expect(game.history[0].play.targets).to.be.lengthOf(3);
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
                 expect(game.history[0].play.targets[1].player._id).to.equals(players[0]._id);
-                expect(game.history[0].play.targets[2].player._id).to.equals(players[28]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[29]._id);
                 done();
             });
     });
@@ -3314,6 +3319,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[24].attributes).to.not.deep.include({ name: "eaten", source: "white-werewolf", remainingPhases: 1 });
         expect(game.players[24].isAlive).to.be.false;
         expect(game.players[24].murdered).to.deep.equals({ by: "white-werewolf", of: "eat" });
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for vile father of wolves (POST /games/:id/play)", done => {
@@ -3423,6 +3429,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[19].role.isRevealed).to.be.false;
         expect(game.players[19].isAlive).to.be.true;
         expect(game.history[0].revealedPlayers).to.not.exist;
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for the big bad wolf (POST /games/:id/play)", done => {
@@ -3514,6 +3521,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[16].isAlive).to.be.false;
         expect(game.players[16].murdered).to.deep.equals({ by: "white-werewolf", of: "eat" });
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for the white werewolf (POST /games/:id/play)", done => {
@@ -3608,6 +3616,7 @@ describe("B - Full game of 29 players with all roles", () => {
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[3].isAlive).to.be.false;
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for the idiot but he doesn't die, only his role is revealed and he can't vote for the rest of the game (POST /games/:id/play)", done => {
@@ -3682,6 +3691,7 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.history[0].deadPlayers).to.exist;
         expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
         expect(game.history[0].deadPlayers[0]._id).to.equals(players[19]._id);
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All can't vote if the idiot who is banned from votes tries anyway (POST /games/:id/play)", done => {
@@ -3761,6 +3771,7 @@ describe("B - Full game of 29 players with all roles", () => {
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[12].isAlive).to.be.false;
+        expect(game.players[29].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for the witch, which joined the werewolf side earlier (POST /games/:id/play)", done => {
@@ -3815,6 +3826,7 @@ describe("B - Full game of 29 players with all roles", () => {
     it("☀️ Sun is rising", done => {
         expect(game.phase).to.equals("day");
         expect(game.players[2].isAlive).to.be.false;
+        expect(game.players[29].attributes).to.not.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
     it("👪 All vote for the thief, which joined the werewolf side by choosing a werewolf card (POST /games/:id/play)", done => {

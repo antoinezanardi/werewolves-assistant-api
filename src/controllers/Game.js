@@ -550,6 +550,7 @@ exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
             game.waiting.push({ for: "all", to: "vote" });
         }
         this.decreasePlayersAttributesRemainingPhases(game);
+        Player.makeBearTamerGrowls(game);
         if (!game.waiting.length) {
             await this.fillWaitingQueue(game, gameHistoryEntry);
         }
