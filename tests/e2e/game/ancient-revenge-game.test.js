@@ -31,6 +31,7 @@ let players = [
     { name: "DΩg", role: "dog-wolf" },
     { name: "D#g", role: "cupid" },
     { name: "D±g", role: "thief" },
+    { name: "D»g", role: "fox" },
 ];
 const additionalCards = [
     { role: "werewolf", for: "thief" },
@@ -135,6 +136,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[18].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[19].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[20].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[21].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 done();
             });
     });

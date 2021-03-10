@@ -23,4 +23,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./game-won-by-angel.test");
     require("./thief-steals.test");
     require("./changes-during-night.test");
+    require("./fox-lack-of-neighbors.test");
 });

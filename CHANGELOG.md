@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
+* [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
 
 ### 🌟 Enhancements
 

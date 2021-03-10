@@ -784,7 +784,51 @@ describe("B - Full game of 29 players with all roles", () => {
                 done();
             });
     });
-    return;
+    it("🦊 Fox can't sniff at multiple targets (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "fox", action: "sniff", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                done();
+            });
+    });
+    it("🦊 Fox can't sniff at unknown target (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: new mongoose.Types.ObjectId() }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🦊 Fox sniffs the werewolf on the fifth position (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets).to.be.lengthOf(3);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[6]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[5]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[4]._id);
+                expect(game.players[28].attributes).to.not.exist;
+                done();
+            });
+    });
     it("🎲 Game is waiting for 'lovers' to 'meet-each-other'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "lovers", to: "meet-each-other" });
         done();
@@ -2075,6 +2119,39 @@ describe("B - Full game of 29 players with all roles", () => {
                 done();
             });
     });
+    it("🎲 Game is waiting for 'fox' to 'sniff'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+        done();
+    });
+    it("🦊 Fox can't sniff at a dead target (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[20]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equals("NOT_TARGETABLE");
+                done();
+            });
+    });
+    it("🦊 Fox sniffs the ancient on the 19th position which has a werewolf neighbor and a dead neighbor (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[19]._id }] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets).to.be.lengthOf(3);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[21]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[19]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[18]._id);
+                expect(game.players[28].attributes).to.not.exist;
+                done();
+            });
+    });
     it("🎲 Game is waiting for 'raven' to 'mark'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
@@ -2526,6 +2603,27 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.players[2].attributes).to.not.deep.includes(cantVoteAttribute);
         done();
     });
+    it("🎲 Game is waiting for 'fox' to 'sniff'", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+        done();
+    });
+    it("🦊 Fox sniffs the ancient on the 19th position which has a werewolf neighbor and a dead neighbor (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[19]._id }] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets).to.be.lengthOf(3);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[21]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[19]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[18]._id);
+                expect(game.players[28].attributes).to.not.exist;
+                done();
+            });
+    });
     it("🎲 Game is waiting for 'raven' to 'mark'", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
@@ -2944,7 +3042,7 @@ describe("B - Full game of 29 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history.length).to.equals(42);
+                expect(game.history.length).to.equals(45);
                 done();
             });
     });
@@ -2955,7 +3053,7 @@ describe("B - Full game of 29 players with all roles", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 const history = res.body;
-                expect(history.length).to.equals(42);
+                expect(history.length).to.equals(45);
                 done();
             });
     });
@@ -2982,6 +3080,19 @@ describe("B - Full game of 29 players with all roles", () => {
                 const history = res.body;
                 expect(history.length).to.equals(1);
                 expect(history[0].play.action).to.equals("choose-side");
+                done();
+            });
+    });
+    it("🦊 Fox skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.not.exist;
+                expect(game.players[28].attributes).to.not.exist;
                 done();
             });
     });
@@ -3089,6 +3200,22 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.phase).to.equals("night");
         expect(game.turn).to.equals(5);
         done();
+    });
+    it("🦊 Fox sniffs the witch which is an infected werewolf (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets).to.be.lengthOf(3);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[0]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[28]._id);
+                done();
+            });
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         chai.request(server)
@@ -3208,6 +3335,23 @@ describe("B - Full game of 29 players with all roles", () => {
         expect(game.phase).to.equals("night");
         expect(game.turn).to.equals(6);
         done();
+    });
+    it("🦊 Fox sniffs the player on the 8th position, which has no alive werewolves neighbors and so, fox becomes powerless (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[8]._id }] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets).to.be.lengthOf(3);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[12]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[8]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[6]._id);
+                expect(game.players[28].attributes).to.deep.include({ name: "powerless", source: "fox" });
+                done();
+            });
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         chai.request(server)
@@ -3742,18 +3886,3 @@ describe("B - Full game of 29 players with all roles", () => {
             });
     });
 });
-
-/*
- * const players = [
- *     { name: "0Dig", role: "witch" },
- *     { name: "1Doug", role: "seer" },
- *     { name: "2Dag", role: "guard" },
- *     { name: "3Dug", role: "raven" },
- *     { name: "4Dyg", role: "hunter" },
- *     { name: "5Deg", role: "werewolf" },
- *     { name: "6Dog", role: "villager" },
- *     { name: "7Diig", role: "little-girl" },
- *     { name: "8Diig", role: "villager-villager" },
- *     { name: "9Dêg", role: "cupid" },
- * ];
- */

@@ -103,7 +103,7 @@ exports.addFoxTargets = (targets, game) => {
     const leftAliveNeighbor = getNearestNeighbor(targets[0].player, game.players, "left", { isAlive: true });
     const rightAliveNeighbor = getNearestNeighbor(targets[0].player, game.players, "right", { isAlive: true });
     if (leftAliveNeighbor) {
-        targets.shift({ player: leftAliveNeighbor._id });
+        targets.unshift({ player: leftAliveNeighbor._id });
     }
     if (rightAliveNeighbor && leftAliveNeighbor !== rightAliveNeighbor) {
         targets.push({ player: rightAliveNeighbor._id });
@@ -463,7 +463,7 @@ exports.checkAndFillVotes = async(votes, game, options) => {
 exports.foxPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, play });
-    if (!targets.find(({ player }) => player.side.current === "werewolves")) {
+    if (targets?.length && !targets.find(({ player }) => player.side.current === "werewolves")) {
         const foxPlayer = getPlayerWithRole("fox", game);
         this.addPlayerAttribute(foxPlayer._id, "powerless", game, { source: "fox" });
     }

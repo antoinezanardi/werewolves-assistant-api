@@ -15,16 +15,13 @@ let players = [
     { name: "Deg", role: "werewolf" },
     { name: "Dog", role: "werewolf" },
 ];
-let server, token, game;
+let token, game;
 
 describe("H - Game where hunter kills mayor when day rises", () => {
     before(done => resetDatabase(done));
-    before(done => {
-        server = app.listen(3000, done);
-    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(server)
+        chai.request(app)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -34,7 +31,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(server)
+        chai.request(app)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -45,7 +42,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(server)
+        chai.request(app)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -57,7 +54,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
     });
     it("👪 All elect a werewolf as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(server)
+        chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -76,7 +73,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
     });
     it("🐺 Werewolves eat the hunter (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(server)
+        chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[0]._id }] })
@@ -93,7 +90,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
     });
     it("🔫 Hunter shoots at the sheriff werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(server)
+        chai.request(app)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "hunter", action: "shoot", targets: [{ player: players[2]._id }] })
