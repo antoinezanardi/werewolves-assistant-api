@@ -23,6 +23,7 @@ exports.roles = [
     { name: "fox", side: "villagers", maxInGame: 1, recommendedMinPlayers: 12 },
     { name: "bear-tamer", side: "villagers", maxInGame: 1 },
     { name: "stuttering-judge", side: "villagers", maxInGame: 1 },
+    { name: "rusty-sword-knight", side: "villagers", maxInGame: 1 },
     { name: "thief", side: "villagers", maxInGame: 1 },
     { name: "wild-child", side: "villagers", maxInGame: 1 },
     { name: "dog-wolf", side: "villagers", maxInGame: 1 },

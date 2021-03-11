@@ -7,6 +7,7 @@
 * [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
 * [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
 * [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
+* [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements
 
@@ -20,10 +21,11 @@
 
 ### 📦 Packages
 
+* `@sentry/node` updated to version `6.2.2`.
 * `chai` updated to version `4.3.3`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.1`.
-* `mongoose` updated to version `5.11.19`.
+* `mongoose` updated to version `5.12.0`.
 
 ---
 

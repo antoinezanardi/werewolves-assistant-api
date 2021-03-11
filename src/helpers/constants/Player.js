@@ -17,6 +17,7 @@ exports.playerAttributes = [
     { name: "cant-vote", source: "all" },
     { name: "charmed", source: "pied-piper" },
     { name: "growls", source: "bear-tamer", remainingPhases: 1 },
+    { name: "contaminated", source: "rusty-sword-knight", remainingPhases: 2 },
 ];
 
 exports.playerActions = [
@@ -50,4 +51,5 @@ exports.murderedPossibilities = [
     { by: "all", of: "vote" },
     { by: "cupid", of: "charm" },
     { by: "all", of: "reconsider" },
+    { by: "rusty-sword-knight", of: "disease" },
 ];

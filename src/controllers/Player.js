@@ -234,8 +234,14 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
         if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
             await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
         }
-    } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1) {
+    } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1 &&
+        !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionImmediately(game, { for: "scapegoat", to: "ban-voting" });
+    } else if (player.role.current === "rusty-sword-knight" && action === "eat" && !doesPlayerHaveAttribute(player, "powerless")) {
+        const leftAliveWerewolfNeighbor = getNearestNeighbor(player._id, game.players, "left", { isAlive: true, side: "werewolves" });
+        if (leftAliveWerewolfNeighbor) {
+            this.addPlayerAttribute(leftAliveWerewolfNeighbor._id, "contaminated", game);
+        }
     }
 };
 
@@ -708,5 +714,12 @@ exports.makeBearTamerGrowls = game => {
             rightAliveNeighbor?.side.current === "werewolves") {
             this.addPlayerAttribute(bearTamerPlayer._id, "growls", game);
         }
+    }
+};
+
+exports.makeWerewolfDiesFromDisease = async(game, gameHistoryEntry) => {
+    const contaminatedWerewolf = getPlayerWithAttribute("contaminated", game);
+    if (contaminatedWerewolf) {
+        await this.killPlayer(contaminatedWerewolf._id, "disease", game, gameHistoryEntry);
     }
 };

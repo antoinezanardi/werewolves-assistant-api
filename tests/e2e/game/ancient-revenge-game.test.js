@@ -34,6 +34,7 @@ let players = [
     { name: "D»g", role: "fox" },
     { name: "D–g", role: "bear-tamer" },
     { name: "D∑g", role: "werewolf" },
+    { name: "DŒg", role: "rusty-sword-knight" },
 ];
 const additionalCards = [
     { role: "werewolf", for: "thief" },
@@ -140,6 +141,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[20].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[21].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[22].attributes).to.deep.include({ name: "powerless", source: "ancient" });
+                expect(game.players[24].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 done();
             });
     });
@@ -280,17 +282,18 @@ describe("L - Game with various villagers who loose their power because they kil
                 done();
             });
     });
-    it("🐺 Werewolf is the only one called during the night and eats the other sister (POST /games/:id/play)", done => {
+    it("🐺 Werewolf is the only one called during the night and eats the rusty sword knight (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[7]._id }] })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[24]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.players[5].attributes).to.not.exist;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[7]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[24]._id);
                 done();
             });
     });

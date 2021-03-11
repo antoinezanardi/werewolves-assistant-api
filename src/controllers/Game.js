@@ -557,6 +557,7 @@ exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
     } else if (game.phase === "day") {
         await this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (!game.waiting || !game.waiting.length) {
+            await Player.makeWerewolfDiesFromDisease(game, gameHistoryEntry);
             this.decreasePlayersAttributesRemainingPhases(game);
             game.phase = "night";
             game.turn++;
