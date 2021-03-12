@@ -29,6 +29,7 @@ module.exports = app => {
      * @apiSuccess {Object} options.repartition Game role's repartition.
      * @apiSuccess {Boolean} options.repartition.isHidden=false If set to `true`, game's repartition will be hidden to all players.
      * @apiSuccess {Object} options.roles Game roles options.
+     * @apiSuccess {Boolean} options.roles.areRevealedOnDeath=true If set to `true`, player's role is revealed when he's dead.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
      * @apiSuccess {Boolean} options.roles.sheriff.isEnabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
@@ -173,8 +174,9 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} additionalCards.for Additional card's recipient. Must be equal to `thief`.
      * @apiParam (Request Body Parameters) {Object} [options] Game's options.
      * @apiParam (Request Body Parameters) {Object} [options.repartition] Game repartition's options.
-     * @apiParam (Request Body Parameters) {Boolean} [options.repartition.isHidden] If set to `true`, game's repartition will be hidden to all players.
+     * @apiParam (Request Body Parameters) {Boolean} [options.repartition.isHidden=false] If set to `true`, game's repartition will be hidden to all players.
      * @apiParam (Request Body Parameters) {Object} [options.roles] Game roles options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.areRevealedOnDeath=true] If set to `true`, player's role is revealed when he's dead.
      * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game sheriff role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.isEnabled=true] If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
@@ -220,6 +222,10 @@ module.exports = app => {
             .isString().withMessage("Must be a valid string")
             .isIn(getAdditionalCardsForRoleNames()).withMessage(`Must be equal to one of the following values: ${getAdditionalCardsForRoleNames()}`),
         body("options.repartition.isHidden")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.areRevealedOnDeath")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

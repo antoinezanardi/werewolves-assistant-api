@@ -15,6 +15,10 @@ const gameOptions = {
         },
     },
     roles: {
+        areRevealedOnDeath: {
+            type: Boolean,
+            default: true,
+        },
         sheriff: {
             isEnabled: {
                 type: Boolean,

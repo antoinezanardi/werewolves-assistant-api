@@ -87,6 +87,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 additionalCards = game.additionalCards;
                 expect(game.options.repartition.isHidden).to.be.false;
+                expect(game.options.roles.areRevealedOnDeath).to.be.true;
                 done();
             });
     });

@@ -57,6 +57,7 @@ describe("K - Game options", () => {
                 options: {
                     repartition: { isHidden: true },
                     roles: {
+                        areRevealedOnDeath: false,
                         sheriff: { hasDoubledVote: false },
                         seer: { isTalkative: false },
                         twoSisters: { wakingUpInterval: 1 },
@@ -71,6 +72,7 @@ describe("K - Game options", () => {
                 expect(game.options.repartition.isHidden).to.be.true;
                 expect(game.options.roles.sheriff.hasDoubledVote).to.be.false;
                 expect(game.options.roles.seer.isTalkative).to.be.false;
+                expect(game.options.roles.areRevealedOnDeath).to.be.false;
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(1);
                 expect(game.options.roles.raven.markPenalty).to.equals(3);

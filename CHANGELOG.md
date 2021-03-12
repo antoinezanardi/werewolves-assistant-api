@@ -8,6 +8,7 @@
 * [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
 * [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
 * [#143](https://github.com/antoinezanardi/werewolves-assistant-api/issues/143) - Hidden game repartition option.
+* [#144](https://github.com/antoinezanardi/werewolves-assistant-api/issues/144) - Role revealed on death option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements
@@ -23,7 +24,7 @@
 ### 📦 Packages
 
 * `@sentry/node` updated to version `6.2.2`.
-* `chai` updated to version `4.3.3`.
+* `chai` updated to version `4.3.4`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
 * `mongoose` updated to version `5.12.0`.

@@ -47,6 +47,7 @@ exports.findFields = ["status"];
 exports.defaultGameOptions = {
     repartition: { isHidden: false },
     roles: {
+        areRevealedOnDeath: true,
         sheriff: { isEnabled: true, hasDoubledVote: true },
         seer: { isTalkative: true },
         littleGirl: { isProtectedByGuard: false },
