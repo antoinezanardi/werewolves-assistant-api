@@ -45,6 +45,7 @@ exports.turnNightActionsOrder = [
 exports.findFields = ["status"];
 
 exports.defaultGameOptions = {
+    repartition: { isHidden: false },
     roles: {
         sheriff: { isEnabled: true, hasDoubledVote: true },
         seer: { isTalkative: true },

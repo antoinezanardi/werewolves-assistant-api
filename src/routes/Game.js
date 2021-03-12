@@ -26,6 +26,8 @@ module.exports = app => {
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {AdditionalCard[]} [additionalCards] Game's additional cards. Set if `thief` is in the game. (_See: [Classes - Additional Card](#game-additional-card-class)_)
      * @apiSuccess {Object} options Game's options.
+     * @apiSuccess {Object} options.repartition Game role's repartition.
+     * @apiSuccess {Boolean} options.repartition.isHidden=false If set to `true`, game's repartition will be hidden to all players.
      * @apiSuccess {Object} options.roles Game roles options.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
      * @apiSuccess {Boolean} options.roles.sheriff.isEnabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
@@ -170,6 +172,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String} additionalCards.role Additional card's role. The role must be still available compared to the game's composition. (_See [Codes - Player Roles](#player-roles)_)
      * @apiParam (Request Body Parameters) {String} additionalCards.for Additional card's recipient. Must be equal to `thief`.
      * @apiParam (Request Body Parameters) {Object} [options] Game's options.
+     * @apiParam (Request Body Parameters) {Object} [options.repartition] Game repartition's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.repartition.isHidden] If set to `true`, game's repartition will be hidden to all players.
      * @apiParam (Request Body Parameters) {Object} [options.roles] Game roles options.
      * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game sheriff role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.isEnabled=true] If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
@@ -215,6 +219,10 @@ module.exports = app => {
         body("additionalCards.*.for")
             .isString().withMessage("Must be a valid string")
             .isIn(getAdditionalCardsForRoleNames()).withMessage(`Must be equal to one of the following values: ${getAdditionalCardsForRoleNames()}`),
+        body("options.repartition.isHidden")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.sheriff.isEnabled")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")

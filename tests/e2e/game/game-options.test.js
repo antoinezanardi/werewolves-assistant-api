@@ -55,6 +55,7 @@ describe("K - Game options", () => {
             .send({
                 players: originalPlayers,
                 options: {
+                    repartition: { isHidden: true },
                     roles: {
                         sheriff: { hasDoubledVote: false },
                         seer: { isTalkative: false },
@@ -67,6 +68,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.options.repartition.isHidden).to.be.true;
                 expect(game.options.roles.sheriff.hasDoubledVote).to.be.false;
                 expect(game.options.roles.seer.isTalkative).to.be.false;
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);

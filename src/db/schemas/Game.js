@@ -8,6 +8,12 @@ const {
 const { getPlayerActions } = require("../../helpers/functions/Player");
 
 const gameOptions = {
+    repartition: {
+        isHidden: {
+            type: Boolean,
+            default: false,
+        },
+    },
     roles: {
         sheriff: {
             isEnabled: {
