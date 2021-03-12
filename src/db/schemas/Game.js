@@ -73,6 +73,12 @@ const gameOptions = {
                 max: 5,
             },
         },
+        fox: {
+            isPowerlessIfMissesWerewolf: {
+                type: Boolean,
+                default: true,
+            },
+        },
         raven: {
             markPenalty: {
                 type: Number,

@@ -473,7 +473,8 @@ exports.checkAndFillVotes = async(votes, game, options) => {
 exports.foxPlays = async(play, game) => {
     const { targets } = play;
     await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, play });
-    if (targets?.length && !targets.find(({ player }) => player.side.current === "werewolves")) {
+    if (targets?.length && !targets.find(({ player }) => player.side.current === "werewolves") &&
+        game.options.roles.fox.isPowerlessIfMissesWerewolf) {
         const foxPlayer = getPlayerWithRole("fox", game);
         this.addPlayerAttribute(foxPlayer._id, "powerless", game, { source: "fox" });
     }

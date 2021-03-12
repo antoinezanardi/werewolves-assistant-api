@@ -20,6 +20,7 @@ const originalPlayers = [
     { name: "Dœg", role: "raven" },
     { name: "D–g", role: "guard" },
     { name: "DÁg", role: "little-girl" },
+    { name: "DŸg", role: "fox" },
 ];
 let server, token, game, players;
 
@@ -65,6 +66,7 @@ describe("K - Game options", () => {
                         guard: { canProtectTwice: true },
                         twoSisters: { wakingUpInterval: 1 },
                         threeBrothers: { wakingUpInterval: 1 },
+                        fox: { isPowerlessIfMissesWerewolf: false },
                         raven: { markPenalty: 3 },
                     },
                 },
@@ -80,6 +82,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.guard.canProtectTwice).to.be.true;
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(1);
+                expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.false;
                 expect(game.options.roles.raven.markPenalty).to.equals(3);
                 done();
             });
@@ -98,6 +101,27 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🦊 Fox sniffs no werewolf but is not powerless thanks to option (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets).to.be.lengthOf(3);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equals(players[2]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player.side.current).to.equals("villagers");
+                expect(game.history[0].play.targets[1].player.side.current).to.equals("villagers");
+                expect(game.history[0].play.targets[2].player.side.current).to.equals("villagers");
+                expect(game.players[10].attributes).to.not.exist;
                 done();
             });
     });
@@ -212,6 +236,18 @@ describe("K - Game options", () => {
         expect(game.turn).to.equals(2);
         done();
     });
+    it("🦊 Fox skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
     it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other' because they wake up every night according to game options", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
         done();
@@ -303,8 +339,8 @@ describe("K - Game options", () => {
         expect(game.turn).to.equals(3);
         done();
     });
-    it("🎲 Game is waiting for 'raven' to 'mark' because sisters and brothers are all alone", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
+    it("🎲 Game is waiting for 'fox' to 'sniff' because sisters and brothers are all alone", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
@@ -350,6 +386,18 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🦊 Fox skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.not.exist;
                 done();
             });
     });
@@ -436,8 +484,8 @@ describe("K - Game options", () => {
         expect(game.turn).to.equals(2);
         done();
     });
-    it("🎲 Game is waiting for 'raven' to 'mark' because brothers and sisters are never waking up again according to game options", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
+    it("🎲 Game is waiting for 'fox' to 'sniff' because brothers and sisters are never waking up again according to game options", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
@@ -475,7 +523,19 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("👭 The two sisters meet each other already because there is no sheriff to elect (POST /games/:id/play)", done => {
+    it("🦊 Fox skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
@@ -612,6 +672,18 @@ describe("K - Game options", () => {
         expect(game.phase).to.equals("night");
         expect(game.turn).to.equals(2);
         done();
+    });
+    it("🦊 Fox skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
     });
     it("🪶 Raven skips (POST /games/:id/play)", done => {
         players = game.players;

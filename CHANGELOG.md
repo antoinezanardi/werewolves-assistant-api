@@ -11,6 +11,7 @@
 * [#144](https://github.com/antoinezanardi/werewolves-assistant-api/issues/144) - Role revealed on death option.
 * [#145](https://github.com/antoinezanardi/werewolves-assistant-api/issues/145) - Seer see exact role option.
 * [#146](https://github.com/antoinezanardi/werewolves-assistant-api/issues/146) - Guard can protect twice option.
+* [#147](https://github.com/antoinezanardi/werewolves-assistant-api/issues/147) - Fox not powerless if he misses a werewolf option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements

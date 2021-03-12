@@ -55,6 +55,7 @@ exports.defaultGameOptions = {
         idiot: { doesDieOnAncientDeath: true },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },
+        fox: { isPowerlessIfMissesWerewolf: true },
         raven: { markPenalty: 2 },
     },
 };
