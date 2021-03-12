@@ -27,14 +27,15 @@ module.exports = app => {
      * @apiSuccess {AdditionalCard[]} [additionalCards] Game's additional cards. Set if `thief` is in the game. (_See: [Classes - Additional Card](#game-additional-card-class)_)
      * @apiSuccess {Object} options Game's options.
      * @apiSuccess {Object} options.repartition Game role's repartition.
-     * @apiSuccess {Boolean} options.repartition.isHidden=false If set to `true`, game's repartition will be hidden to all players.
+     * @apiSuccess {Boolean} options.repartition.isHidden=false If set to `true`, game's repartition will be hidden to all players. Default is false.
      * @apiSuccess {Object} options.roles Game roles options.
-     * @apiSuccess {Boolean} options.roles.areRevealedOnDeath=true If set to `true`, player's role is revealed when he's dead.
+     * @apiSuccess {Boolean} options.roles.areRevealedOnDeath=true If set to `true`, player's role is revealed when he's dead. Default is `true`.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
      * @apiSuccess {Boolean} options.roles.sheriff.isEnabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiSuccess {Boolean} options.roles.seer.canSeeRoles=true If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
      * @apiSuccess {Object} options.roles.twoSisters Game two sisters role's options.
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.twoSisters.wakingUpInterval=2 Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiSuccess {Object} options.roles.threeBrothers Game three brothers role's options.
@@ -182,6 +183,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.littleGirl] Game little girl role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.isProtectedByGuard=false] If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.idiot] Game idiot role's options.
@@ -238,6 +240,10 @@ module.exports = app => {
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
         body("options.roles.seer.isTalkative")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.seer.canSeeRoles")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

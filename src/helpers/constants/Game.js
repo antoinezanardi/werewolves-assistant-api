@@ -49,7 +49,7 @@ exports.defaultGameOptions = {
     roles: {
         areRevealedOnDeath: true,
         sheriff: { isEnabled: true, hasDoubledVote: true },
-        seer: { isTalkative: true },
+        seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
         idiot: { doesDieOnAncientDeath: true },
         twoSisters: { wakingUpInterval: 2 },

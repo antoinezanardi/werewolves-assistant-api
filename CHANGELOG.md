@@ -9,6 +9,7 @@
 * [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
 * [#143](https://github.com/antoinezanardi/werewolves-assistant-api/issues/143) - Hidden game repartition option.
 * [#144](https://github.com/antoinezanardi/werewolves-assistant-api/issues/144) - Role revealed on death option.
+* [#145](https://github.com/antoinezanardi/werewolves-assistant-api/issues/145) - Seer see exact role option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements

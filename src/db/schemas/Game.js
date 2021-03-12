@@ -34,6 +34,10 @@ const gameOptions = {
                 type: Boolean,
                 default: true,
             },
+            canSeeRoles: {
+                type: Boolean,
+                default: true,
+            },
         },
         littleGirl: {
             isProtectedByGuard: {
