@@ -89,6 +89,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 expect(game.options.repartition.isHidden).to.be.false;
                 expect(game.options.roles.areRevealedOnDeath).to.be.true;
                 expect(game.options.roles.seer.canSeeRoles).to.be.true;
+                expect(game.options.roles.guard.canProtectTwice).to.be.false;
                 done();
             });
     });

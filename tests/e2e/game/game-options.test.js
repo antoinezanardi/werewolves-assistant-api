@@ -18,6 +18,8 @@ const originalPlayers = [
     { name: "Dyg", role: "three-brothers" },
     { name: "Dπg", role: "villager" },
     { name: "Dœg", role: "raven" },
+    { name: "D–g", role: "guard" },
+    { name: "DÁg", role: "little-girl" },
 ];
 let server, token, game, players;
 
@@ -60,6 +62,7 @@ describe("K - Game options", () => {
                         areRevealedOnDeath: false,
                         sheriff: { hasDoubledVote: false },
                         seer: { isTalkative: false, canSeeRoles: false },
+                        guard: { canProtectTwice: true },
                         twoSisters: { wakingUpInterval: 1 },
                         threeBrothers: { wakingUpInterval: 1 },
                         raven: { markPenalty: 3 },
@@ -70,10 +73,11 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.options.repartition.isHidden).to.be.true;
+                expect(game.options.roles.areRevealedOnDeath).to.be.false;
                 expect(game.options.roles.sheriff.hasDoubledVote).to.be.false;
                 expect(game.options.roles.seer.isTalkative).to.be.false;
                 expect(game.options.roles.seer.canSeeRoles).to.be.false;
-                expect(game.options.roles.areRevealedOnDeath).to.be.false;
+                expect(game.options.roles.guard.canProtectTwice).to.be.true;
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(1);
                 expect(game.options.roles.raven.markPenalty).to.equals(3);
@@ -131,6 +135,21 @@ describe("K - Game options", () => {
                 expect(game.players[0].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                done();
+            });
+    });
+    it("🛡 Guard protects himself (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
                 done();
             });
     });
@@ -232,6 +251,21 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🛡 Guard protects himself again because option allows him (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
                 done();
             });
     });
@@ -353,6 +387,21 @@ describe("K - Game options", () => {
                 done();
             });
     });
+    it("🛡 Guard protects himself again because option allows him (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                done();
+            });
+    });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
@@ -408,11 +457,7 @@ describe("K - Game options", () => {
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
-                players: [
-                    ...originalPlayers,
-                    { name: "Little girl", role: "little-girl" },
-                    { name: "Guard", role: "guard" },
-                ],
+                players: originalPlayers,
                 options: {
                     roles: {
                         sheriff: { isEnabled: false },
@@ -469,13 +514,13 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[9]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.players[9].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[9]._id);
                 done();
             });
     });
@@ -484,7 +529,7 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[8]._id }] })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[9]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -492,7 +537,7 @@ describe("K - Game options", () => {
             });
     });
     it("☀️ Sun is rising and little girl is alive because option for protecting her is set to true", done => {
-        expect(game.players[8].isAlive).to.be.true;
+        expect(game.players[9].isAlive).to.be.true;
         expect(game.phase).to.equals("day");
         done();
     });
@@ -585,13 +630,13 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "guard", action: "protect", targets: [{ player: players[9]._id }] })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[8]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[9].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[9]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
                 done();
             });
     });

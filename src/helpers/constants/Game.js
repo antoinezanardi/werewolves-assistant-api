@@ -51,6 +51,7 @@ exports.defaultGameOptions = {
         sheriff: { isEnabled: true, hasDoubledVote: true },
         seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
+        guard: { canProtectTwice: false },
         idiot: { doesDieOnAncientDeath: true },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },

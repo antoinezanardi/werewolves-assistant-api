@@ -45,6 +45,12 @@ const gameOptions = {
                 default: false,
             },
         },
+        guard: {
+            canProtectTwice: {
+                type: Boolean,
+                default: false,
+            },
+        },
         idiot: {
             doesDieOnAncientDeath: {
                 type: Boolean,

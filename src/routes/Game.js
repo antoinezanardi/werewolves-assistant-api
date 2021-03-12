@@ -36,6 +36,12 @@ module.exports = app => {
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiSuccess {Boolean} options.roles.seer.canSeeRoles=true If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
+     * @apiSuccess {Object} options.roles.littleGirl Game little girl role's options.
+     * @apiSuccess {Boolean} options.roles.littleGirl.isProtectedByGuard=false If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
+     * @apiSuccess {Object} options.roles.guard Game guard role's options.
+     * @apiSuccess {Boolean} options.roles.guard.canProtectTwice=false If set to `true`, the guard can protect twice in a row the same target. Default is `false`.
+     * @apiSuccess {Object} options.roles.idiot Game idiot role's options.
+     * @apiSuccess {Boolean} options.roles.idiot.doesDieOnAncientDeath=true If set to `true`, the idiot will die if he is revealed and the ancient is dead. Default is `true`.
      * @apiSuccess {Object} options.roles.twoSisters Game two sisters role's options.
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.twoSisters.wakingUpInterval=2 Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiSuccess {Object} options.roles.threeBrothers Game three brothers role's options.
@@ -186,6 +192,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.littleGirl] Game little girl role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.isProtectedByGuard=false] If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.guard] Game guard role's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.guard.canProtectTwice=false] If set to `true`, the guard can protect twice in a row the same target. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.idiot] Game idiot role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.idiot.doesDieOnAncientDeath=true] If set to `true`, the idiot will die if he is revealed and the ancient is dead. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game two sisters role's options.
@@ -248,6 +256,10 @@ module.exports = app => {
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
         body("options.roles.littleGirl.isProtectedByGuard")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.guard.canProtectTwice")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

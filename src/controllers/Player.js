@@ -39,6 +39,13 @@ exports.checkPiedPiperTargets = target => {
     }
 };
 
+exports.checkProtectTarget = async(target, game) => {
+    const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
+    if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString() && !game.options.roles.guard.canProtectTwice) {
+        throw generateError("CANT_PROTECT_TWICE", `Guard can't protect the same player twice in a row.`);
+    }
+};
+
 exports.checkEatTarget = async(target, game, source) => {
     if (source !== "white-werewolf" && target.player.side.current === "werewolves") {
         throw generateError("CANT_EAT_EACH_OTHER", `Werewolves target can't be a player with current side "werewolves".`);
@@ -71,10 +78,7 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
             throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by "werewolves" of "big-bad-wolf".`);
         }
     } else if (action === "protect") {
-        const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
-        if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString()) {
-            throw generateError("CANT_PROTECT_TWICE", `Guard can't protect the same player twice in a row.`);
-        }
+        await this.checkProtectTarget(target, game);
     } else if (action === "settle-votes") {
         const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
         if (lastVotePlay && !lastVotePlay.play.targets.find(({ player }) => player._id.toString() === target.player._id.toString())) {
