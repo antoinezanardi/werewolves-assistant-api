@@ -22,6 +22,7 @@ const originalPlayers = [
     { name: "DÁg", role: "little-girl" },
     { name: "DŸg", role: "fox" },
     { name: "Døg", role: "bear-tamer" },
+    { name: "D„g", role: "stuttering-judge" },
 ];
 let server, token, game, players;
 
@@ -69,6 +70,7 @@ describe("K - Game options", () => {
                         threeBrothers: { wakingUpInterval: 1 },
                         fox: { isPowerlessIfMissesWerewolf: false },
                         bearTamer: { doesGrowlIfInfected: false },
+                        stutteringJudge: { voteRequestsCount: 2 },
                         raven: { markPenalty: 3 },
                     },
                 },
@@ -86,6 +88,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equal(1);
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.false;
                 expect(game.options.roles.bearTamer.doesGrowlIfInfected).to.be.false;
+                expect(game.options.roles.stutteringJudge.voteRequestsCount).to.equal(2);
                 expect(game.options.roles.raven.markPenalty).to.equal(3);
                 done();
             });
@@ -125,6 +128,17 @@ describe("K - Game options", () => {
                 expect(game.history[0].play.targets[1].player.side.current).to.equal("villagers");
                 expect(game.history[0].play.targets[2].player.side.current).to.equal("villagers");
                 expect(game.players[10].attributes).to.not.exist;
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "choose-sign" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });
@@ -210,7 +224,7 @@ describe("K - Game options", () => {
                     { from: players[2]._id, for: players[4]._id },
                     { from: players[3]._id, for: players[4]._id },
                     { from: players[4]._id, for: players[5]._id },
-                ],
+                ], doesJudgeRequestAnotherVote: true,
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -236,22 +250,38 @@ describe("K - Game options", () => {
                 done();
             });
     });
+    it("👪 All vote for the fox and stuttering judge request another vote again (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[10]._id }], doesJudgeRequestAnotherVote: true })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[10].isAlive).to.be.false;
+                expect(game.players[10].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("👪 All vote for the stuttering judge (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[12]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[12].isAlive).to.be.false;
+                expect(game.players[12].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
     it("🌙 Night falls", done => {
         expect(game.phase).to.equal("night");
         expect(game.turn).to.equal(2);
         done();
-    });
-    it("🦊 Fox skips (POST /games/:id/play)", done => {
-        chai.request(server)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "fox", action: "sniff" })
-            .end((err, res) => {
-                game = res.body;
-                expect(res).to.have.status(200);
-                expect(game.history[0].play.targets).to.not.exist;
-                done();
-            });
     });
     it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other' because they wake up every night according to game options", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
@@ -344,8 +374,8 @@ describe("K - Game options", () => {
         expect(game.turn).to.equal(3);
         done();
     });
-    it("🎲 Game is waiting for 'fox' to 'sniff' because sisters and brothers are all alone", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+    it("🎲 Game is waiting for 'raven' to 'mark' because sisters and brothers are all alone", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
@@ -403,6 +433,17 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(res).to.have.status(200);
                 expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "choose-sign" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });
@@ -537,6 +578,17 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(res).to.have.status(200);
                 expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("⚖️ Stuttering judge chooses sign (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "stuttering-judge", action: "choose-sign" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
                 done();
             });
     });

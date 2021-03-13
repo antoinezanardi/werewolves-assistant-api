@@ -92,6 +92,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 expect(game.options.roles.guard.canProtectTwice).to.be.false;
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.true;
                 expect(game.options.roles.bearTamer.doesGrowlIfInfected).to.be.true;
+                expect(game.options.roles.stutteringJudge.voteRequestsCount).to.equal(1);
                 done();
             });
     });
@@ -3022,7 +3023,7 @@ describe("B - Full game of 31 players with all roles", () => {
             .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[4]._id }], doesJudgeRequestAnotherVote: true })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equal("ONLY_ONE_SECOND_VOTE_REQUEST");
+                expect(res.body.type).to.equal("VOTE_REQUESTS_EXCEEDED");
                 done();
             });
     });

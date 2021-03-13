@@ -57,6 +57,7 @@ exports.defaultGameOptions = {
         threeBrothers: { wakingUpInterval: 2 },
         fox: { isPowerlessIfMissesWerewolf: true },
         bearTamer: { doesGrowlIfInfected: true },
+        stutteringJudge: { voteRequestsCount: 1 },
         raven: { markPenalty: 2 },
     },
 };

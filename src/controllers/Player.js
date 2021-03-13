@@ -449,8 +449,8 @@ exports.checkJudgeSecondVoteRequest = async game => {
         throw generateError("STUTTERING_JUDGE_POWERLESS", "Stuttering judge is powerless and so can't request another vote.");
     } else if (!await GameHistory.didJudgeChooseSign(game._id)) {
         throw generateError("STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET", `Stuttering judge didn't choose his sign yet and so can't request another vote.`);
-    } else if (await GameHistory.isSecondVoteRequestUsed(game._id)) {
-        throw generateError("ONLY_ONE_SECOND_VOTE_REQUEST", "Second vote request has been already made.");
+    } else if (!await GameHistory.doesStutteringJudgeHaveVoteRequestsLeft(game)) {
+        throw generateError("VOTE_REQUESTS_EXCEEDED", "Stuttering judge doesn't have any vote request left.");
     }
 };
 

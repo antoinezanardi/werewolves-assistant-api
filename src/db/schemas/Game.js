@@ -85,6 +85,14 @@ const gameOptions = {
                 default: true,
             },
         },
+        stutteringJudge: {
+            voteRequestsCount: {
+                type: Number,
+                default: 1,
+                min: 1,
+                max: 5,
+            },
+        },
         raven: {
             markPenalty: {
                 type: Number,

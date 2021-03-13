@@ -195,7 +195,7 @@ Description for each case below :
 | 51   | CANT_EAT_HIMSELF                           |    400    | White werewolf can't eat himself.                                                                         |
 | 52   | STUTTERING_JUDGE_ABSENT                    |    400    | Second vote can't be requested if stuttering judge is absent from the game.                               |
 | 53   | STUTTERING_JUDGE_POWERLESS                 |    400    | Stuttering judge is powerless and so can't request another vote.                                          |
-| 54   | ONLY_ONE_SECOND_VOTE_REQUEST               |    400    | Second vote request has been already made.                                                                |
+| 54   | VOTE_REQUESTS_EXCEEDED                     |    400    | Stuttering judge doesn't have any vote request left.                                                      |
 | 55   | BAD_PLAY_ACTION_FOR_SIDE_CHOICE            |    400    | `side` can be set only if play's action is `choose-side`.                                                 |
 | 56   | BAD_PLAY_ACTION_FOR_JUDGE_REQUEST          |    400    | `doesJudgeRequestAnotherVote` can be set only if play's action is `vote`.                                 |
 | 57   | BAD_PLAY_ACTION_FOR_INFECTION              |    400    | `isInfected` can be set on target only if play's action is `eat`.                                         |

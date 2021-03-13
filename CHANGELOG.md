@@ -13,6 +13,7 @@
 * [#146](https://github.com/antoinezanardi/werewolves-assistant-api/issues/146) - Guard can protect twice option.
 * [#147](https://github.com/antoinezanardi/werewolves-assistant-api/issues/147) - Fox not powerless if he misses a werewolf option.
 * [#148](https://github.com/antoinezanardi/werewolves-assistant-api/issues/148) - Bear Tamer growls if he is infected option.
+* [#149](https://github.com/antoinezanardi/werewolves-assistant-api/issues/149) - Number of vote requests for Stuttering Judge option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements

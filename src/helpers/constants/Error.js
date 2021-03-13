@@ -211,7 +211,7 @@ exports.errorMetadata = {
         code: 53,
         HTTPCode: 400,
     },
-    ONLY_ONE_SECOND_VOTE_REQUEST: {
+    VOTE_REQUESTS_EXCEEDED: {
         code: 54,
         HTTPCode: 400,
     },
