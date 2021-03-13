@@ -79,6 +79,12 @@ const gameOptions = {
                 default: true,
             },
         },
+        bearTamer: {
+            doesGrowlIfInfected: {
+                type: Boolean,
+                default: true,
+            },
+        },
         raven: {
             markPenalty: {
                 type: Number,

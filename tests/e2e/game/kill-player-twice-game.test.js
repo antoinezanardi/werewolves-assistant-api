@@ -71,10 +71,10 @@ describe("G - Game where player is killed twice during the night", () => {
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
-                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
+                expect(game.history[0].play.votes[0].from._id).to.equal(game.players[0]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equal(game.players[1]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[1]._id);
                 done();
             });
     });
@@ -89,7 +89,7 @@ describe("G - Game where player is killed twice during the night", () => {
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
@@ -103,13 +103,13 @@ describe("G - Game where player is killed twice during the night", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 expect(game.history[0].play.targets[0].hasDrankDeathPotion).to.be.true;
                 done();
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[1].isAlive).to.be.false;
         done();
     });
@@ -129,7 +129,7 @@ describe("G - Game where player is killed twice during the night", () => {
                 expect(game.players[1].attributes).to.not.deep.include({ name: "sheriff", source: "all" });
                 expect(game.players[0].attributes).to.deep.include({ name: "sheriff", source: "sheriff" });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[0]._id);
                 done();
             });
     });

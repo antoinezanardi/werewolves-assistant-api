@@ -102,7 +102,7 @@ describe("V - Tiny game of 5 players in which because of the early votes, action
                 game = res.body;
                 expect(game.players[4].attributes).to.deep.include({ name: "sheriff", source: "sheriff" });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[4]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[4]._id);
                 done();
             });
     });

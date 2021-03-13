@@ -73,10 +73,10 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
-                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
+                expect(game.history[0].play.votes[0].from._id).to.equal(game.players[0]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equal(game.players[1]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[0]._id);
                 done();
             });
     });
@@ -90,7 +90,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[2].isAlive).to.be.false;
-                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
                 done();
@@ -107,7 +107,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
@@ -121,12 +121,12 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[1].isAlive).to.be.false;
         expect(game.players[1].attributes).to.not.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
         done();
@@ -147,7 +147,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             });
     });
     it("🎲 Game is still playing because angel died from the SECOND vote", done => {
-        expect(game.status).to.equals("playing");
+        expect(game.status).to.equal("playing");
         done();
     });
 });

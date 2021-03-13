@@ -16,7 +16,7 @@ describe("E2E - Testing main route", () => {
             .get("/")
             .end((err, res) => {
                 expect(res).to.have.status(200);
-                expect(res.body.name).to.equals("🐺 Werewolves Assistant API");
+                expect(res.body.name).to.equal("🐺 Werewolves Assistant API");
                 done();
             });
     });

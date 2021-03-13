@@ -155,7 +155,7 @@ describe("A - Game creation", () => {
             .send({ players: [{ name: "Doug", role: "witch" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -166,7 +166,7 @@ describe("A - Game creation", () => {
             .send({ players: tooMuchPlayers })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -177,7 +177,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithoutWerewolves })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("NO_WEREWOLF_IN_GAME_COMPOSITION");
+                expect(res.body.type).to.equal("NO_WEREWOLF_IN_GAME_COMPOSITION");
                 done();
             });
     });
@@ -188,7 +188,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithoutVillagers })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("NO_VILLAGER_IN_GAME_COMPOSITION");
+                expect(res.body.type).to.equal("NO_VILLAGER_IN_GAME_COMPOSITION");
                 done();
             });
     });
@@ -199,7 +199,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Doug", role: "werewolf" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYERS_NAME_NOT_UNIQUE");
+                expect(res.body.type).to.equal("PLAYERS_NAME_NOT_UNIQUE");
                 done();
             });
     });
@@ -210,7 +210,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "IAmLaSuperKouisteMoumouneDig!!!", role: "werewolf" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -221,7 +221,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Dœg", role: "werewolf" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("ALL_PLAYERS_POSITION_NOT_SET");
+                expect(res.body.type).to.equal("ALL_PLAYERS_POSITION_NOT_SET");
                 done();
             });
     });
@@ -232,7 +232,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Dœg", role: "werewolf", position: 5 }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYERS_POSITION_NOT_UNIQUE");
+                expect(res.body.type).to.equal("PLAYERS_POSITION_NOT_UNIQUE");
                 done();
             });
     });
@@ -243,7 +243,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Dœg", role: "werewolf", position: 7 }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("PLAYER_POSITION_TOO_HIGH");
+                expect(res.body.type).to.equal("PLAYER_POSITION_TOO_HIGH");
                 done();
             });
     });
@@ -254,7 +254,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Dœg", role: "guard", position: 6 }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                expect(res.body.type).to.equal("TOO_MUCH_PLAYERS_WITH_ROLE");
                 done();
             });
     });
@@ -265,7 +265,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithOnlyOneSister })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
+                expect(res.body.type).to.equal("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
                 done();
             });
     });
@@ -276,7 +276,7 @@ describe("A - Game creation", () => {
             .send({ players: playersWithOnlyTwoBrothers })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
+                expect(res.body.type).to.equal("MIN_PLAYERS_NOT_REACHED_FOR_ROLE");
                 done();
             });
     });
@@ -287,7 +287,7 @@ describe("A - Game creation", () => {
             .send({ players, additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("ADDITIONAL_CARDS_NOT_ALLOWED");
+                expect(res.body.type).to.equal("ADDITIONAL_CARDS_NOT_ALLOWED");
                 done();
             });
     });
@@ -298,7 +298,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [{ role: "two-sisters", for: "thief" }, { role: "witch", for: "thief" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF");
+                expect(res.body.type).to.equal("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF");
                 done();
             });
     });
@@ -309,7 +309,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [{ role: "seer", for: "thief" }, { role: "witch", for: "thief" }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                expect(res.body.type).to.equal("TOO_MUCH_PLAYERS_WITH_ROLE");
                 done();
             });
     });
@@ -325,7 +325,7 @@ describe("A - Game creation", () => {
             })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("TOO_MUCH_PLAYERS_WITH_ROLE");
+                expect(res.body.type).to.equal("TOO_MUCH_PLAYERS_WITH_ROLE");
                 done();
             });
     });
@@ -336,7 +336,7 @@ describe("A - Game creation", () => {
             .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("NEED_ADDITIONAL_CARDS_FOR_THIEF");
+                expect(res.body.type).to.equal("NEED_ADDITIONAL_CARDS_FOR_THIEF");
                 done();
             });
     });
@@ -348,29 +348,29 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("playing");
-                expect(game.turn).to.equals(1);
-                expect(game.phase).to.equals("night");
-                expect(game.tick).to.equals(1);
+                expect(game.status).to.equal("playing");
+                expect(game.turn).to.equal(1);
+                expect(game.phase).to.equal("night");
+                expect(game.tick).to.equal(1);
                 expect(game.options.roles.sheriff.hasDoubledVote).to.be.true;
                 expect(game.options.roles.seer.isTalkative).to.be.true;
-                expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(2);
-                expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(2);
+                expect(game.options.roles.twoSisters.wakingUpInterval).to.equal(2);
+                expect(game.options.roles.threeBrothers.wakingUpInterval).to.equal(2);
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.be.true;
-                expect(game.players[0].name).to.equals("Deg");
-                expect(game.players[0].position).to.equals(0);
-                expect(game.players[1].name).to.equals("Dig");
-                expect(game.players[1].position).to.equals(1);
-                expect(game.players[2].name).to.equals("Dug");
-                expect(game.players[2].position).to.equals(2);
-                expect(game.players[3].name).to.equals("Dag");
-                expect(game.players[3].position).to.equals(3);
-                expect(game.players[4].name).to.equals("Doug");
-                expect(game.players[4].position).to.equals(4);
-                expect(game.players[5].name).to.equals("Dyg");
-                expect(game.players[5].position).to.equals(5);
+                expect(game.players[0].name).to.equal("Deg");
+                expect(game.players[0].position).to.equal(0);
+                expect(game.players[1].name).to.equal("Dig");
+                expect(game.players[1].position).to.equal(1);
+                expect(game.players[2].name).to.equal("Dug");
+                expect(game.players[2].position).to.equal(2);
+                expect(game.players[3].name).to.equal("Dag");
+                expect(game.players[3].position).to.equal(3);
+                expect(game.players[4].name).to.equal("Doug");
+                expect(game.players[4].position).to.equal(4);
+                expect(game.players[5].name).to.equal("Dyg");
+                expect(game.players[5].position).to.equal(5);
                 done();
             });
     });
@@ -382,7 +382,7 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game2 = res.body;
-                expect(game2.status).to.equals("playing");
+                expect(game2.status).to.equal("playing");
                 done();
             });
     });
@@ -393,7 +393,7 @@ describe("A - Game creation", () => {
             .send({ players })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("GAME_MASTER_HAS_ON_GOING_GAMES");
+                expect(res.body.type).to.equal("GAME_MASTER_HAS_ON_GOING_GAMES");
                 done();
             });
     });
@@ -405,7 +405,7 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("canceled");
+                expect(game.status).to.equal("canceled");
                 done();
             });
     });
@@ -416,7 +416,7 @@ describe("A - Game creation", () => {
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("NO_MORE_PLAY_ALLOWED");
+                expect(res.body.type).to.equal("NO_MORE_PLAY_ALLOWED");
                 done();
             });
     });
@@ -426,7 +426,7 @@ describe("A - Game creation", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("CANT_BE_RESET");
+                expect(res.body.type).to.equal("CANT_BE_RESET");
                 done();
             });
     });
@@ -457,7 +457,7 @@ describe("A - Game creation", () => {
                 expect(res).to.have.status(200);
                 const games = res.body;
                 expect(Array.isArray(games)).to.be.true;
-                expect(games.length).to.equals(2);
+                expect(games.length).to.equal(2);
                 done();
             });
     });
@@ -471,7 +471,7 @@ describe("A - Game creation", () => {
                 expect(res).to.have.status(200);
                 const games = res.body;
                 expect(Array.isArray(games)).to.be.true;
-                expect(games.length).to.equals(1);
+                expect(games.length).to.equal(1);
                 done();
             });
     });
@@ -485,7 +485,7 @@ describe("A - Game creation", () => {
                 expect(res).to.have.status(200);
                 const games = res.body;
                 expect(Array.isArray(games)).to.be.true;
-                expect(games.length).to.equals(0);
+                expect(games.length).to.equal(0);
                 done();
             });
     });
@@ -498,7 +498,7 @@ describe("A - Game creation", () => {
                 expect(res).to.have.status(200);
                 const games = res.body;
                 expect(Array.isArray(games)).to.be.true;
-                expect(games.length).to.equals(3);
+                expect(games.length).to.equal(3);
                 done();
             });
     });
@@ -509,7 +509,7 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game._id).to.equals(game._id);
+                expect(game._id).to.equal(game._id);
                 done();
             });
     });
@@ -520,7 +520,7 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game._id).to.equals(game._id);
+                expect(game._id).to.equal(game._id);
                 done();
             });
     });
@@ -530,7 +530,7 @@ describe("A - Game creation", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
+                expect(res.body.type).to.equal("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });

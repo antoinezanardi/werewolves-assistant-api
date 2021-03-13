@@ -82,7 +82,7 @@ describe("L - Game with various villagers who loose their power because they kil
     });
     it("🌙 Night falls", done => {
         players = game.players;
-        expect(game.phase).to.equals("night");
+        expect(game.phase).to.equal("night");
         done();
     });
     it("👪 All elect the idiot as the sheriff (POST /games/:id/play)", done => {
@@ -97,10 +97,10 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[15].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history).to.be.an("array").to.have.lengthOf(1);
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
-                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[15]._id);
+                expect(game.history[0].play.votes[0].from._id).to.equal(game.players[0]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equal(game.players[15]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[15]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[15]._id);
                 expect(game.history[0].play.source.name).to.equal("all");
                 expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(players.length);
                 expect(game.history[0].deadPlayers).to.not.exist;
@@ -130,7 +130,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(game.players[9].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[10].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[11].attributes).to.deep.include({ name: "powerless", source: "ancient" });
-                expect(game.players[11].side.current).to.equals("villagers");
+                expect(game.players[11].side.current).to.equal("villagers");
                 expect(game.players[13].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[14].attributes).to.deep.include({ name: "powerless", source: "ancient" });
                 expect(game.players[15].attributes).to.deep.include({ name: "powerless", source: "ancient" });
@@ -155,12 +155,12 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[17]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[17]._id);
                 done();
             });
     });
     it("☀️ Sun is rising", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[17].isAlive).to.be.false;
         expect(game.players[22].attributes).to.not.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
@@ -187,9 +187,9 @@ describe("L - Game with various villagers who loose their power because they kil
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[4].side.current).to.equals("villagers");
+                expect(game.players[4].side.current).to.equal("villagers");
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[4]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[4]._id);
                 expect(game.players[4].isAlive).to.be.false;
                 expect(game.players[4].attributes).to.deep.includes({ name: "powerless", source: "ancient" });
                 expect(game.players[4].attributes).to.not.deep.includes({ name: "eaten", source: "werewolves" });
@@ -224,7 +224,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[2]._id);
                 done();
             });
     });
@@ -241,7 +241,7 @@ describe("L - Game with various villagers who loose their power because they kil
             })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("STUTTERING_JUDGE_POWERLESS");
+                expect(res.body.type).to.equal("STUTTERING_JUDGE_POWERLESS");
                 done();
             });
     });
@@ -293,7 +293,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 game = res.body;
                 expect(game.players[5].attributes).to.not.exist;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[24]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[24]._id);
                 done();
             });
     });
@@ -326,7 +326,7 @@ describe("L - Game with various villagers who loose their power because they kil
                 game = res.body;
                 expect(game.players[5].attributes).to.deep.include({ name: "sheriff", source: "sheriff" });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[5]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[5]._id);
                 done();
             });
     });

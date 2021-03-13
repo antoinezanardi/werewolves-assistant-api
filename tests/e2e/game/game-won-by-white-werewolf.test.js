@@ -78,7 +78,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "eaten", source: "white-werewolf", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
@@ -90,7 +90,7 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
             .send({ source: "witch", action: "use-potion", targets: [{ player: players[1]._id, hasDrankLifePotion: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_LIFE_POTION_USE");
+                expect(res.body.type).to.equal("BAD_LIFE_POTION_USE");
                 done();
             });
     });
@@ -107,10 +107,10 @@ describe("R - Tiny game of 4 players in which the white werewolf is the last sur
             });
     });
     it("🎲 Game is WON by the white werewolf !", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("white-werewolf");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("white-werewolf");
         expect(game.won.players).to.be.an("array").lengthOf(1);
-        expect(game.won.players[0]._id).to.equals(game.players[0]._id);
+        expect(game.won.players[0]._id).to.equal(game.players[0]._id);
         done();
     });
 });

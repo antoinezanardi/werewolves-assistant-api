@@ -23,7 +23,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -33,7 +33,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar@foooooooooooooooooooooooooooooooooooobar.com", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -43,7 +43,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar@lol.com", password: "lol" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -53,7 +53,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar@lol.com", password: "IamASuperLongPasswordHowAreYouDoing?ReviewingCodeIsFun!" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -73,7 +73,7 @@ describe("A - Sign up and log in", () => {
             .send(credentials)
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("EMAIL_EXISTS");
+                expect(res.body.type).to.equal("EMAIL_EXISTS");
                 done();
             });
     });
@@ -83,7 +83,7 @@ describe("A - Sign up and log in", () => {
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .end((err, res) => {
                 expect(res).to.have.status(200);
-                expect(res.body.email).to.equals(credentials.email);
+                expect(res.body.email).to.equal(credentials.email);
                 done();
             });
     });
@@ -93,7 +93,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar@foooooooooooooooooooooooooooooooooooobar.com", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -103,7 +103,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar@lol.com", password: "lol" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -113,7 +113,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foobar@lol.com", password: "IamASuperLongPasswordHowAreYouDoing?ReviewingCodeIsFun!" })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -123,7 +123,7 @@ describe("A - Sign up and log in", () => {
             .send({ email: "foo@bar.com", password: "secret" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("BAD_CREDENTIALS");
+                expect(res.body.type).to.equal("BAD_CREDENTIALS");
                 done();
             });
     });
@@ -144,7 +144,7 @@ describe("A - Sign up and log in", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(200);
-                expect(res.body.email).to.equals(credentials.email);
+                expect(res.body.email).to.equal(credentials.email);
                 done();
             });
     });
@@ -172,7 +172,7 @@ describe("A - Sign up and log in", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("UNAUTHORIZED");
+                expect(res.body.type).to.equal("UNAUTHORIZED");
                 done();
             });
     });

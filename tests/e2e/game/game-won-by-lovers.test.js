@@ -88,8 +88,8 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ name: "in-love", source: "cupid" });
                 expect(game.players[3].attributes).to.deep.include({ name: "in-love", source: "cupid" });
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
-                expect(game.history[0].play.targets[1].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[0]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -112,7 +112,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id, isInfected: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("ABSENT_VILE_FATHER_OF_WOLVES");
+                expect(res.body.type).to.equal("ABSENT_VILE_FATHER_OF_WOLVES");
                 done();
             });
     });
@@ -129,7 +129,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[2].isAlive).to.be.false;
         done();
     });
@@ -148,10 +148,10 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             });
     });
     it("🎲 Game is WON by lovers!", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("lovers");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("lovers");
         expect(game.won.players).to.be.an("array");
-        expect(game.won.players.length).to.equals(2);
+        expect(game.won.players.length).to.equal(2);
         done();
     });
 });

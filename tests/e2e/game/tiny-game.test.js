@@ -67,7 +67,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
+                expect(res.body.type).to.equal("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });
@@ -98,8 +98,8 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[3].role.current).to.equals("thief");
-                expect(game.players[3].side.current).to.equals("villagers");
+                expect(game.players[3].role.current).to.equal("thief");
+                expect(game.players[3].side.current).to.equal("villagers");
                 expect(game.history[0].play.card).to.not.exist;
                 done();
             });
@@ -123,7 +123,7 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             .send({ source: "big-bad-wolf", action: "eat", targets: [{ player: players[3]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                expect(res.body.type).to.equal("BAD_TARGETS_LENGTH");
                 done();
             });
     });
@@ -139,8 +139,8 @@ describe("C - Tiny game of 4 players with only werewolves and one poor thief who
             });
     });
     it("🎲 Game is WON by 'werewolves'!!", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("werewolves");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("werewolves");
         done();
     });
 });

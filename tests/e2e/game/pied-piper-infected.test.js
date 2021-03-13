@@ -155,7 +155,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
     });
     it("🎲 Game is not won by pied piper even if all alive players are charmed because he is infected", done => {
         expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
-        expect(game.status).to.equals("playing");
+        expect(game.status).to.equal("playing");
         expect(game.players.every(({ isAlive, role, attributes }) => !isAlive || role.current === "pied-piper" ||
             attributes?.find(({ name }) => name === "charmed"))).to.be.true;
         done();
@@ -168,7 +168,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("canceled");
+                expect(game.status).to.equal("canceled");
                 done();
             });
     });

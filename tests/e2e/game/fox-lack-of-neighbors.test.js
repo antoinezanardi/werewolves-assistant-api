@@ -66,9 +66,9 @@ describe("W - Tiny game of 4 players in which fox has less and less neighbors to
                 expect(res).to.have.status(200);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets).to.be.lengthOf(3);
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[1].player._id).to.equals(players[0]._id);
-                expect(game.history[0].play.targets[2].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equal(players[0]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equal(players[3]._id);
                 expect(game.players[0].attributes).to.not.exist;
                 done();
             });
@@ -110,8 +110,8 @@ describe("W - Tiny game of 4 players in which fox has less and less neighbors to
                 expect(res).to.have.status(200);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets).to.be.lengthOf(2);
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
-                expect(game.history[0].play.targets[1].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[0]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equal(players[1]._id);
                 expect(game.players[0].attributes).to.not.exist;
                 done();
             });

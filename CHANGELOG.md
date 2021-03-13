@@ -12,6 +12,7 @@
 * [#145](https://github.com/antoinezanardi/werewolves-assistant-api/issues/145) - Seer see exact role option.
 * [#146](https://github.com/antoinezanardi/werewolves-assistant-api/issues/146) - Guard can protect twice option.
 * [#147](https://github.com/antoinezanardi/werewolves-assistant-api/issues/147) - Fox not powerless if he misses a werewolf option.
+* [#148](https://github.com/antoinezanardi/werewolves-assistant-api/issues/148) - Bear Tamer growls if he is infected option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements
@@ -28,6 +29,7 @@
 
 * `@sentry/node` updated to version `6.2.2`.
 * `chai` updated to version `4.3.4`.
+* `eslint` updated to version `7.22.0`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
 * `mongoose` updated to version `5.12.0`.

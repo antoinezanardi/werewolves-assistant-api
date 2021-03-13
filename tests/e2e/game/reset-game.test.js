@@ -63,7 +63,7 @@ describe("D - Game Reset", () => {
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
+                expect(res.body.type).to.equal("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });
@@ -92,21 +92,21 @@ describe("D - Game Reset", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("playing");
-                expect(game.turn).to.equals(1);
-                expect(game.phase).to.equals("night");
-                expect(game.tick).to.equals(1);
+                expect(game.status).to.equal("playing");
+                expect(game.turn).to.equal(1);
+                expect(game.phase).to.equal("night");
+                expect(game.tick).to.equal(1);
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
                 expect(game.history).to.deep.equals([]);
                 expect(Array.isArray(game.players)).to.be.true;
                 expect(game.players[0].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
-                expect(game.players[0].side.current).to.equals("werewolves");
+                expect(game.players[0].side.current).to.equal("werewolves");
                 expect(game.players[1].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
-                expect(game.players[1].side.current).to.equals("werewolves");
+                expect(game.players[1].side.current).to.equal("werewolves");
                 expect(game.players[2].role).to.deep.equals({ original: "werewolf", current: "werewolf", isRevealed: false });
-                expect(game.players[2].side.current).to.equals("werewolves");
+                expect(game.players[2].side.current).to.equal("werewolves");
                 expect(game.players[3].role).to.deep.equals({ original: "villager", current: "villager", isRevealed: false });
-                expect(game.players[3].side.current).to.equals("villagers");
+                expect(game.players[3].side.current).to.equal("villagers");
                 done();
             });
     });
@@ -141,8 +141,8 @@ describe("D - Game Reset", () => {
             });
     });
     it("🎲 Game is WON by 'werewolves'!!", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("werewolves");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("werewolves");
         done();
     });
     it("🔐 Game can't be reset if status is 'done' (PATCH /games/:id/reset)", done => {
@@ -151,7 +151,7 @@ describe("D - Game Reset", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("CANT_BE_RESET");
+                expect(res.body.type).to.equal("CANT_BE_RESET");
                 done();
             });
     });

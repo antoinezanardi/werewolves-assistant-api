@@ -74,7 +74,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }], doesJudgeRequestAnotherVote: true })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_PLAY_ACTION_FOR_JUDGE_REQUEST");
+                expect(res.body.type).to.equal("BAD_PLAY_ACTION_FOR_JUDGE_REQUEST");
                 done();
             });
     });
@@ -104,7 +104,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history[0].play.votesResult).to.equals("need-settlement");
+                expect(game.history[0].play.votesResult).to.equal("need-settlement");
                 expect(game.players[0].isAlive).to.be.true;
                 expect(game.players[2].isAlive).to.be.true;
                 expect(game.waiting).to.be.an("array").lengthOf(2);
@@ -124,7 +124,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
                 game = res.body;
                 expect(game.players[2].isAlive).to.be.false;
                 expect(game.players[2].murdered).to.deep.equals({ by: "all", of: "vote" });
-                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.history[0].play.votesResult).to.equal("death");
                 done();
             });
     });
@@ -142,7 +142,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history[0].play.votesResult).to.equals("need-settlement");
+                expect(game.history[0].play.votesResult).to.equal("need-settlement");
                 expect(game.players[0].isAlive).to.be.true;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.waiting).to.be.an("array").lengthOf(1);
@@ -161,7 +161,7 @@ describe("S - Tiny game of 4 players in which there is no sheriff and a stutteri
                 game = res.body;
                 expect(game.players[1].isAlive).to.be.false;
                 expect(game.players[1].murdered).to.deep.equals({ by: "all", of: "vote" });
-                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.history[0].play.votesResult).to.equal("death");
                 done();
             });
     });

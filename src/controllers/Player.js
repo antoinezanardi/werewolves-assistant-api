@@ -715,8 +715,8 @@ exports.makeBearTamerGrowls = game => {
     if (bearTamerPlayer && !doesPlayerHaveAttribute(bearTamerPlayer, "powerless")) {
         const leftAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "left", { isAlive: true });
         const rightAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "right", { isAlive: true });
-        if (bearTamerPlayer.side.current === "werewolves" || leftAliveNeighbor?.side.current === "werewolves" ||
-            rightAliveNeighbor?.side.current === "werewolves") {
+        if (bearTamerPlayer.side.current === "werewolves" && game.options.roles.bearTamer.doesGrowlIfInfected ||
+            leftAliveNeighbor?.side.current === "werewolves" || rightAliveNeighbor?.side.current === "werewolves") {
             this.addPlayerAttribute(bearTamerPlayer._id, "growls", game);
         }
     }

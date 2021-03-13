@@ -59,7 +59,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
     });
     it("🌙 Night falls", done => {
         players = game.players;
-        expect(game.phase).to.equals("night");
+        expect(game.phase).to.equal("night");
         done();
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
@@ -73,7 +73,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
@@ -87,9 +87,9 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[3].attributes).to.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
-                expect(game.players[3].side.current).to.equals("villagers");
+                expect(game.players[3].side.current).to.equal("villagers");
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -105,7 +105,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
             });
     });
     it("☀️ Sun is rising and ancient is alive because witch saved him", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
@@ -118,7 +118,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }], doesJudgeRequestAnotherVote: true })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("STUTTERING_JUDGE_ABSENT");
+                expect(res.body.type).to.equal("STUTTERING_JUDGE_ABSENT");
                 done();
             });
     });
@@ -147,7 +147,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 game = res.body;
                 expect(game.players[3].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -161,12 +161,12 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
     it("☀️ Sun is rising and ancient is alive because guard saved him", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
@@ -196,7 +196,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
@@ -210,12 +210,12 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
     it("☀️ Sun is rising and ancient is alive because he has a second life", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
@@ -245,7 +245,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 game = res.body;
                 expect(game.players[5].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[5]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[5]._id);
                 done();
             });
     });
@@ -259,12 +259,12 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
     it("☀️ Sun is rising and ancient is finally dead and idiot too because he was already revealed", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.false;
         expect(game.players[3].role.isRevealed).to.be.true;
         expect(game.players[5].isAlive).to.be.false;

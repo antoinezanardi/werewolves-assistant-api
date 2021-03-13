@@ -63,7 +63,7 @@ describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves
             .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[0]._id }], doesJudgeRequestAnotherVote: true })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET");
+                expect(res.body.type).to.equal("STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET");
                 done();
             });
     });
@@ -82,10 +82,10 @@ describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves
             });
     });
     it("🎲 Game is WON by the angel !", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("angel");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("angel");
         expect(game.won.players).to.be.an("array").lengthOf(1);
-        expect(game.won.players[0]._id).to.equals(game.players[0]._id);
+        expect(game.won.players[0]._id).to.equal(game.players[0]._id);
         done();
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
@@ -123,15 +123,15 @@ describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[0]._id);
                 done();
             });
     });
     it("🎲 Game is WON by the angel !", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("angel");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("angel");
         expect(game.won.players).to.be.an("array").lengthOf(1);
-        expect(game.won.players[0]._id).to.equals(game.players[0]._id);
+        expect(game.won.players[0]._id).to.equal(game.players[0]._id);
         done();
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
@@ -191,10 +191,10 @@ describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves
             });
     });
     it("🎲 Game is WON by the angel !", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("angel");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("angel");
         expect(game.won.players).to.be.an("array").lengthOf(1);
-        expect(game.won.players[0]._id).to.equals(game.players[0]._id);
+        expect(game.won.players[0]._id).to.equal(game.players[0]._id);
         done();
     });
 });

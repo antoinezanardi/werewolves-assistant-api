@@ -128,7 +128,7 @@ describe("E - Game repartition with multiple teams", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });
@@ -138,7 +138,7 @@ describe("E - Game repartition with multiple teams", () => {
             .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_REQUEST");
+                expect(res.body.type).to.equal("BAD_REQUEST");
                 done();
             });
     });

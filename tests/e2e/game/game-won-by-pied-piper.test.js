@@ -144,7 +144,7 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }, { player: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("BAD_TARGETS_LENGTH");
+                expect(res.body.type).to.equal("BAD_TARGETS_LENGTH");
                 done();
             });
     });
@@ -161,10 +161,10 @@ describe("N - Tiny game of 6 players in which the pied piper charmed everybody, 
             });
     });
     it("🎲 Game is WON by the pied piper even if there is no more werewolves because all alive players are charmed !", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("pied-piper");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("pied-piper");
         expect(game.won.players).to.be.an("array").lengthOf(1);
-        expect(game.won.players[0]._id).to.equals(game.players[1]._id);
+        expect(game.won.players[0]._id).to.equal(game.players[1]._id);
         done();
     });
 });

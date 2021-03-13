@@ -10,17 +10,18 @@ const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
 const originalPlayers = [
-    { name: "Dag", role: "werewolf" },
     { name: "Dig", role: "two-sisters" },
     { name: "Deg", role: "two-sisters" },
     { name: "Dog", role: "three-brothers" },
     { name: "Dug", role: "three-brothers" },
     { name: "Dyg", role: "three-brothers" },
+    { name: "Dag", role: "vile-father-of-wolves" },
     { name: "Dπg", role: "villager" },
     { name: "Dœg", role: "raven" },
     { name: "D–g", role: "guard" },
     { name: "DÁg", role: "little-girl" },
     { name: "DŸg", role: "fox" },
+    { name: "Døg", role: "bear-tamer" },
 ];
 let server, token, game, players;
 
@@ -67,6 +68,7 @@ describe("K - Game options", () => {
                         twoSisters: { wakingUpInterval: 1 },
                         threeBrothers: { wakingUpInterval: 1 },
                         fox: { isPowerlessIfMissesWerewolf: false },
+                        bearTamer: { doesGrowlIfInfected: false },
                         raven: { markPenalty: 3 },
                     },
                 },
@@ -80,10 +82,11 @@ describe("K - Game options", () => {
                 expect(game.options.roles.seer.isTalkative).to.be.false;
                 expect(game.options.roles.seer.canSeeRoles).to.be.false;
                 expect(game.options.roles.guard.canProtectTwice).to.be.true;
-                expect(game.options.roles.twoSisters.wakingUpInterval).to.equals(1);
-                expect(game.options.roles.threeBrothers.wakingUpInterval).to.equals(1);
+                expect(game.options.roles.twoSisters.wakingUpInterval).to.equal(1);
+                expect(game.options.roles.threeBrothers.wakingUpInterval).to.equal(1);
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.false;
-                expect(game.options.roles.raven.markPenalty).to.equals(3);
+                expect(game.options.roles.bearTamer.doesGrowlIfInfected).to.be.false;
+                expect(game.options.roles.raven.markPenalty).to.equal(3);
                 done();
             });
     });
@@ -115,12 +118,12 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets).to.be.lengthOf(3);
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
-                expect(game.history[0].play.targets[1].player._id).to.equals(players[2]._id);
-                expect(game.history[0].play.targets[2].player._id).to.equals(players[1]._id);
-                expect(game.history[0].play.targets[0].player.side.current).to.equals("villagers");
-                expect(game.history[0].play.targets[1].player.side.current).to.equals("villagers");
-                expect(game.history[0].play.targets[2].player.side.current).to.equals("villagers");
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equal(players[2]._id);
+                expect(game.history[0].play.targets[2].player._id).to.equal(players[1]._id);
+                expect(game.history[0].play.targets[0].player.side.current).to.equal("villagers");
+                expect(game.history[0].play.targets[1].player.side.current).to.equal("villagers");
+                expect(game.history[0].play.targets[2].player.side.current).to.equal("villagers");
                 expect(game.players[10].attributes).to.not.exist;
                 done();
             });
@@ -152,13 +155,13 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "raven", action: "mark", targets: [{ player: players[0]._id }] })
+            .send({ source: "raven", action: "mark", targets: [{ player: players[5]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[0].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
+                expect(game.players[5].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[5]._id);
                 done();
             });
     });
@@ -173,24 +176,26 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[8]._id);
                 done();
             });
     });
-    it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
+    it("🐺 Werewolf infects the bear tamer (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[11]._id, isInfected: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.players[11].side.current).to.equal("werewolves");
                 done();
             });
     });
-    it("☀️ Sun is rising", done => {
-        expect(game.phase).to.equals("day");
+    it("☀️ Sun is rising, bear tamer doesn't growl even if he is infected because of option", done => {
+        expect(game.phase).to.equal("day");
+        expect(game.players[11].attributes).to.not.exist;
         done();
     });
     it("👪 Werewolf (sheriff) and three other players votes for one brother and the brother votes for the werewolf (POST /games/:id/play)", done => {
@@ -200,11 +205,11 @@ describe("K - Game options", () => {
             .set({ Authorization: `Bearer ${token}` })
             .send({
                 source: "all", action: "vote", votes: [
-                    { from: players[0]._id, for: players[5]._id },
-                    { from: players[1]._id, for: players[5]._id },
-                    { from: players[2]._id, for: players[5]._id },
-                    { from: players[3]._id, for: players[5]._id },
-                    { from: players[5]._id, for: players[0]._id },
+                    { from: players[0]._id, for: players[4]._id },
+                    { from: players[1]._id, for: players[4]._id },
+                    { from: players[2]._id, for: players[4]._id },
+                    { from: players[3]._id, for: players[4]._id },
+                    { from: players[4]._id, for: players[5]._id },
                 ],
             })
             .end((err, res) => {
@@ -223,17 +228,17 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[5]._id }] })
+            .send({ source: "sheriff", action: "settle-votes", targets: [{ player: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[5].isAlive).to.be.false;
+                expect(game.players[4].isAlive).to.be.false;
                 done();
             });
     });
     it("🌙 Night falls", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(2);
+        expect(game.phase).to.equal("night");
+        expect(game.turn).to.equal(2);
         done();
     });
     it("🦊 Fox skips (POST /games/:id/play)", done => {
@@ -301,7 +306,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[8]._id);
                 done();
             });
     });
@@ -318,7 +323,7 @@ describe("K - Game options", () => {
             });
     });
     it("☀️ Sun is rising", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         done();
     });
     it("👪 Werewolf (sheriff) votes for one of the two remaining brothers (POST /games/:id/play)", done => {
@@ -326,17 +331,17 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[4]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[3]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[4].isAlive).to.be.false;
+                expect(game.players[3].isAlive).to.be.false;
                 done();
             });
     });
     it("🌙 Night falls", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(3);
+        expect(game.phase).to.equal("night");
+        expect(game.turn).to.equal(3);
         done();
     });
     it("🎲 Game is waiting for 'fox' to 'sniff' because sisters and brothers are all alone", done => {
@@ -351,7 +356,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("canceled");
+                expect(game.status).to.equal("canceled");
                 done();
             });
     });
@@ -446,7 +451,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[8]._id);
                 done();
             });
     });
@@ -463,7 +468,7 @@ describe("K - Game options", () => {
             });
     });
     it("☀️ Sun is rising", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         done();
     });
     it("👪 Werewolf (sheriff) votes for one of the two remaining brothers (POST /games/:id/play)", done => {
@@ -480,8 +485,8 @@ describe("K - Game options", () => {
             });
     });
     it("🌙 Night falls", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(2);
+        expect(game.phase).to.equal("night");
+        expect(game.turn).to.equal(2);
         done();
     });
     it("🎲 Game is waiting for 'fox' to 'sniff' because brothers and sisters are never waking up again according to game options", done => {
@@ -496,7 +501,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("canceled");
+                expect(game.status).to.equal("canceled");
                 done();
             });
     });
@@ -580,7 +585,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[9].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[9]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[9]._id);
                 done();
             });
     });
@@ -598,7 +603,7 @@ describe("K - Game options", () => {
     });
     it("☀️ Sun is rising and little girl is alive because option for protecting her is set to true", done => {
         expect(game.players[9].isAlive).to.be.true;
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         done();
     });
     it("👪 Tie in votes between the werewolf and one of the two sisters (POST /games/:id/play)", done => {
@@ -615,7 +620,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history[0].play.votesResult).to.equals("need-settlement");
+                expect(game.history[0].play.votesResult).to.equal("need-settlement");
                 expect(game.players[0].isAlive).to.be.true;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[5].isAlive).to.be.true;
@@ -638,7 +643,7 @@ describe("K - Game options", () => {
             })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("CANT_BE_VOTE_TARGET");
+                expect(res.body.type).to.equal("CANT_BE_VOTE_TARGET");
                 done();
             });
     });
@@ -663,14 +668,14 @@ describe("K - Game options", () => {
                 expect(game.players[0].isAlive).to.be.true;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[5].isAlive).to.be.true;
-                expect(game.history[0].play.votesResult).to.equals("no-death");
+                expect(game.history[0].play.votesResult).to.equal("no-death");
                 expect(game.history[0].deadPlayers).to.not.exist;
                 done();
             });
     });
     it("🌙 Night falls", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(2);
+        expect(game.phase).to.equal("night");
+        expect(game.turn).to.equal(2);
         done();
     });
     it("🦊 Fox skips (POST /games/:id/play)", done => {
@@ -708,7 +713,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[8].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[8]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[8]._id);
                 done();
             });
     });
@@ -717,7 +722,7 @@ describe("K - Game options", () => {
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -725,7 +730,7 @@ describe("K - Game options", () => {
             });
     });
     it("☀️ Sun is rising", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         done();
     });
     it("👪 Tie in votes between the two sisters (POST /games/:id/play)", done => {
@@ -742,7 +747,7 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.history[0].play.votesResult).to.equals("need-settlement");
+                expect(game.history[0].play.votesResult).to.equal("need-settlement");
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[2].isAlive).to.be.true;
                 done();
@@ -764,7 +769,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[1].isAlive).to.be.true;
                 expect(game.players[2].isAlive).to.be.false;
-                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
                 done();

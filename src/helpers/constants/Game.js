@@ -56,6 +56,7 @@ exports.defaultGameOptions = {
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },
         fox: { isPowerlessIfMissesWerewolf: true },
+        bearTamer: { doesGrowlIfInfected: true },
         raven: { markPenalty: 2 },
     },
 };

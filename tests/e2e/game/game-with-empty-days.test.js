@@ -69,10 +69,10 @@ describe("M - Game with empty days because vote is impossible", () => {
                 expect(game.players[0].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history).to.be.an("array").to.have.lengthOf(1);
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[1]._id);
-                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.votes[0].from._id).to.equal(game.players[1]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equal(game.players[0]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[0]._id);
                 expect(game.history[0].play.source.name).to.equal("all");
                 expect(game.history[0].play.source.players).to.be.an("array").to.have.lengthOf(players.length);
                 expect(game.history[0].deadPlayers).to.not.exist;
@@ -89,7 +89,7 @@ describe("M - Game with empty days because vote is impossible", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[2]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[2]._id);
                 done();
             });
     });
@@ -148,13 +148,13 @@ describe("M - Game with empty days because vote is impossible", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[5]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[5]._id);
                 done();
             });
     });
     it("🌙 Night falls without day rising because no one can vote", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(3);
+        expect(game.phase).to.equal("night");
+        expect(game.turn).to.equal(3);
         expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
         done();
     });

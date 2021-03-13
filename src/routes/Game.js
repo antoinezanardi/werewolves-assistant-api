@@ -48,6 +48,8 @@ module.exports = app => {
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.threeBrothers.wakingUpInterval=2 Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiSuccess {Object} options.roles.fox Game fox role's options.
      * @apiSuccess {Boolean} options.roles.fox.isPowerlessIfMissesWerewolf=true If set to `true`, the fox will loose his power if he doesn't find a player from the `werewolves` side during his turn if he doesn't skip. Default is `true`.
+     * @apiSuccess {Object} options.roles.bearTamer Game bear tamer role's options.
+     * @apiSuccess {Boolean} options.roles.bearTamer.doesGrowlIfInfected=true If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
      * @apiSuccess {Object} options.roles.raven Game raven role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.raven.markPenalty=2 Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
@@ -204,6 +206,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.threeBrothers.wakingUpInterval=2] Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiParam (Request Body Parameters) {Object} [options.roles.fox] Game fox's role options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.fox.isPowerlessIfMissesWerewolf=true] If set to `true`, the fox will loose his power if he doesn't find a player from the `werewolves` side during his turn if he doesn't skip. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.bearTamer] Game bear tamer's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.fox.doesGrowlIfInfected=true] If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty=2] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiUse GameResponse
@@ -280,6 +284,10 @@ module.exports = app => {
             .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
             .toInt(),
         body("options.roles.fox.isPowerlessIfMissesWerewolf")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.bearTamer.doesGrowlIfInfected")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

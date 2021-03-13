@@ -63,7 +63,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             .send({ source: "all", action: "elect-sheriff" })
             .end((err, res) => {
                 expect(res).to.have.status(401);
-                expect(res.body.type).to.equals("GAME_DOESNT_BELONG_TO_USER");
+                expect(res.body.type).to.equal("GAME_DOESNT_BELONG_TO_USER");
                 done();
             });
     });
@@ -107,13 +107,13 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 expect(game.history[0].play.targets[0].hasDrankLifePotion).to.be.true;
                 done();
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[1].isAlive).to.be.true;
         done();
     });
@@ -132,8 +132,8 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             });
     });
     it("🌙 Night falls", done => {
-        expect(game.phase).to.equals("night");
-        expect(game.turn).to.equals(2);
+        expect(game.phase).to.equal("night");
+        expect(game.turn).to.equal(2);
         done();
     });
     it("🐺 Werewolf eats the witch (POST /games/:id/play)", done => {
@@ -158,7 +158,7 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 expect(game.history[0].play.targets[0].hasDrankDeathPotion).to.be.true;
                 done();
             });
@@ -181,8 +181,8 @@ describe("I - Tiny game of 4 players with no winner at the end", () => {
             });
     });
     it("🎲 Game is WON by... nobody ..!", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals(null);
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal(null);
         expect(game.won.players).to.not.exist;
         done();
     });

@@ -71,8 +71,8 @@ describe("U - Tiny game of 4 players in which thief steals different roles", () 
                 expect(res).to.have.status(200);
                 game = res.body;
                 additionalCards = game.additionalCards;
-                expect(game.players[0].role.current).to.equals("angel");
-                expect(game.players[0].side.current).to.equals("villagers");
+                expect(game.players[0].role.current).to.equal("angel");
+                expect(game.players[0].side.current).to.equal("villagers");
                 expect(game.history[0].play.card).to.deep.equals(additionalCards[0]);
                 expect(game.waiting).to.be.an("array").lengthOf(2);
                 expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
@@ -88,7 +88,7 @@ describe("U - Tiny game of 4 players in which thief steals different roles", () 
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.status).to.equals("canceled");
+                expect(game.status).to.equal("canceled");
                 done();
             });
     });
@@ -118,8 +118,8 @@ describe("U - Tiny game of 4 players in which thief steals different roles", () 
                 expect(res).to.have.status(200);
                 game = res.body;
                 additionalCards = game.additionalCards;
-                expect(game.players[0].role.current).to.equals("witch");
-                expect(game.players[0].side.current).to.equals("villagers");
+                expect(game.players[0].role.current).to.equal("witch");
+                expect(game.players[0].side.current).to.equal("villagers");
                 expect(game.history[0].play.card).to.deep.equals(additionalCards[0]);
                 expect(game.waiting).to.be.an("array").lengthOf(2);
                 expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });

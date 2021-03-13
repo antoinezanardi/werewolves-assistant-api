@@ -58,7 +58,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
     });
     it("🌙 Night falls", done => {
         players = game.players;
-        expect(game.phase).to.equals("night");
+        expect(game.phase).to.equal("night");
         done();
     });
     it("🛡 Guard protects himself (POST /games/:id/play)", done => {
@@ -72,7 +72,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
@@ -86,9 +86,9 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[3].attributes).to.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
-                expect(game.players[3].side.current).to.equals("villagers");
+                expect(game.players[3].side.current).to.equal("villagers");
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -104,7 +104,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
             });
     });
     it("☀️ Sun is rising and ancient is alive because hhe has another life", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
@@ -134,7 +134,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 game = res.body;
                 expect(game.players[3].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -148,7 +148,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -164,7 +164,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
             });
     });
     it("☀️ Sun is rising and ancient is alive because guard saved him", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
@@ -193,7 +193,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
@@ -209,7 +209,7 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
             });
     });
     it("☀️ Sun is rising and ancient is alive because witch saved him", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         done();
@@ -238,12 +238,12 @@ describe("Q - Game with an ancient who is infected after his first life and 2 pr
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
                 done();
             });
     });
     it("☀️ Sun is rising and ancient has become a werewolf", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[3].role.isRevealed).to.be.false;
         expect(game.players[3].side.current).to.equal("werewolves");

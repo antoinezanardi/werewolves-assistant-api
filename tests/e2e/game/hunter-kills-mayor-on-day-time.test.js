@@ -84,7 +84,7 @@ describe("H - Game where hunter kills mayor when day rises", () => {
             });
     });
     it("☀️ Sun is rising and hunter is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[0].isAlive).to.be.false;
         done();
     });
