@@ -151,6 +151,7 @@ All available roles of this version can be gathered on the [route GET /roles](#a
 | _id                           | ObjectId | Role's ID.                                                                                              |
 | name                          | String   | Role's name.                                                                                            |
 | side                          | String   | Role's original side.                                                                                   |
+| type                          | String   | Role's type. (_Possibilities: `villager`, `werewolf`, `ambiguous`, `lonely`_)                           |
 | **minInGame***                | Number   | If the role is chosen by at least one player, then minimum X players must choose it to start the game.  |
 | maxInGame                     | Number   | Maximum possible of this role in a game.                                                                |
 | **recommendedMinPlayers***    | Number   | It is recommended to have at least X players in game for choosing this role.                            |

@@ -23,6 +23,7 @@ describe("A - Get roles", () => {
                 expect(res.body[0].name).to.exist;
                 expect(res.body[0].side).to.exist;
                 expect(res.body[0].maxInGame).to.exist;
+                expect(res.body[0].type).to.exist;
                 done();
             });
     });

@@ -18,6 +18,8 @@
 
 ### 🌟 Enhancements
 
+* [#162](https://github.com/antoinezanardi/werewolves-assistant-api/issues/162) - Role types.
+
 ### 🐛 Bug fixes
 
 ### ♻️ Refactoring
