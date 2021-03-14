@@ -397,26 +397,12 @@ describe("K - Game options", () => {
             .send({
                 players: originalPlayers,
                 options: {
-                    brothersWakingUpInterval: 0,
-                    sistersWakingUpInterval: 0,
+                    roles: {
+                        sheriff: { electedAt: { turn: 1, phase: "day" } },
+                        twoSisters: { wakingUpInterval: 0 },
+                        threeBrothers: { wakingUpInterval: 0 },
+                    },
                 },
-            })
-            .end((err, res) => {
-                expect(res).to.have.status(200);
-                game = res.body;
-                done();
-            });
-    });
-    it("👪 All elect the werewolf as the sheriff (POST /games/:id/play)", done => {
-        players = game.players;
-        chai.request(server)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({
-                source: "all", action: "elect-sheriff", votes: [
-                    { from: players[2]._id, for: players[0]._id },
-                    { from: players[3]._id, for: players[0]._id },
-                ],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -512,6 +498,23 @@ describe("K - Game options", () => {
         expect(game.phase).to.equal("day");
         done();
     });
+    it("👪 All elect the werewolf as the sheriff on first day because of options (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[2]._id, for: players[0]._id },
+                    { from: players[3]._id, for: players[0]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
     it("👪 Werewolf (sheriff) votes for one of the two remaining brothers (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
@@ -530,8 +533,20 @@ describe("K - Game options", () => {
         expect(game.turn).to.equal(2);
         done();
     });
-    it("🎲 Game is waiting for 'fox' to 'sniff' because brothers and sisters are never waking up again according to game options", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+    it("🦊 Fox skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "fox", action: "sniff" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                expect(game.history[0].play.targets).to.not.exist;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'raven' to 'mark' because brothers and sisters are never waking up again according to game options", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
@@ -614,7 +629,7 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🪶 Raven mark a brother (POST /games/:id/play)", done => {
+    it("🪶 Raven marks a brother (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
             .post(`/games/${game._id}/play`)

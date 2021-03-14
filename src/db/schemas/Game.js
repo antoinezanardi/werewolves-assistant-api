@@ -24,6 +24,17 @@ const gameOptions = {
                 type: Boolean,
                 default: true,
             },
+            electedAt: {
+                turn: {
+                    type: Number,
+                    default: 1,
+                },
+                phase: {
+                    type: String,
+                    enum: getGamePhases(),
+                    default: "night",
+                },
+            },
             hasDoubledVote: {
                 type: Boolean,
                 default: true,

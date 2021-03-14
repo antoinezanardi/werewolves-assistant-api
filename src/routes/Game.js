@@ -4,7 +4,7 @@ const Game = require("../controllers/Game");
 const GameHistory = require("../controllers/GameHistory");
 const { getRoleNames, getSideNames } = require("../helpers/functions/Role");
 const {
-    getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses,
+    getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses, getGamePhases,
     getGameRepartitionForbiddenRoleNames, getAdditionalCardsForRoleNames,
 } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
@@ -32,6 +32,9 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.areRevealedOnDeath=true If set to `true`, player's role is revealed when he's dead. Default is `true`.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
      * @apiSuccess {Boolean} options.roles.sheriff.isEnabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
+     * @apiSuccess {Object} options.roles.sheriff.electedAt When the sheriff is elected during the game.
+     * @apiSuccess {Number} options.roles.sheriff.electedAt.turn=1 Game's turn when the sheriff is elected. Default is `1`.
+     * @apiSuccess {String} options.roles.sheriff.electedAt.phase="night" Game's phase when the sheriff is elected. Default is `night`.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
@@ -192,6 +195,9 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.areRevealedOnDeath=true] If set to `true`, player's role is revealed when he's dead.
      * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game sheriff role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.isEnabled=true] If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff.electedAt] When the sheriff is elected during the game.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.sheriff.electedAt.turn=1] When the sheriff is elected during the game.
+     * @apiParam (Request Body Parameters) {String{"night", "day"}} [options.roles.sheriff.electedAt.phase="night"] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
@@ -255,6 +261,14 @@ module.exports = app => {
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.sheriff.electedAt.turn")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
+        body("options.roles.sheriff.electedAt.phase")
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .isIn(getGamePhases()).withMessage(`Must be equal to one of the following values: ${getGamePhases()}`),
         body("options.roles.sheriff.hasDoubledVote")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")

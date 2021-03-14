@@ -449,6 +449,9 @@ exports.fillWaitingQueueWithDayActions = async(game, gameHistoryEntry) => {
             }
         }
     }
+    if (await this.isTimeToElectSheriff(game)) {
+        game.waiting.push({ for: "all", to: "elect-sheriff" });
+    }
 };
 
 exports.isGroupCallableDuringTheNight = (game, group) => {
@@ -514,9 +517,7 @@ exports.isSheriffCallableDuringTheNight = game => {
 
 exports.isSourceCallableDuringTheNight = (game, source, action) => {
     if (source === "all") {
-        if (action === "elect-sheriff") {
-            return getProp(game, "options.roles.sheriff.isEnabled", true);
-        } else if (action === "vote") {
+        if (action === "vote") {
             return !!getPlayerWithRole("angel", game);
         }
     } else if (source === "sheriff") {
@@ -524,6 +525,15 @@ exports.isSourceCallableDuringTheNight = (game, source, action) => {
     }
     const sourceType = getGroupNames().includes(source) ? "group" : "role";
     return sourceType === "group" ? this.isGroupCallableDuringTheNight(game, source) : this.isRoleCallableDuringTheNight(game, source);
+};
+
+exports.isTimeToElectSheriff = async game => {
+    const sheriffOptions = game.options.roles.sheriff;
+    if (sheriffOptions.isEnabled && game.turn === sheriffOptions.electedAt.turn && game.phase === sheriffOptions.electedAt.phase) {
+        const allElectSheriffPlays = await GameHistory.find({ "gameId": game._id, "play.source.name": "all", "play.action": "elect-sheriff" });
+        return !allElectSheriffPlays.length;
+    }
+    return false;
 };
 
 exports.getWaitingQueueWithNightActions = async game => {
@@ -534,6 +544,9 @@ exports.getWaitingQueueWithNightActions = async game => {
         actionsOrder = getGameTurnNightActionsOrder().filter(action => !action.isFirstNightOnly);
     }
     const waitingQueue = [];
+    if (await this.isTimeToElectSheriff(game)) {
+        waitingQueue.push({ for: "all", to: "elect-sheriff" });
+    }
     for (const { source, action } of actionsOrder) {
         if (await this.isSourceCallableDuringTheNight(game, source, action)) {
             waitingQueue.push({ for: source, to: action });

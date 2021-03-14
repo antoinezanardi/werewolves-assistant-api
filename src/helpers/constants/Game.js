@@ -20,7 +20,6 @@ exports.populate = [
 ];
 
 exports.turnNightActionsOrder = [
-    { source: "all", action: "elect-sheriff", isFirstNightOnly: true },
     { source: "all", action: "vote", isFirstNightOnly: true },
     { source: "thief", action: "choose-card", isFirstNightOnly: true },
     { source: "dog-wolf", action: "choose-side", isFirstNightOnly: true },
@@ -48,7 +47,11 @@ exports.defaultGameOptions = {
     repartition: { isHidden: false },
     roles: {
         areRevealedOnDeath: true,
-        sheriff: { isEnabled: true, hasDoubledVote: true },
+        sheriff: {
+            isEnabled: true,
+            electedAt: { turn: 1, phase: "night" },
+            hasDoubledVote: true,
+        },
         seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
         guard: { canProtectTwice: false },
