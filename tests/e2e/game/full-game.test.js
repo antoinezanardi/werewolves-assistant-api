@@ -91,6 +91,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 expect(game.options.roles.sheriff.electedAt.turn).to.be.equal(1);
                 expect(game.options.roles.sheriff.electedAt.phase).to.be.equal("night");
                 expect(game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies).to.be.true;
+                expect(game.options.roles.whiteWerewolf.wakingUpInterval).to.be.equal(2);
                 expect(game.options.roles.seer.canSeeRoles).to.be.true;
                 expect(game.options.roles.guard.canProtectTwice).to.be.false;
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.true;

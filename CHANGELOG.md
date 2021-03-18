@@ -19,6 +19,7 @@
 * [#152](https://github.com/antoinezanardi/werewolves-assistant-api/issues/152) - Wild Child transformation is revealed option.
 * [#153](https://github.com/antoinezanardi/werewolves-assistant-api/issues/153) - Dog Wolf chosen side is revealed option.
 * [#154](https://github.com/antoinezanardi/werewolves-assistant-api/issues/154) - Big Bad Wolf not powerless if one werewolf dies option.
+* [#155](https://github.com/antoinezanardi/werewolves-assistant-api/issues/155) - White Werewolf waking up interval option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements

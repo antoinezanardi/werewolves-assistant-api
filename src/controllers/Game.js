@@ -467,9 +467,11 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
 };
 
 exports.isWhiteWerewolfCallableDuringTheNight = async game => {
+    const { wakingUpInterval: whiteWerewolfWakingUpInterval } = game.options.roles.whiteWerewolf;
     const whiteWerewolfPlayer = getPlayerWithRole("white-werewolf", game);
     const lastWhiteWerewolfPlay = await GameHistory.getLastWhiteWerewolfPlay(game._id);
-    return whiteWerewolfPlayer?.isAlive && (!lastWhiteWerewolfPlay || game.turn - lastWhiteWerewolfPlay.turn > 1);
+    const turnsSinceLastWhiteWerewolfPlay = lastWhiteWerewolfPlay ? game.turn - lastWhiteWerewolfPlay.turn : undefined;
+    return whiteWerewolfPlayer?.isAlive && (!lastWhiteWerewolfPlay || turnsSinceLastWhiteWerewolfPlay >= whiteWerewolfWakingUpInterval);
 };
 
 exports.areThreeBrothersCallableDuringTheNight = async game => {

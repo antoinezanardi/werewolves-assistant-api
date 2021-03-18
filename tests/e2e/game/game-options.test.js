@@ -418,11 +418,12 @@ describe("K - Game options", () => {
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
-                players: [...originalPlayers, { name: "D∆g", role: "big-bad-wolf" }],
+                players: [...originalPlayers, { name: "D∆g", role: "big-bad-wolf" }, { name: "dåg", role: "white-werewolf" }],
                 options: {
                     roles: {
                         sheriff: { electedAt: { turn: 1, phase: "day" } },
                         bigBadWolf: { isPowerlessIfWerewolfDies: false },
+                        whiteWerewolf: { wakingUpInterval: 1 },
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
                         thief: { mustChooseBetweenWerewolves: false },
@@ -434,6 +435,7 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies).to.be.false;
+                expect(game.options.roles.whiteWerewolf.wakingUpInterval).to.be.equal(1);
                 done();
             });
     });
@@ -530,6 +532,18 @@ describe("K - Game options", () => {
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🐺 White werewolf skips (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "white-werewolf", action: "eat" })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -634,6 +648,18 @@ describe("K - Game options", () => {
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🐺 White werewolf skips because he is called every night thanks to options (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "white-werewolf", action: "eat", targets: [] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;

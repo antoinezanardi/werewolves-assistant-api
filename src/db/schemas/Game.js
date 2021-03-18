@@ -46,6 +46,14 @@ const gameOptions = {
                 default: true,
             },
         },
+        whiteWerewolf: {
+            wakingUpInterval: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+        },
         seer: {
             isTalkative: {
                 type: Boolean,

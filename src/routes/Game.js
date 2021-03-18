@@ -38,6 +38,8 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiSuccess {Object} options.roles.bigBadWolf Game big bad wolf role's options.
      * @apiSuccess {Boolean} options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
+     * @apiSuccess {Object} options.roles.whiteWerewolf Game white werewolf role's options.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.whiteWerewolf.wakingUpInterval=2 Since first `night`, interval of nights when the `white-werewolf` is waking up. Default is `2`, meaning he wakes up every other night.
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiSuccess {Boolean} options.roles.seer.canSeeRoles=true If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
@@ -209,6 +211,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiParam (Request Body Parameters) {Object} [options.roles.bigBadWolf] Game big bad wolf role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true] If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.whiteWerewolf] Game white werewolf role's options.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.whiteWerewolf.wakingUpInterval=2] Since first `night`, interval of nights when the `white-werewolf` is waking up. Default is `2`, meaning he wakes up every other night.
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
@@ -293,6 +297,10 @@ module.exports = app => {
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.whiteWerewolf.wakingUpInterval")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
         body("options.roles.seer.isTalkative")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")

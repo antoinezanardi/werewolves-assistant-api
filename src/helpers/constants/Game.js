@@ -53,6 +53,7 @@ exports.defaultGameOptions = {
             hasDoubledVote: true,
         },
         bigBadWolf: { isPowerlessIfWerewolfDies: true },
+        whiteWerewolf: { wakingUpInterval: 2 },
         seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
         guard: { canProtectTwice: false },
