@@ -107,7 +107,13 @@ const gameOptions = {
         wildChild: {
             isTransformationRevealed: {
                 type: Boolean,
-                default: true,
+                default: false,
+            },
+        },
+        dogWolf: {
+            isChosenSideRevealed: {
+                type: Boolean,
+                default: false,
             },
         },
         thief: {

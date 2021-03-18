@@ -57,6 +57,8 @@ module.exports = app => {
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.stutteringJudge.voteRequestsCount=1 Number of vote requests that the `stuttering-judge` can make during the game. Default is `1`.
      * @apiSuccess {Object} options.roles.wildChild Game wild child role's options.
      * @apiSuccess {Boolean} options.roles.wildChild.isTransformationRevealed=false If set to `true`, when `wild-child` joins the `werewolves` side because his model died, the game master will announce his transformation to other players. Default is `false`.
+     * @apiSuccess {Object} options.roles.dogWolf Game dog wolf role's options.
+     * @apiSuccess {Boolean} options.roles.dogWolf.isChosenSideRevealed=false If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
      * @apiSuccess {Object} options.roles.thief Game thief role's options.
      * @apiSuccess {Boolean} options.roles.thief.mustChooseBetweenWerewolves=true If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiSuccess {Object} options.roles.raven Game raven role's options.
@@ -224,6 +226,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.stutteringJudge.voteRequestsCount=1] Number of vote requests that the `stuttering-judge` can make during the game. Default is `1`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.wildChild] Game wild child's role options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.wildChild.isTransformationRevealed=false] If set to `true`, when `wild-child` joins the `werewolves` side because his model died, the game master will announce his transformation to other players. Default is `false`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.dogWolf] Game dog wolf's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.dogWolf.isChosenSideRevealed=false] If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.thief] Game thief's role options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.mustChooseBetweenWerewolves=true] If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
@@ -322,6 +326,10 @@ module.exports = app => {
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
             .toInt(),
         body("options.roles.wildChild.isTransformationRevealed")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.dogWolf.isChosenSideRevealed")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

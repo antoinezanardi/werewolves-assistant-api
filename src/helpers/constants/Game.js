@@ -62,6 +62,7 @@ exports.defaultGameOptions = {
         bearTamer: { doesGrowlIfInfected: true },
         stutteringJudge: { voteRequestsCount: 1 },
         wildChild: { isTransformationRevealed: false },
+        dogWolf: { isChosenSideRevealed: false },
         thief: { mustChooseBetweenWerewolves: true },
         raven: { markPenalty: 2 },
     },
