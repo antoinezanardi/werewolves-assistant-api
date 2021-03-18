@@ -40,6 +40,12 @@ const gameOptions = {
                 default: true,
             },
         },
+        bigBadWolf: {
+            isPowerlessIfWerewolfDies: {
+                type: Boolean,
+                default: true,
+            },
+        },
         seer: {
             isTalkative: {
                 type: Boolean,

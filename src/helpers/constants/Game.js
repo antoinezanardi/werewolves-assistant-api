@@ -52,6 +52,7 @@ exports.defaultGameOptions = {
             electedAt: { turn: 1, phase: "night" },
             hasDoubledVote: true,
         },
+        bigBadWolf: { isPowerlessIfWerewolfDies: true },
         seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
         guard: { canProtectTwice: false },

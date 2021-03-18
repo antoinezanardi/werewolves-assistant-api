@@ -500,7 +500,7 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
     } else if (role === "three-brothers") {
         return this.areThreeBrothersCallableDuringTheNight(game);
     } else if (role === "big-bad-wolf") {
-        return player.isAlive && areAllWerewolvesAlive(game);
+        return player.isAlive && (!game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies || areAllWerewolvesAlive(game));
     } else if (role === "pied-piper") {
         return player.isAlive && player.side.current === "villagers";
     } else if (role === "white-werewolf") {

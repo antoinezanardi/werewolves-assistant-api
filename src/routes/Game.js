@@ -36,6 +36,8 @@ module.exports = app => {
      * @apiSuccess {Number} options.roles.sheriff.electedAt.turn=1 Game's turn when the sheriff is elected. Default is `1`.
      * @apiSuccess {String} options.roles.sheriff.electedAt.phase="night" Game's phase when the sheriff is elected. Default is `night`.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiSuccess {Object} options.roles.bigBadWolf Game big bad wolf role's options.
+     * @apiSuccess {Boolean} options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiSuccess {Boolean} options.roles.seer.canSeeRoles=true If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
@@ -205,6 +207,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.sheriff.electedAt.turn=1] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {String{"night", "day"}} [options.roles.sheriff.electedAt.phase="night"] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.bigBadWolf] Game big bad wolf role's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true] If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
@@ -282,6 +286,10 @@ module.exports = app => {
             .isString().withMessage("Must be a valid string")
             .isIn(getGamePhases()).withMessage(`Must be equal to one of the following values: ${getGamePhases()}`),
         body("options.roles.sheriff.hasDoubledVote")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.bigBadWolf.isPowerlessIfWerewolfDies")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
