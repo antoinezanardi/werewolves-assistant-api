@@ -72,6 +72,7 @@ describe("K - Game options", () => {
                         fox: { isPowerlessIfMissesWerewolf: false },
                         bearTamer: { doesGrowlIfInfected: false },
                         stutteringJudge: { voteRequestsCount: 2 },
+                        wildChild: { isTransformationRevealed: true },
                         thief: { mustChooseBetweenWerewolves: false },
                         raven: { markPenalty: 3 },
                     },
@@ -92,6 +93,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.false;
                 expect(game.options.roles.bearTamer.doesGrowlIfInfected).to.be.false;
                 expect(game.options.roles.stutteringJudge.voteRequestsCount).to.equal(2);
+                expect(game.options.roles.wildChild.isTransformationRevealed).to.be.true;
                 expect(game.options.roles.thief.mustChooseBetweenWerewolves).to.be.false;
                 expect(game.options.roles.raven.markPenalty).to.equal(3);
                 done();

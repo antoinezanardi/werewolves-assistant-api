@@ -104,6 +104,12 @@ const gameOptions = {
                 max: 5,
             },
         },
+        wildChild: {
+            isTransformationRevealed: {
+                type: Boolean,
+                default: true,
+            },
+        },
         thief: {
             mustChooseBetweenWerewolves: {
                 type: Boolean,
