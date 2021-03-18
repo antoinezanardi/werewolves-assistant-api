@@ -104,6 +104,12 @@ const gameOptions = {
                 max: 5,
             },
         },
+        thief: {
+            mustChooseBetweenWerewolves: {
+                type: Boolean,
+                default: true,
+            },
+        },
         raven: {
             markPenalty: {
                 type: Number,

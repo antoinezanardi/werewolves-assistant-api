@@ -15,6 +15,7 @@
 * [#148](https://github.com/antoinezanardi/werewolves-assistant-api/issues/148) - Bear Tamer growls if he is infected option.
 * [#149](https://github.com/antoinezanardi/werewolves-assistant-api/issues/149) - Number of vote requests for Stuttering Judge option.
 * [#150](https://github.com/antoinezanardi/werewolves-assistant-api/issues/150) - Time for the Sheriff to be elected option.
+* [#151](https://github.com/antoinezanardi/werewolves-assistant-api/issues/151) - Thief not obliged to choose between werewolves cards option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements
@@ -32,6 +33,7 @@
 ### 📦 Packages
 
 * `@sentry/node` updated to version `6.2.2`.
+* `apidoc` updated to version `0.27.0`.
 * `chai` updated to version `4.3.4`.
 * `eslint` updated to version `7.22.0`.
 * `migrate-mongo` updated to version `8.2.2`.

@@ -55,6 +55,8 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.bearTamer.doesGrowlIfInfected=true If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
      * @apiSuccess {Object} options.roles.stutteringJudge Game stuttering judge role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.stutteringJudge.voteRequestsCount=1 Number of vote requests that the `stuttering-judge` can make during the game. Default is `1`.
+     * @apiSuccess {Object} options.roles.thief Game thief role's options.
+     * @apiSuccess {Boolean} options.roles.thief.mustChooseBetweenWerewolves=true If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiSuccess {Object} options.roles.raven Game raven role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.raven.markPenalty=2 Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
@@ -215,9 +217,11 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Object} [options.roles.fox] Game fox's role options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.fox.isPowerlessIfMissesWerewolf=true] If set to `true`, the fox will loose his power if he doesn't find a player from the `werewolves` side during his turn if he doesn't skip. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.bearTamer] Game bear tamer's role options.
-     * @apiParam (Request Body Parameters) {Boolean} [options.roles.fox.doesGrowlIfInfected=true] If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.bearTamer.doesGrowlIfInfected=true] If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.stutteringJudge] Game stuttering judge's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.stutteringJudge.voteRequestsCount=1] Number of vote requests that the `stuttering-judge` can make during the game. Default is `1`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.thief] Game thief's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.mustChooseBetweenWerewolves=true] If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty=2] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiUse GameResponse
@@ -313,6 +317,10 @@ module.exports = app => {
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
             .toInt(),
+        body("options.roles.thief.mustChooseBetweenWerewolves")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.raven.markPenalty")
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")

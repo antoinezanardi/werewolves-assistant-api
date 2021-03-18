@@ -61,6 +61,7 @@ exports.defaultGameOptions = {
         fox: { isPowerlessIfMissesWerewolf: true },
         bearTamer: { doesGrowlIfInfected: true },
         stutteringJudge: { voteRequestsCount: 1 },
+        thief: { mustChooseBetweenWerewolves: true },
         raven: { markPenalty: 2 },
     },
 };

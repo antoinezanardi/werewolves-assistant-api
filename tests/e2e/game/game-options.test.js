@@ -23,6 +23,7 @@ const originalPlayers = [
     { name: "DŸg", role: "fox" },
     { name: "Døg", role: "bear-tamer" },
     { name: "D„g", role: "stuttering-judge" },
+    { name: "D‰g", role: "thief" },
 ];
 let server, token, game, players;
 
@@ -53,7 +54,7 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🎲 Creates game with brothers and sisters waking up every night, sheriff has regular vote, seer is talkative and raven penalty to 3 with JWT auth (POST /games)", done => {
+    it("🎲 Creates game with brothers and sisters waking up every night, sheriff has regular vote, seer is talkative and raven penalty to 3 and other options with JWT auth (POST /games)", done => {
         chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
@@ -71,9 +72,11 @@ describe("K - Game options", () => {
                         fox: { isPowerlessIfMissesWerewolf: false },
                         bearTamer: { doesGrowlIfInfected: false },
                         stutteringJudge: { voteRequestsCount: 2 },
+                        thief: { mustChooseBetweenWerewolves: false },
                         raven: { markPenalty: 3 },
                     },
                 },
+                additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -89,6 +92,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.false;
                 expect(game.options.roles.bearTamer.doesGrowlIfInfected).to.be.false;
                 expect(game.options.roles.stutteringJudge.voteRequestsCount).to.equal(2);
+                expect(game.options.roles.thief.mustChooseBetweenWerewolves).to.be.false;
                 expect(game.options.roles.raven.markPenalty).to.equal(3);
                 done();
             });
@@ -107,6 +111,21 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🦹️ Thief can skip his turn thanks to options (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[13].role.current).to.equal("thief");
+                expect(game.players[13].side.current).to.equal("villagers");
+                expect(game.history[0].play.card).to.not.exist;
                 done();
             });
     });
@@ -401,12 +420,29 @@ describe("K - Game options", () => {
                         sheriff: { electedAt: { turn: 1, phase: "day" } },
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
+                        thief: { mustChooseBetweenWerewolves: false },
                     },
                 },
+                additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                done();
+            });
+    });
+    it("🦹️ Thief can skip his turn thanks to options (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[13].role.current).to.equal("thief");
+                expect(game.players[13].side.current).to.equal("villagers");
+                expect(game.history[0].play.card).to.not.exist;
                 done();
             });
     });
@@ -573,14 +609,31 @@ describe("K - Game options", () => {
                         littleGirl: { isProtectedByGuard: true },
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
+                        thief: { mustChooseBetweenWerewolves: false },
                         raven: { markPenalty: 1 },
                     },
                 },
+                additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.options.roles.sheriff.isEnabled).to.be.false;
+                done();
+            });
+    });
+    it("🦹️ Thief can skip his turn thanks to options (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "thief", action: "choose-card" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[13].role.current).to.equal("thief");
+                expect(game.players[13].side.current).to.equal("villagers");
+                expect(game.history[0].play.card).to.not.exist;
                 done();
             });
     });

@@ -486,7 +486,8 @@ exports.checkAndGetChosenCard = (chosenCardId, game) => {
     const thiefAdditionalCards = game.additionalCards.filter(({ for: recipient }) => recipient === "thief");
     if (chosenCardId && !chosenCard) {
         throw generateError("CHOSEN_CARD_NOT_FOUND", `The chosen card with id "${chosenCardId}" is not found in additional cards.`);
-    } else if (!chosenCard && thiefAdditionalCards.every(({ role: roleName }) => werewolvesRoles.find(({ name }) => name === roleName))) {
+    } else if (!chosenCard && thiefAdditionalCards.every(({ role: roleName }) => werewolvesRoles.find(({ name }) => name === roleName)) &&
+        game.options.roles.thief.mustChooseBetweenWerewolves) {
         throw generateError("THIEF_MUST_STEAL", `As all additional cards for thief are on the werewolves side, he must choose one of them.`);
     }
     if (chosenCard) {
