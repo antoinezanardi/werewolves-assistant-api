@@ -519,7 +519,9 @@ exports.whiteWerewolfPlays = async(play, game) => {
 
 exports.piedPiperPlays = async(play, game) => {
     const { targets } = play;
-    const targetsExpectedLength = getRemainingPlayersToCharm(game).length === 1 ? 1 : 2;
+    const { charmedPeopleCountPerNight: maxCharmedPeople } = game.options.roles.piedPiper;
+    const remainingPlayersToCharmCount = getRemainingPlayersToCharm(game).length;
+    const targetsExpectedLength = remainingPlayersToCharmCount >= maxCharmedPeople ? maxCharmedPeople : remainingPlayersToCharmCount;
     await this.checkAndFillTargets(targets, game, { expectedLength: targetsExpectedLength, play });
     for (const { player } of targets) {
         this.addPlayerAttribute(player._id, "charmed", game);

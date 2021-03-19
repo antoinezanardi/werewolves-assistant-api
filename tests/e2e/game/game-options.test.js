@@ -418,7 +418,12 @@ describe("K - Game options", () => {
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({
-                players: [...originalPlayers, { name: "D∆g", role: "big-bad-wolf" }, { name: "dåg", role: "white-werewolf" }],
+                players: [
+                    ...originalPlayers,
+                    { name: "D∆g", role: "big-bad-wolf" },
+                    { name: "Dåg", role: "white-werewolf" },
+                    { name: "Dªg", role: "pied-piper" },
+                ],
                 options: {
                     roles: {
                         sheriff: { electedAt: { turn: 1, phase: "day" } },
@@ -427,6 +432,7 @@ describe("K - Game options", () => {
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
                         thief: { mustChooseBetweenWerewolves: false },
+                        piedPiper: { charmedPeopleCountPerNight: 1 },
                     },
                 },
                 additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
@@ -436,6 +442,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies).to.be.false;
                 expect(game.options.roles.whiteWerewolf.wakingUpInterval).to.be.equal(1);
+                expect(game.options.roles.piedPiper.charmedPeopleCountPerNight).to.equal(1);
                 done();
             });
     });
@@ -561,6 +568,29 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equal(players[4]._id);
+                done();
+            });
+    });
+    it("📣 Pied piper charms one brother (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                done();
+            });
+    });
+    it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "charmed", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
                 done();
             });
     });

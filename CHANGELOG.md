@@ -20,6 +20,7 @@
 * [#153](https://github.com/antoinezanardi/werewolves-assistant-api/issues/153) - Dog Wolf chosen side is revealed option.
 * [#154](https://github.com/antoinezanardi/werewolves-assistant-api/issues/154) - Big Bad Wolf not powerless if one werewolf dies option.
 * [#155](https://github.com/antoinezanardi/werewolves-assistant-api/issues/155) - White Werewolf waking up interval option.
+* [#156](https://github.com/antoinezanardi/werewolves-assistant-api/issues/156) - Number of charmed people per night by Pied Piper option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements
@@ -37,12 +38,13 @@
 ### 📦 Packages
 
 * `@sentry/node` updated to version `6.2.2`.
-* `apidoc` updated to version `0.27.0`.
+* `apidoc` updated to version `0.27.1`.
 * `chai` updated to version `4.3.4`.
 * `eslint` updated to version `7.22.0`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
-* `mongoose` updated to version `5.12.0`.
+* `mongoose` updated to version `5.12.1`.
+* `qs` updated to version `6.10.0`.
 
 ---
 

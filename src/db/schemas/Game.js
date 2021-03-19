@@ -136,6 +136,14 @@ const gameOptions = {
                 default: true,
             },
         },
+        piedPiper: {
+            charmedPeopleCountPerNight: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+        },
         raven: {
             markPenalty: {
                 type: Number,

@@ -66,6 +66,7 @@ exports.defaultGameOptions = {
         wildChild: { isTransformationRevealed: false },
         dogWolf: { isChosenSideRevealed: false },
         thief: { mustChooseBetweenWerewolves: true },
+        piedPiper: { charmedPeopleCountPerNight: 2 },
         raven: { markPenalty: 2 },
     },
 };
