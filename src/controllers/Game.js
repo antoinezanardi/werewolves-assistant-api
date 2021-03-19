@@ -460,7 +460,8 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
         return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
     } else if (group === "charmed") {
         const piedPiperPlayer = getPlayerWithRole("pied-piper", game);
-        return piedPiperPlayer?.isAlive && piedPiperPlayer.side.current !== "werewolves" && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
+        return piedPiperPlayer?.isAlive && (piedPiperPlayer.side.current === "villagers" || !game.options.roles.piedPiper.isPowerlessIfInfected) &&
+            !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
@@ -504,7 +505,7 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
     } else if (role === "big-bad-wolf") {
         return player.isAlive && (!game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies || areAllWerewolvesAlive(game));
     } else if (role === "pied-piper") {
-        return player.isAlive && player.side.current === "villagers";
+        return player.isAlive && (player.side.current === "villagers" || !game.options.roles.piedPiper.isPowerlessIfInfected);
     } else if (role === "white-werewolf") {
         return this.isWhiteWerewolfCallableDuringTheNight(game);
     }

@@ -432,7 +432,7 @@ describe("K - Game options", () => {
                         twoSisters: { wakingUpInterval: 0 },
                         threeBrothers: { wakingUpInterval: 0 },
                         thief: { mustChooseBetweenWerewolves: false },
-                        piedPiper: { charmedPeopleCountPerNight: 1 },
+                        piedPiper: { charmedPeopleCountPerNight: 1, isPowerlessIfInfected: false },
                     },
                 },
                 additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
@@ -443,6 +443,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies).to.be.false;
                 expect(game.options.roles.whiteWerewolf.wakingUpInterval).to.be.equal(1);
                 expect(game.options.roles.piedPiper.charmedPeopleCountPerNight).to.equal(1);
+                expect(game.options.roles.piedPiper.isPowerlessIfInfected).to.be.false;
                 done();
             });
     });
@@ -533,15 +534,17 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
+    it("🐺 Werewolf infects the pied piper (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "werewolves", action: "eat", targets: [{ player: players[6]._id }] })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[16]._id, isInfected: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.players[16].role.current).to.equal("pied-piper");
+                expect(game.players[16].side.current).to.equal("werewolves");
                 done();
             });
     });

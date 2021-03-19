@@ -8,6 +8,7 @@ const cors = require("cors");
 const Config = require("./config");
 const { sendError, generateError } = require("./src/helpers/functions/Error");
 const { connect: connectDatabase } = require("./src/helpers/functions/Mongoose");
+const routes = require("./src/routes");
 
 if (Config.sentry.enabled) {
     const Sentry = require("@sentry/node");
@@ -29,7 +30,6 @@ connectDatabase().then(() => {
             next();
         }
     });
-    const routes = require("./src/routes");
     routes(app);
     app.listen(Config.app.port);
     if (Config.app.nodeEnv !== "test") {

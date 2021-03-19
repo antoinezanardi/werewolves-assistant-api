@@ -67,6 +67,7 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.thief.mustChooseBetweenWerewolves=true If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiSuccess {Object} options.roles.piedPiper Game pied piper role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.piedPiper.charmedPeopleCountPerNight=2 Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
+     * @apiSuccess {Boolean} options.roles.piedPiper.isPowerlessIfInfected=true If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
      * @apiSuccess {Object} options.roles.raven Game raven role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.raven.markPenalty=2 Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
@@ -242,6 +243,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.mustChooseBetweenWerewolves=true] If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.piedPiper] Game pied piper's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.piedPiper.charmedPeopleCountPerNight=2] Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.piedPiper.isPowerlessIfInfected=true] If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty=2] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiUse GameResponse
@@ -361,6 +363,10 @@ module.exports = app => {
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
             .toInt(),
+        body("options.roles.piedPiper.isPowerlessIfInfected")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.raven.markPenalty")
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")

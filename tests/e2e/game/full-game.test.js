@@ -101,6 +101,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 expect(game.options.roles.dogWolf.isChosenSideRevealed).to.be.false;
                 expect(game.options.roles.thief.mustChooseBetweenWerewolves).to.be.true;
                 expect(game.options.roles.piedPiper.charmedPeopleCountPerNight).to.equal(2);
+                expect(game.options.roles.piedPiper.isPowerlessIfInfected).to.be.true;
                 expect(game.options.roles.raven.markPenalty).to.be.equal(2);
                 done();
             });

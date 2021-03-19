@@ -143,6 +143,10 @@ const gameOptions = {
                 min: 1,
                 max: 5,
             },
+            isPowerlessIfInfected: {
+                type: Boolean,
+                default: true,
+            },
         },
         raven: {
             markPenalty: {
