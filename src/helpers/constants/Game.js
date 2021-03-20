@@ -57,6 +57,7 @@ exports.defaultGameOptions = {
         seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
         guard: { canProtectTwice: false },
+        ancient: { livesCountAgainstWerewolves: 2 },
         idiot: { doesDieOnAncientDeath: true },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },

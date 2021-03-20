@@ -76,6 +76,14 @@ const gameOptions = {
                 default: false,
             },
         },
+        ancient: {
+            livesCountAgainstWerewolves: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+        },
         idiot: {
             doesDieOnAncientDeath: {
                 type: Boolean,

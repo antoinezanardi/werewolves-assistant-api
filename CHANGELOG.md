@@ -38,7 +38,7 @@
 
 ### 📦 Packages
 
-* `@sentry/node` updated to version `6.2.2`.
+* `@sentry/node` updated to version `6.2.3`.
 * `apidoc` updated to version `0.27.1`.
 * `chai` updated to version `4.3.4`.
 * `eslint` updated to version `7.22.0`.
