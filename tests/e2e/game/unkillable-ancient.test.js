@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const credentials = { email: "test@test.fr", password: "secret" };
-let players = [
+const originalPlayers = [
     { name: "Dig", role: "witch" },
     { name: "Dag", role: "guard" },
     { name: "Dog", role: "werewolf" },
@@ -17,7 +17,7 @@ let players = [
     { name: "Dôg", role: "scapegoat" },
     { name: "D∂g", role: "idiot" },
 ];
-let server, token, game;
+let server, token, game, players;
 
 describe("P - Game with an ancient who survives from 3 werewolves attacks", () => {
     before(done => resetDatabase(done));
@@ -50,7 +50,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
         chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
-            .send({ players, options: { roles: { sheriff: { isEnabled: false } } } })
+            .send({ players: originalPlayers, options: { roles: { sheriff: { isEnabled: false } } } })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
@@ -269,6 +269,89 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
         expect(game.players[3].role.isRevealed).to.be.true;
         expect(game.players[5].isAlive).to.be.false;
         expect(game.players[5].murdered).to.deep.equals({ by: "all", of: "reconsider" });
+        done();
+    });
+    it("🎲 Cancels game (PATCH /games/:id)", done => {
+        chai.request(server)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ status: "canceled" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.status).to.equal("canceled");
+                done();
+            });
+    });
+    it("🎲 Creates game with JWT auth with ancient with only one life against werewolves (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: originalPlayers, options: {
+                    roles: {
+                        sheriff: { isEnabled: false },
+                        ancient: { livesCountAgainstWerewolves: 1 },
+                    },
+                },
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.options.roles.ancient.livesCountAgainstWerewolves).to.equal(1);
+                done();
+            });
+    });
+    it("🌙 Night falls", done => {
+        players = game.players;
+        expect(game.phase).to.equal("night");
+        done();
+    });
+    it("🛡 Guard protects himself (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "guard", action: "protect", targets: [{ player: players[1]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[1].attributes).to.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
+                done();
+            });
+    });
+    it("🐺 Werewolf eats the ancient (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[3].attributes).to.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
+                expect(game.players[3].side.current).to.equal("villagers");
+                expect(game.history[0].play.targets).to.exist;
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[3]._id);
+                done();
+            });
+    });
+    it("🪄 Witch skips (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "witch", action: "use-potion" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("☀️ Sun is rising and ancient is dead because he has only one life against werewolves", done => {
+        expect(game.phase).to.equal("day");
+        expect(game.players[3].isAlive).to.be.false;
         done();
     });
 });

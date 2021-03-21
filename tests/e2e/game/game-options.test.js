@@ -67,7 +67,6 @@ describe("K - Game options", () => {
                         sheriff: { hasDoubledVote: false },
                         seer: { isTalkative: false, canSeeRoles: false },
                         guard: { canProtectTwice: true },
-                        ancient: { livesCountAgainstWerewolves: 3 },
                         twoSisters: { wakingUpInterval: 1 },
                         threeBrothers: { wakingUpInterval: 1 },
                         fox: { isPowerlessIfMissesWerewolf: false },
@@ -90,7 +89,6 @@ describe("K - Game options", () => {
                 expect(game.options.roles.seer.isTalkative).to.be.false;
                 expect(game.options.roles.seer.canSeeRoles).to.be.false;
                 expect(game.options.roles.guard.canProtectTwice).to.be.true;
-                expect(game.options.roles.ancient.livesCountAgainstWerewolves).to.equal(3);
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equal(1);
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equal(1);
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.false;

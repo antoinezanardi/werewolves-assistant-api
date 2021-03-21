@@ -22,6 +22,7 @@
 * [#155](https://github.com/antoinezanardi/werewolves-assistant-api/issues/155) - White Werewolf waking up interval option.
 * [#156](https://github.com/antoinezanardi/werewolves-assistant-api/issues/156) - Number of charmed people per night by Pied Piper option.
 * [#157](https://github.com/antoinezanardi/werewolves-assistant-api/issues/157) - Pied Piper not powerless if infected option.
+* [#158](https://github.com/antoinezanardi/werewolves-assistant-api/issues/158) - Lives count for the Ancient option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements

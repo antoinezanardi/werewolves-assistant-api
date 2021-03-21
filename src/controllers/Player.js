@@ -260,7 +260,7 @@ exports.fillMurderedData = (player, action, gameHistoryEntry, options) => {
     }
 };
 
-exports.isAncientKillable = async(action, gameHistoryEntry) => {
+exports.isAncientKillable = async(action, game, gameHistoryEntry) => {
     if (action !== "eat") {
         return true;
     }
@@ -280,7 +280,7 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
         "play.source.name": "guard",
         "play.targets": { $elemMatch: { "player.role.current": "ancient" } },
     };
-    let livesCount = 2;
+    let livesCount = game.options.roles.ancient.livesCountAgainstWerewolves;
     for (const werewolvesPlay of werewolvesPlaysOnAncient) {
         if (werewolvesPlay.play.action === "eat" && werewolvesPlay.play.targets.find(({ player }) => player.role.current === "ancient") &&
             !await GameHistory.findOne({ ...ancientSavedByWitchPlaySearch, turn: werewolvesPlay.turn }) &&
@@ -291,15 +291,15 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
     return livesCount <= 0;
 };
 
-exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, gameHistoryEntry) => role.current !== "ancient" &&
-    role.current !== "idiot" || role.current === "ancient" && await this.isAncientKillable(action, gameHistoryEntry) ||
+exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, game, gameHistoryEntry) => role.current !== "ancient" &&
+    role.current !== "idiot" || role.current === "ancient" && await this.isAncientKillable(action, game, gameHistoryEntry) ||
     role.current === "idiot" && isIdiotKillable(action, { attributes }, alreadyRevealed);
 
 exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {}) => {
     const player = getPlayerWithId(playerId, game);
     if (player?.isAlive && (action !== "eat" || canBeEaten(player, game))) {
         const alreadyRevealed = player.role.isRevealed;
-        if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, gameHistoryEntry))) {
+        if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, game, gameHistoryEntry))) {
             player.role.isRevealed = true;
             this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             if (player.role.current === "idiot" && !doesPlayerHaveAttribute(player, "powerless") &&
@@ -307,7 +307,7 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
                 this.addPlayerAttribute(player._id, "cant-vote", game, { source: "all" });
             }
         }
-        if (await this.isPlayerKillable(player, action, alreadyRevealed, gameHistoryEntry)) {
+        if (await this.isPlayerKillable(player, action, alreadyRevealed, game, gameHistoryEntry)) {
             player.isAlive = false;
             this.fillMurderedData(player, action, gameHistoryEntry, options);
             if (action === "vote") {
@@ -597,7 +597,7 @@ exports.werewolvesPlay = async(play, game, gameHistoryEntry) => {
     if (targets[0].isInfected) {
         const infectedPlayer = getPlayerWithId(targets[0].player._id, game);
         if (infectedPlayer) {
-            if (infectedPlayer.role.current === "ancient" && !await this.isAncientKillable(play.action, gameHistoryEntry)) {
+            if (infectedPlayer.role.current === "ancient" && !await this.isAncientKillable(play.action, game, gameHistoryEntry)) {
                 this.addPlayerAttribute(targets[0].player._id, "eaten", game);
             } else {
                 infectedPlayer.side.current = "werewolves";
