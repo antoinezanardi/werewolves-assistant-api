@@ -23,6 +23,7 @@
 * [#156](https://github.com/antoinezanardi/werewolves-assistant-api/issues/156) - Number of charmed people per night by Pied Piper option.
 * [#157](https://github.com/antoinezanardi/werewolves-assistant-api/issues/157) - Pied Piper not powerless if infected option.
 * [#158](https://github.com/antoinezanardi/werewolves-assistant-api/issues/158) - Lives count for the Ancient option.
+* [#159](https://github.com/antoinezanardi/werewolves-assistant-api/issues/159) - Ancient doesn't make all villagers powerless if murdered from them option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements
@@ -46,7 +47,7 @@
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
 * `mongoose` updated to version `5.12.1`.
-* `qs` updated to version `6.10.0`.
+* `qs` updated to version `6.10.1`.
 
 ---
 

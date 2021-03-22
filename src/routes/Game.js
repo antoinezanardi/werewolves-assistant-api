@@ -49,6 +49,7 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.guard.canProtectTwice=false If set to `true`, the guard can protect twice in a row the same target. Default is `false`.
      * @apiSuccess {Object} options.roles.ancient Game ancient role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.ancient.livesCountAgainstWerewolves=2 Number of lives ancient has against `werewolves`. Default is `2`.
+     * @apiSuccess {Boolean} options.roles.ancient.doesTakeHisRevenge=true If set to `true`, the `ancient` will make all players from the `villagers` side `powerless` if he dies from them. Default is `true`.
      * @apiSuccess {Object} options.roles.idiot Game idiot role's options.
      * @apiSuccess {Boolean} options.roles.idiot.doesDieOnAncientDeath=true If set to `true`, the idiot will die if he is revealed and the ancient is dead. Default is `true`.
      * @apiSuccess {Object} options.roles.twoSisters Game two sisters role's options.
@@ -227,6 +228,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.guard.canProtectTwice=false] If set to `true`, the guard can protect twice in a row the same target. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.ancient] Game ancient role's options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.ancient.livesCountAgainstWerewolves=2] Number of lives ancient has against `werewolves`. Default is `2`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.ancient.doesTakeHisRevenge=true] If set to `true`, the `ancient` will make all players from the `villagers` side `powerless` if he dies from them. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.idiot] Game idiot role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.idiot.doesDieOnAncientDeath=true] If set to `true`, the idiot will die if he is revealed and the ancient is dead. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game two sisters role's options.
@@ -331,6 +333,10 @@ module.exports = app => {
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
             .toInt(),
+        body("options.roles.ancient.doesTakeHisRevenge")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.idiot.doesDieOnAncientDeath")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")

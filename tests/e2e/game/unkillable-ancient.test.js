@@ -283,7 +283,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 done();
             });
     });
-    it("🎲 Creates game with JWT auth with ancient with only one life against werewolves (POST /games)", done => {
+    it("🎲 Creates game with JWT auth with ancient with only one life against werewolves and doesn't take his revenge (POST /games)", done => {
         chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
@@ -291,7 +291,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 players: originalPlayers, options: {
                     roles: {
                         sheriff: { isEnabled: false },
-                        ancient: { livesCountAgainstWerewolves: 1 },
+                        ancient: { livesCountAgainstWerewolves: 1, doesTakeHisRevenge: false },
                     },
                 },
             })
@@ -299,6 +299,7 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.options.roles.ancient.livesCountAgainstWerewolves).to.equal(1);
+                expect(game.options.roles.ancient.doesTakeHisRevenge).to.be.false;
                 done();
             });
     });
@@ -349,9 +350,13 @@ describe("P - Game with an ancient who survives from 3 werewolves attacks", () =
                 done();
             });
     });
-    it("☀️ Sun is rising and ancient is dead because he has only one life against werewolves", done => {
+    it("☀️ Sun is rising and ancient is dead because he has only one life against werewolves and no villagers are powerless", done => {
         expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.false;
+        expect(game.players[0].attributes).to.not.exist;
+        expect(game.players[1].attributes).to.be.an("array").lengthOf(0);
+        expect(game.players[4].attributes).to.not.exist;
+        expect(game.players[5].attributes).to.not.exist;
         done();
     });
 });

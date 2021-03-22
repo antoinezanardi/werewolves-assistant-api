@@ -225,7 +225,7 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionImmediately(game, { for: "hunter", to: "shoot" });
     } else if (player.role.current === "ancient") {
-        if (ancientRevengeActions.includes(action)) {
+        if (ancientRevengeActions.includes(action) && game.options.roles.ancient.doesTakeHisRevenge) {
             for (const { _id, isAlive, side } of game.players) {
                 if (isAlive && side.original === "villagers") {
                     this.addPlayerAttribute(_id, "powerless", game);

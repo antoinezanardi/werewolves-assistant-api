@@ -83,6 +83,10 @@ const gameOptions = {
                 min: 1,
                 max: 5,
             },
+            doesTakeHisRevenge: {
+                type: Boolean,
+                default: true,
+            },
         },
         idiot: {
             doesDieOnAncientDeath: {

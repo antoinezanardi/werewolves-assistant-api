@@ -95,6 +95,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 expect(game.options.roles.seer.canSeeRoles).to.be.true;
                 expect(game.options.roles.guard.canProtectTwice).to.be.false;
                 expect(game.options.roles.ancient.livesCountAgainstWerewolves).to.equal(2);
+                expect(game.options.roles.ancient.doesTakeHisRevenge).to.be.true;
                 expect(game.options.roles.fox.isPowerlessIfMissesWerewolf).to.be.true;
                 expect(game.options.roles.bearTamer.doesGrowlIfInfected).to.be.true;
                 expect(game.options.roles.stutteringJudge.voteRequestsCount).to.equal(1);
