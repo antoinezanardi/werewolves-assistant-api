@@ -271,4 +271,8 @@ exports.errorMetadata = {
         code: 68,
         HTTPCode: 400,
     },
+    THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED: {
+        code: 69,
+        HTTPCode: 400,
+    },
 };

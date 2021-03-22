@@ -24,6 +24,7 @@
 * [#157](https://github.com/antoinezanardi/werewolves-assistant-api/issues/157) - Pied Piper not powerless if infected option.
 * [#158](https://github.com/antoinezanardi/werewolves-assistant-api/issues/158) - Lives count for the Ancient option.
 * [#159](https://github.com/antoinezanardi/werewolves-assistant-api/issues/159) - Ancient doesn't make all villagers powerless if murdered from them option.
+* [#160](https://github.com/antoinezanardi/werewolves-assistant-api/issues/160) - Number of additional cards for Thief option.
 * [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
 
 ### 🌟 Enhancements

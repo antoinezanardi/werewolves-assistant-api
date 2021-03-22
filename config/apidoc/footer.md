@@ -203,10 +203,11 @@ Description for each case below :
 | 59   | STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET     |    400    | Stuttering judge didn't choose his sign yet and so can't request another vote.                            |
 | 60   | ADDITIONAL_CARDS_NOT_ALLOWED               |    400    | `additionalCards` is not allowed when there is no `thief` in game.                                        |
 | 61   | FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF   |    400    | Role is not allowed in additional cards for thief.                                                        |
-| 62   | NEED_ADDITIONAL_CARDS_FOR_THIEF            |    400    | When `thief` is in the game, 2 additional cards must be added for him.                                    |
+| 62   | NEED_ADDITIONAL_CARDS_FOR_THIEF            |    400    | When `thief` is in the game, 2 additional cards must be added for him (depending on game's options).      |
 | 63   | BAD_PLAY_ACTION_FOR_CHOSEN_CARD            |    400    | `card` can be set only if action is `choose-card`.                                                        |
 | 64   | CHOSEN_CARD_NOT_FOUND                      |    404    | The chosen card is not found in additional cards.                                                         |
 | 65   | THIEF_MUST_STEAL                           |    400    | As all additional cards for thief are on the werewolves side, he must choose one of them.                 |
 | 66   | ALL_PLAYERS_POSITION_NOT_SET               |    400    | Some players has a position and other not. You must define all position or none of them.                  |
 | 67   | PLAYERS_POSITION_NOT_UNIQUE                |    400    | Players don't all have unique position.                                                                   |
 | 68   | PLAYER_POSITION_TOO_HIGH                   |    400    | One player's position exceeds the maximum.                                                                |
+| 69   | THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED |    400    | Exactly 2 additional cards are needed for thief (depending on game's options).                            |

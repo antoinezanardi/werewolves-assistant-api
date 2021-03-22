@@ -147,6 +147,12 @@ const gameOptions = {
                 type: Boolean,
                 default: true,
             },
+            additionalCardsCount: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
         },
         piedPiper: {
             charmedPeopleCountPerNight: {

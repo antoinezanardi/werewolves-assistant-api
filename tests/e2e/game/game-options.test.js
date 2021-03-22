@@ -74,11 +74,11 @@ describe("K - Game options", () => {
                         stutteringJudge: { voteRequestsCount: 2 },
                         wildChild: { isTransformationRevealed: true },
                         dogWolf: { isChosenSideRevealed: true },
-                        thief: { mustChooseBetweenWerewolves: false },
+                        thief: { mustChooseBetweenWerewolves: false, additionalCardsCount: 3 },
                         raven: { markPenalty: 3 },
                     },
                 },
-                additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
+                additionalCards: [{ role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }, { role: "werewolf", for: "thief" }],
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -97,6 +97,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.wildChild.isTransformationRevealed).to.be.true;
                 expect(game.options.roles.dogWolf.isChosenSideRevealed).to.be.true;
                 expect(game.options.roles.thief.mustChooseBetweenWerewolves).to.be.false;
+                expect(game.options.roles.thief.additionalCardsCount).to.be.equal(3);
                 expect(game.options.roles.raven.markPenalty).to.equal(3);
                 done();
             });

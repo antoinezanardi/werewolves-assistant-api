@@ -68,6 +68,7 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.dogWolf.isChosenSideRevealed=false If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
      * @apiSuccess {Object} options.roles.thief Game thief role's options.
      * @apiSuccess {Boolean} options.roles.thief.mustChooseBetweenWerewolves=true If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.thief.additionalCardsCount=2 Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
      * @apiSuccess {Object} options.roles.piedPiper Game pied piper role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.piedPiper.charmedPeopleCountPerNight=2 Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
      * @apiSuccess {Boolean} options.roles.piedPiper.isPowerlessIfInfected=true If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
@@ -247,6 +248,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.dogWolf.isChosenSideRevealed=false] If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.thief] Game thief's role options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.mustChooseBetweenWerewolves=true] If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.thief.additionalCardsCount =2] Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.piedPiper] Game pied piper's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.piedPiper.charmedPeopleCountPerNight=2] Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.piedPiper.isPowerlessIfInfected=true] If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
@@ -272,9 +274,7 @@ module.exports = app => {
             .toInt(),
         body("additionalCards")
             .optional()
-            .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length === 2 ? Promise.resolve() : Promise.reject(new Error()))
-            .withMessage("Must contain 2 cards"),
+            .isArray().withMessage("Must be a valid array"),
         body("additionalCards.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getRoleNames()).withMessage(`Must be equal to one of the following values: ${getRoleNames()}`),
@@ -373,6 +373,10 @@ module.exports = app => {
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.thief.additionalCardsCount")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
         body("options.roles.piedPiper.charmedPeopleCountPerNight")
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")

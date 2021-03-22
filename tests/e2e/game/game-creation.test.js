@@ -329,6 +329,34 @@ describe("A - Game creation", () => {
                 done();
             });
     });
+    it("🃏 Can't create game with too much additional cards for thief (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [{ role: "werewolf", for: "thief" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED");
+                done();
+            });
+    });
+    it("🃏 Can't create game with too much additional cards for thief (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: [...players, { name: "Chipper", role: "thief", position: 6 }], additionalCards: [
+                    { role: "werewolf", for: "thief" },
+                    { role: "werewolf", for: "thief" },
+                    { role: "werewolf", for: "thief" },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED");
+                done();
+            });
+    });
     it("🃏 Can't create game without additional cards if thief is in the game (POST /games)", done => {
         chai.request(server)
             .post("/games")

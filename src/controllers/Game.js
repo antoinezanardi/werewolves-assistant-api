@@ -64,15 +64,20 @@ exports.fillTickData = game => {
     game.turn = 1;
 };
 
-exports.checkAdditionalCardsData = ({ players, additionalCards }) => {
+exports.checkAdditionalCardsData = ({ players, additionalCards, options }) => {
+    const { additionalCardsCount: thiefAdditionalCardsCount } = options.roles.thief;
     if (additionalCards && !getPlayerWithRole("thief", { players })) {
         throw generateError("ADDITIONAL_CARDS_NOT_ALLOWED", "`additionalCards` is not allowed when there is no `thief` in game.");
     } else if (!additionalCards && getPlayerWithRole("thief", { players })) {
-        throw generateError("NEED_ADDITIONAL_CARDS_FOR_THIEF", "2 additional cards are needed for thief.");
+        throw generateError("NEED_ADDITIONAL_CARDS_FOR_THIEF", `${thiefAdditionalCardsCount} additional cards are needed for thief.`);
     }
     if (additionalCards) {
         const additionalCardsThiefRoleNames = getAdditionalCardsThiefRoleNames();
         const roles = getRoles();
+        const thiefAdditionalCards = additionalCards.filter(({ for: recipient }) => recipient === "thief");
+        if (thiefAdditionalCards.length !== thiefAdditionalCardsCount) {
+            throw generateError("THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED", `Exactly ${thiefAdditionalCardsCount} additional cards are needed for thief.`);
+        }
         for (const { role: additionalRole, for: recipient } of additionalCards) {
             if (recipient === "thief" && !additionalCardsThiefRoleNames.includes(additionalRole)) {
                 throw generateError("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF", `"${additionalRole}" is not allowed in additional cards for thief.`);
@@ -153,9 +158,9 @@ exports.checkAndFillDataBeforeCreate = async data => {
     this.checkPlayersPosition(data.players);
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
+    this.fillOptionsData(data);
     this.checkAdditionalCardsData(data);
     this.fillTickData(data);
-    this.fillOptionsData(data);
     data.waiting = await this.getWaitingQueueWithNightActions(data);
 };
 
