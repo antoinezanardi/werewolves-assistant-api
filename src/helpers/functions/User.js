@@ -1,3 +1,4 @@
+const { registrationMethods } = require("../constants/User");
 const { generateError } = require("./Error");
 
 exports.checkJWTUserRights = (req, userId) => {
@@ -5,3 +6,5 @@ exports.checkJWTUserRights = (req, userId) => {
         throw generateError("UNAUTHORIZED", "You can't access other's data.");
     }
 };
+
+exports.getRegistrationMethods = () => JSON.parse(JSON.stringify(registrationMethods));

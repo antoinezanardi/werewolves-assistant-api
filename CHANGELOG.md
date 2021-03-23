@@ -41,13 +41,14 @@
 
 ### 📦 Packages
 
+* `axios` installed with version `0.21.1`.
 * `@sentry/node` updated to version `6.2.3`.
 * `apidoc` updated to version `0.27.1`.
 * `chai` updated to version `4.3.4`.
 * `eslint` updated to version `7.22.0`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
-* `mongoose` updated to version `5.12.1`.
+* `mongoose` updated to version `5.12.2`.
 * `qs` updated to version `6.10.1`.
 
 ---

@@ -1,0 +1,1 @@
+exports.registrationMethods = ["manual", "facebook", "google"];

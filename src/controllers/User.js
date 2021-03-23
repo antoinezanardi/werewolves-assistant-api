@@ -1,3 +1,4 @@
+const axios = require("axios");
 const { flatten } = require("mongo-dot-notation");
 const { sign } = require("jsonwebtoken");
 const passport = require("passport");
@@ -53,6 +54,7 @@ exports.postUser = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         await this.generateSaltAndHash(body);
+        body.registration = { method: "manual" };
         const newUser = await this.create(body, { toJSON: true });
         delete newUser.password;
         res.status(200).json(newUser);
@@ -105,6 +107,16 @@ exports.login = (req, res) => {
                 return res.status(200).json({ token });
             });
         })(req, res);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.loginWithFacebook = async(req, res) => {
+    try {
+        const { body } = checkRequestData(req);
+        const { data } = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${body.accessToken}`);
+        res.status(200).json(data);
     } catch (e) {
         sendError(res, e);
     }
