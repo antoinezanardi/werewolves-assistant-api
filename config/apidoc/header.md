@@ -24,7 +24,7 @@ In order to log in and create games, a user must be created (aka the future game
 | _id                  | ObjectId | User's ID.                                                                              |
 | email                | String   | User's email.                                                                           |
 | registration         | Object   | User's registration data.                                                               |
-| &emsp;⮑ method      | String   | How the user registered himself. (_Possibilities: `manual`, `facebook` or `google`_)    |
+| &emsp;⮑ method      | String   | How the user registered himself. (_Possibilities: `local`, `facebook` or `google`_)    |
 | createdAt            | Date     | When the user created his account.                                                      |
 | updatedAt            | Date     | When the user updated his account.                                                      |
 

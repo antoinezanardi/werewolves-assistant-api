@@ -12,7 +12,7 @@ const userSchema = new Schema({
         method: {
             type: String,
             enum: getRegistrationMethods(),
-            default: "manual",
+            default: "local",
         },
     },
 }, {

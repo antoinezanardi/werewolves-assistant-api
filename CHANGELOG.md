@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
+* [#138](https://github.com/antoinezanardi/werewolves-assistant-api/issues/138) - Facebook authentication.
 * [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
 * [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
 * [#143](https://github.com/antoinezanardi/werewolves-assistant-api/issues/143) - Hidden game repartition option.
@@ -31,13 +32,9 @@
 
 * [#162](https://github.com/antoinezanardi/werewolves-assistant-api/issues/162) - Role types.
 
-### 🐛 Bug fixes
-
 ### ♻️ Refactoring
 
 * [#140](https://github.com/antoinezanardi/werewolves-assistant-api/issues/140) - Extend token's lifetime to infinity.
-
-### 📚 Documentation
 
 ### 📦 Packages
 

@@ -1,1 +1,1 @@
-exports.registrationMethods = ["manual", "facebook", "google"];
+exports.registrationMethods = ["local", "facebook", "google"];

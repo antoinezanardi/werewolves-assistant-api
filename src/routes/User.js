@@ -23,7 +23,7 @@ module.exports = app => {
      * @apiSuccess {ObjectID} _id User's ID.
      * @apiSuccess {String} email User's email.
      * @apiSuccess {Object} registration User's registration data.
-     * @apiSuccess {String} registration.method How the user registered himself. (_Possibilities: `manual`, `facebook` or `google`_)
+     * @apiSuccess {String} registration.method How the user registered himself. (_Possibilities: `local`, `facebook` or `google`_)
      * @apiSuccess {Date} createdAt When the user is created.
      * @apiSuccess {Date} updatedAt When the user is updated.
      */

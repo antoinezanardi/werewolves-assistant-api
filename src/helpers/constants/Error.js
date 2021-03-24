@@ -275,4 +275,24 @@ exports.errorMetadata = {
         code: 69,
         HTTPCode: 400,
     },
+    BAD_FACEBOOK_ACCESS_TOKEN: {
+        code: 70,
+        HTTPCode: 400,
+    },
+    NEED_FACEBOOK_EMAIL_PERMISSION: {
+        code: 71,
+        HTTPCode: 400,
+    },
+    EMAIL_EXISTS_WITH_LOCAL_REGISTRATION: {
+        code: 72,
+        HTTPCode: 400,
+    },
+    EMAIL_EXISTS_WITH_FACEBOOK_REGISTRATION: {
+        code: 73,
+        HTTPCode: 400,
+    },
+    EMAIL_EXISTS_WITH_GOOGLE_REGISTRATION: {
+        code: 74,
+        HTTPCode: 400,
+    },
 };

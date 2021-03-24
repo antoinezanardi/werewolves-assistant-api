@@ -9,7 +9,24 @@ const { checkJWTUserRights } = require("../helpers/functions/User");
 const { checkRequestData } = require("../helpers/functions/Express");
 const Config = require("../../config");
 
+exports.checkDataBeforeCreate = async data => {
+    const existingUser = await this.findOne({ email: data.email });
+    if (existingUser) {
+        if (existingUser.registration.method === data.registration.method) {
+            throw generateError("EMAIL_EXISTS", "The email provided already exists.");
+        }
+        if (existingUser.registration.method === "local") {
+            throw generateError("EMAIL_EXISTS_WITH_LOCAL_REGISTRATION", "The email provided already exists with local registration.");
+        } else if (existingUser.registration.method === "facebook") {
+            throw generateError("EMAIL_EXISTS_WITH_FACEBOOK_REGISTRATION", "The email provided already exists with facebook registration.");
+        } else if (existingUser.registration.method === "google") {
+            throw generateError("EMAIL_EXISTS_WITH_GOOGLE_REGISTRATION", "The email provided already exists with google registration.");
+        }
+    }
+};
+
 exports.create = async(data, options = {}) => {
+    await this.checkDataBeforeCreate(data);
     const { toJSON } = options;
     delete options.toJSON;
     if (!Array.isArray(data)) {
@@ -54,7 +71,7 @@ exports.postUser = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         await this.generateSaltAndHash(body);
-        body.registration = { method: "manual" };
+        body.registration = { method: "local" };
         const newUser = await this.create(body, { toJSON: true });
         delete newUser.password;
         res.status(200).json(newUser);
@@ -92,6 +109,8 @@ exports.getUser = async(req, res) => {
     }
 };
 
+exports.getJWT = user => sign({ userId: user._id }, Config.app.JWTSecret);
+
 exports.login = (req, res) => {
     try {
         checkRequestData(req);
@@ -103,7 +122,7 @@ exports.login = (req, res) => {
                 if (loginErr) {
                     res.status(500).send(loginErr);
                 }
-                const token = sign({ userId: user._id }, Config.app.JWTSecret);
+                const token = this.getJWT(user);
                 return res.status(200).json({ token });
             });
         })(req, res);
@@ -112,11 +131,29 @@ exports.login = (req, res) => {
     }
 };
 
+exports.getFacebookUser = async accessToken => {
+    try {
+        const { data } = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${accessToken}`);
+        return data;
+    } catch (e) {
+        throw generateError("BAD_FACEBOOK_ACCESS_TOKEN", `Access token "${accessToken}" doesn't allow to get user info.`);
+    }
+};
+
 exports.loginWithFacebook = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
-        const { data } = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${body.accessToken}`);
-        res.status(200).json(data);
+        const facebookUser = await this.getFacebookUser(body.accessToken);
+        if (!facebookUser.email) {
+            throw generateError("NEED_FACEBOOK_EMAIL_PERMISSION", `You need to share your email to login with Facebook.`);
+        }
+        const facebookUserData = { email: facebookUser.email, registration: { method: "facebook" } };
+        let user = await this.findOne(facebookUserData);
+        if (!user) {
+            user = await this.create(facebookUserData);
+        }
+        const token = this.getJWT(user);
+        res.status(200).json({ token });
     } catch (e) {
         sendError(res, e);
     }

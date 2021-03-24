@@ -211,3 +211,8 @@ Description for each case below :
 | 67   | PLAYERS_POSITION_NOT_UNIQUE                |    400    | Players don't all have unique position.                                                                   |
 | 68   | PLAYER_POSITION_TOO_HIGH                   |    400    | One player's position exceeds the maximum.                                                                |
 | 69   | THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED |    400    | Exactly 2 additional cards are needed for thief (depending on game's options).                            |
+| 70   | BAD_FACEBOOK_ACCESS_TOKEN                  |    400    | Access token doesn't allow to get user info.                                                              |
+| 71   | NEED_FACEBOOK_EMAIL_PERMISSION             |    400    | You need to share your email to login with Facebook.                                                      |
+| 72   | EMAIL_EXISTS_WITH_LOCAL_REGISTRATION       |    400    | The email provided already exists with local registration.                                                |
+| 73   | EMAIL_EXISTS_WITH_FACEBOOK_REGISTRATION    |    400    | The email provided already exists with facebook registration.                                             |
+| 74   | EMAIL_EXISTS_WITH_GOOGLE_REGISTRATION      |    400    | The email provided already exists with google registration.                                               |

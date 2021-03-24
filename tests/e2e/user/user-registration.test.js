@@ -84,7 +84,7 @@ describe("A - Sign up and log in", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body.email).to.equal(credentials.email);
-                expect(res.body.registration.method).to.equal("manual");
+                expect(res.body.registration.method).to.equal("local");
                 done();
             });
     });
@@ -187,6 +187,17 @@ describe("A - Sign up and log in", () => {
                 expect(res.body[0].email).to.exist;
                 expect(res.body[0].password).to.not.exist;
                 expect(res.body[0].createdAt).to.not.exist;
+                done();
+            });
+    });
+    it("🔐 Can't login with facebook with bad access token (POST /users/login/facebook)", done => {
+        chai.request(server)
+            .post(`/users/login/facebook`)
+            .send({ accessToken: "lol" })
+            .set({ Authorization: `Bearer ${token}` })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("BAD_FACEBOOK_ACCESS_TOKEN");
                 done();
             });
     });
