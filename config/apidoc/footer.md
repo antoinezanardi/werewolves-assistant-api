@@ -216,3 +216,4 @@ Description for each case below :
 | 72   | EMAIL_EXISTS_WITH_LOCAL_REGISTRATION       |    400    | The email provided already exists with local registration.                                                |
 | 73   | EMAIL_EXISTS_WITH_FACEBOOK_REGISTRATION    |    400    | The email provided already exists with facebook registration.                                             |
 | 74   | EMAIL_EXISTS_WITH_GOOGLE_REGISTRATION      |    400    | The email provided already exists with google registration.                                               |
+| 75   | BAD_GOOGLE_ID_TOKEN                        |    400    | Id token doesn't allow to get user info.                                                                  |

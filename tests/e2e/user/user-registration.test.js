@@ -190,14 +190,23 @@ describe("A - Sign up and log in", () => {
                 done();
             });
     });
-    it("🔐 Can't login with facebook with bad access token (POST /users/login/facebook)", done => {
+    it("🔐 Can't login with Facebook with bad access token (POST /users/login/facebook)", done => {
         chai.request(server)
             .post(`/users/login/facebook`)
             .send({ accessToken: "lol" })
-            .set({ Authorization: `Bearer ${token}` })
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equal("BAD_FACEBOOK_ACCESS_TOKEN");
+                done();
+            });
+    });
+    it("🔐 Can't login with Google with bad id token (POST /users/login/facebook)", done => {
+        chai.request(server)
+            .post(`/users/login/google`)
+            .send({ idToken: "lol" })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("BAD_GOOGLE_ID_TOKEN");
                 done();
             });
     });

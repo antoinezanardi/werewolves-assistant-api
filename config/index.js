@@ -22,6 +22,8 @@ const Config = {
         projectID: process.env.SENTRY_PROJECT_ID,
         key: process.env.SENTRY_KEY,
     },
+    google: { client: { ID: process.env.GOOGLE_CLIENT_ID } },
+    facebook: { app: { ID: process.env.FACEBOOK_APP_ID } },
 };
 
 if (Config.app.nodeEnv === "test") {

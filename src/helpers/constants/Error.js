@@ -295,4 +295,8 @@ exports.errorMetadata = {
         code: 74,
         HTTPCode: 400,
     },
+    BAD_GOOGLE_ID_TOKEN: {
+        code: 75,
+        HTTPCode: 400,
+    },
 };

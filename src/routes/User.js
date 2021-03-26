@@ -110,4 +110,17 @@ module.exports = app => {
         body("accessToken")
             .isString().withMessage("Must be a valid string"),
     ], User.loginWithFacebook);
+
+    /**
+     * @api {POST} /users/login/facebook F] Login with Google
+     * @apiName LoginGoogleUser
+     * @apiGroup Users 👤
+     *
+     * @apiParam (Request Body Parameters) {String} idToken Google user's id token for the Werewolves Assistant app.
+     * @apiSuccess {String} token JSON Web Token to keep for further route authentication.
+     */
+    app.post("/users/login/google", [
+        body("idToken")
+            .isString().withMessage("Must be a valid string"),
+    ], User.loginWithGoogle);
 };

@@ -133,8 +133,12 @@ exports.login = (req, res) => {
 
 exports.getFacebookUser = async accessToken => {
     try {
-        const { data } = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${accessToken}`);
-        return data;
+        const { data: facebookApp } = await axios.get(`https://graph.facebook.com/app?access_token=${accessToken}`);
+        if (facebookApp.id !== Config.facebook.app.ID) {
+            throw generateError("BAD_FACEBOOK_ACCESS_TOKEN", `Access token "${accessToken}" doesn't belong to the Werewolves Assistant Facebook app.`);
+        }
+        const { data: facebookUser } = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${accessToken}`);
+        return facebookUser;
     } catch (e) {
         throw generateError("BAD_FACEBOOK_ACCESS_TOKEN", `Access token "${accessToken}" doesn't allow to get user info.`);
     }
@@ -151,6 +155,34 @@ exports.loginWithFacebook = async(req, res) => {
         let user = await this.findOne(facebookUserData);
         if (!user) {
             user = await this.create(facebookUserData);
+        }
+        const token = this.getJWT(user);
+        res.status(200).json({ token });
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.getGoogleUser = async idToken => {
+    try {
+        const { data } = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${idToken}`);
+        if (data.azp !== Config.google.client.ID) {
+            throw generateError("BAD_GOOGLE_ID_TOKEN", `Id token "${idToken}" doesn't belong to the Werewolves Assistant Google app.`);
+        }
+        return data;
+    } catch (e) {
+        throw generateError("BAD_GOOGLE_ID_TOKEN", `Id token "${idToken}" doesn't allow to get user info.`);
+    }
+};
+
+exports.loginWithGoogle = async(req, res) => {
+    try {
+        const { body } = checkRequestData(req);
+        const googleUser = await this.getGoogleUser(body.idToken);
+        const googleUserData = { email: googleUser.email, registration: { method: "google" } };
+        let user = await this.findOne(googleUserData);
+        if (!user) {
+            user = await this.create(googleUserData);
         }
         const token = this.getJWT(user);
         res.status(200).json({ token });

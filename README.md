@@ -140,6 +140,10 @@ Complete list of all enabled rules is available in the **[.eslintrc.js file](htt
       - _**Not required**_
     * **SENTRY_KEY**: Sentry secret key. 
       - _**Not required**_
+    * **FACEBOOK_APP_ID**: Facebook application ID if you want to enable Facebook authentication.
+      -  _**Not Required**_
+    * **GOOGLE_CLIENT_ID**: Google client ID if you want to enable Google authentication.
+      -  _**Not Required**_
 
 ## <a name="lets-go">🔌 Let's go</a>
 

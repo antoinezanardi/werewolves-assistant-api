@@ -6,6 +6,7 @@
 
 * [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
 * [#138](https://github.com/antoinezanardi/werewolves-assistant-api/issues/138) - Facebook authentication.
+* [#139](https://github.com/antoinezanardi/werewolves-assistant-api/issues/139) - Google authentication.
 * [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
 * [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
 * [#143](https://github.com/antoinezanardi/werewolves-assistant-api/issues/143) - Hidden game repartition option.
@@ -42,7 +43,7 @@
 * `@sentry/node` updated to version `6.2.3`.
 * `apidoc` updated to version `0.27.1`.
 * `chai` updated to version `4.3.4`.
-* `eslint` updated to version `7.22.0`.
+* `eslint` updated to version `7.23.0`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
 * `mongoose` updated to version `5.12.2`.
