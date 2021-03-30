@@ -20,14 +20,14 @@ exports.populate = [
 ];
 
 exports.turnNightActionsOrder = [
-    { source: "all", action: "elect-sheriff", isFirstNightOnly: true },
     { source: "all", action: "vote", isFirstNightOnly: true },
     { source: "thief", action: "choose-card", isFirstNightOnly: true },
     { source: "dog-wolf", action: "choose-side", isFirstNightOnly: true },
     { source: "cupid", action: "charm", isFirstNightOnly: true },
+    { source: "seer", action: "look" },
+    { source: "fox", action: "sniff" },
     { source: "lovers", action: "meet-each-other", isFirstNightOnly: true },
     { source: "stuttering-judge", action: "choose-sign", isFirstNightOnly: true },
-    { source: "seer", action: "look" },
     { source: "two-sisters", action: "meet-each-other" },
     { source: "three-brothers", action: "meet-each-other" },
     { source: "wild-child", action: "choose-model", isFirstNightOnly: true },
@@ -44,13 +44,30 @@ exports.turnNightActionsOrder = [
 exports.findFields = ["status"];
 
 exports.defaultGameOptions = {
+    repartition: { isHidden: false },
     roles: {
-        sheriff: { isEnabled: true, hasDoubledVote: true },
-        seer: { isTalkative: true },
+        areRevealedOnDeath: true,
+        sheriff: {
+            isEnabled: true,
+            electedAt: { turn: 1, phase: "night" },
+            hasDoubledVote: true,
+        },
+        bigBadWolf: { isPowerlessIfWerewolfDies: true },
+        whiteWerewolf: { wakingUpInterval: 2 },
+        seer: { isTalkative: true, canSeeRoles: true },
         littleGirl: { isProtectedByGuard: false },
+        guard: { canProtectTwice: false },
+        ancient: { livesCountAgainstWerewolves: 2, doesTakeHisRevenge: true },
         idiot: { doesDieOnAncientDeath: true },
         twoSisters: { wakingUpInterval: 2 },
         threeBrothers: { wakingUpInterval: 2 },
+        fox: { isPowerlessIfMissesWerewolf: true },
+        bearTamer: { doesGrowlIfInfected: true },
+        stutteringJudge: { voteRequestsCount: 1 },
+        wildChild: { isTransformationRevealed: false },
+        dogWolf: { isChosenSideRevealed: false },
+        thief: { mustChooseBetweenWerewolves: true, additionalCardsCount: 2 },
+        piedPiper: { charmedPeopleCountPerNight: 2, isPowerlessIfInfected: true },
         raven: { markPenalty: 2 },
     },
 };

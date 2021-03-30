@@ -1,4 +1,5 @@
 const { Schema } = require("mongoose");
+const { getRegistrationMethods } = require("../../helpers/functions/User");
 
 const userSchema = new Schema({
     email: {
@@ -6,9 +7,13 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     },
-    password: {
-        type: String,
-        required: true,
+    password: { type: String },
+    registration: {
+        method: {
+            type: String,
+            enum: getRegistrationMethods(),
+            default: "local",
+        },
     },
 }, {
     timestamps: true,

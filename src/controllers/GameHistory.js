@@ -75,7 +75,10 @@ exports.isInfectionUsed = async gameId => !!await this.findOne({ gameId, "play.t
 
 exports.didJudgeChooseSign = async gameId => !!await this.findOne({ gameId, "play.action": "choose-sign", "play.source.name": "stuttering-judge" });
 
-exports.isSecondVoteRequestUsed = async gameId => !!await this.findOne({ gameId, "play.doesJudgeRequestAnotherVote": true });
+exports.doesStutteringJudgeHaveVoteRequestsLeft = async game => {
+    const stutteringJudgeVoteRequests = await this.find({ "gameId": game._id, "play.doesJudgeRequestAnotherVote": true });
+    return stutteringJudgeVoteRequests.length < game.options.roles.stutteringJudge.voteRequestsCount;
+};
 
 exports.getLastNightPlay = gameId => {
     const nightPlayActions = [...turnPreNightActionsOrder, ...turnNightActionsOrder].map(({ action }) => action);
