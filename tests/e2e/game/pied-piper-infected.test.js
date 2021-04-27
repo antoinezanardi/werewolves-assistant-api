@@ -225,4 +225,120 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
         expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
         done();
     });
+    it("🎲 Cancels game (PATCH /games/:id)", done => {
+        chai.request(server)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ status: "canceled" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.status).to.equal("canceled");
+                done();
+            });
+    });
+    it("🎲 Creates game with JWT auth where Pied Piper charms 3 people per night and not powerless if infected (can win even infected) (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: [...originalPlayers, { name: "D∏g", role: "villager" }], options: {
+                    roles: {
+                        sheriff: { isEnabled: false },
+                        piedPiper: { charmedPeopleCountPerNight: 3, isPowerlessIfInfected: false },
+                    },
+                },
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🐺 Vile father of wolf infects the pied piper (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id, isInfected: true }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("📣 Pied piper charms three villagers (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "pied-piper", action: "charm", targets: [
+                    { player: players[2]._id },
+                    { player: players[3]._id },
+                    { player: players[4]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                expect(game.players[3].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                expect(game.players[4].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                done();
+            });
+    });
+    it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "charmed", action: "meet-each-other" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("👪 All vote for the last villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].isAlive).to.be.false;
+                expect(game.players[5].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🐺 Vile father eats one villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("📣 Pied piper charms the vile father of wolves (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "pied-piper", action: "charm", targets: [{ player: players[0]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].attributes).to.deep.include({ name: "charmed", source: "pied-piper" });
+                done();
+            });
+    });
+    it("🎲 Game is won by the pied piper even if he is infected thanks to game option", done => {
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("pied-piper");
+        done();
+    });
 });
