@@ -28,10 +28,11 @@ exports.getRemainingWerewolvesToEat = game => game.players.filter(({ side, role,
     role.current !== "white-werewolf");
 
 exports.hasPiedPiperWon = game => {
+    const { isPowerlessIfInfected } = game.options.roles.piedPiper;
     const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
     const remainingPlayersToCharm = this.getRemainingPlayersToCharm(game);
-    return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless") && piedPiperPlayer.side.current === "villagers" &&
-        !remainingPlayersToCharm.length;
+    return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless") &&
+        (!isPowerlessIfInfected || piedPiperPlayer.side.current === "villagers") && !remainingPlayersToCharm.length;
 };
 
 exports.hasAngelWon = game => {
