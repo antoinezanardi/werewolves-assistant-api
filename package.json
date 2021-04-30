@@ -34,7 +34,7 @@
     "nodemon": "^2.0.7"
   },
   "dependencies": {
-    "@sentry/node": "^6.3.1",
+    "@sentry/node": "^6.3.5",
     "apidoc": "^0.26.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
@@ -49,7 +49,7 @@
     "jsonwebtoken": "^8.5.1",
     "migrate-mongo": "^8.1.4",
     "mongo-dot-notation": "^2.0.0",
-    "mongoose": "^5.12.5",
+    "mongoose": "5.12.5",
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",

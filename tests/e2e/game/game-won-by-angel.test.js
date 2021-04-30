@@ -14,10 +14,11 @@ const originalPlayers = [
     { name: "Dig", role: "werewolf" },
     { name: "Deg", role: "villager" },
     { name: "Dog", role: "villager" },
+    { name: "D|g", role: "witch" },
 ];
 let server, token, game, players;
 
-describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves or sheriff, and wins", () => {
+describe("T - Tiny game of 5 players in which the angel wins of vote, werewolves or sheriff, and wins", () => {
     before(done => resetDatabase(done));
     before(done => {
         server = app.listen(3000, done);
@@ -99,21 +100,21 @@ describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves
                 done();
             });
     });
-    it("👪 All vote for the villager (POST /games/:id/play)", done => {
+    it("👪 All vote for the witch (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[2]._id }] })
+            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[4]._id }] })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
-                expect(game.players[2].isAlive).to.be.false;
-                expect(game.players[2].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[4].isAlive).to.be.false;
+                expect(game.players[4].murdered).to.deep.equals({ by: "all", of: "vote" });
                 done();
             });
     });
-    it("🐺 Werewolf eats one villager (POST /games/:id/play)", done => {
+    it("🐺 Werewolf eats the angel (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
             .post(`/games/${game._id}/play`)
@@ -127,7 +128,7 @@ describe("T - Tiny game of 4 players in which the angel wins of vote, werewolves
                 done();
             });
     });
-    it("🎲 Game is WON by the angel !", done => {
+    it("🎲 Game is WON by the angel ! (Witch is not called during the night because she is dead)", done => {
         expect(game.status).to.equal("done");
         expect(game.won.by).to.equal("angel");
         expect(game.won.players).to.be.an("array").lengthOf(1);
