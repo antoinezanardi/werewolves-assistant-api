@@ -414,8 +414,7 @@ exports.refreshNightWaitingQueue = async game => {
             "gameId": game._id, "turn": game.turn, "phase": "night",
             "play.source.name": waiting.for, "play.action": waiting.to,
         };
-        if (currentPlay.for !== waiting.for && currentPlay.to !== waiting.to &&
-            !await GameHistory.findOne(gameHistorySearch)) {
+        if (currentPlay.for !== waiting.for && currentPlay.to !== waiting.to && !await GameHistory.findOne(gameHistorySearch)) {
             newWaitingQueue.push(waiting);
         }
     }
@@ -514,7 +513,7 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
     } else if (role === "white-werewolf") {
         return this.isWhiteWerewolfCallableDuringTheNight(game);
     }
-    return game.tick === 1 ? !!player : !!player && player.isAlive;
+    return !!player && player.isAlive;
 };
 
 exports.isSheriffCallableDuringTheNight = game => {

@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.11.0 (2021-04-??)
+## 0.11.0 (2021-04-30)
 
 ### 🚀 New features
 
@@ -40,14 +40,14 @@
 ### 📦 Packages
 
 * `axios` installed with version `0.21.1`.
-* `@sentry/node` updated to version `6.3.1`.
+* `@sentry/node` updated to version `6.3.5`.
 * `apidoc` updated to version `0.26.0`.
 * `chai` updated to version `4.3.4`.
 * `eslint` updated to version `7.25.0`.
 * `express-validator` updated to version `6.10.1`.
 * `migrate-mongo` updated to version `8.2.2`.
 * `mocha` updated to version `8.3.2`.
-* `mongoose` updated to version `5.12.5`.
+* `mongoose` updated to version `5.12.6`.
 * `qs` updated to version `6.10.1`.
 * `validator` updated to version `13.6.0`.
 

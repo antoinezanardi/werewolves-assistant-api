@@ -38,13 +38,13 @@ Two versions are available for testing this API:
 
 🔧 <a href="https://sandbox.werewolves-assistant-api.antoinezanardi.fr" target="_blank">**Sandbox API**</a> _(Base URL: https://sandbox.werewolves-assistant-api.antoinezanardi.fr)_
 
-**Sandbox API** may contains some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
+**Sandbox API** may contain some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
 
 Both APIs are running on a server with the following configuration:
 - **OS**: `Debian GNU/Linux 10 (buster)` 
-- **NodeJS**: `v14.15.4`
-- **NPM**: `v7.5.2`
-- **MongoDB shell version**: `v4.4.3` 
+- **NodeJS**: `v14.16.1`
+- **NPM**: `v6.14.12`
+- **MongoDB shell version**: `v4.4.5` 
 
 The MongoDB database is protected under username and password authentication.
 
