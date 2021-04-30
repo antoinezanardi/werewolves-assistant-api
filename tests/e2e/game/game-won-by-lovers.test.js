@@ -15,13 +15,16 @@ let players = [
     { name: "Deg", role: "villager" },
     { name: "Dog", role: "little-girl" },
 ];
-let token, game;
+let server, token, game;
 
 describe("J - Tiny game of 4 players in which lovers win despite they're not on the same side", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -31,7 +34,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -42,7 +45,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -54,7 +57,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
     });
     it("👪 All elect the werewolf as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -71,7 +74,7 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
     });
     it("🏹 Cupid charms the little girl and the werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -85,13 +88,13 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ name: "in-love", source: "cupid" });
                 expect(game.players[3].attributes).to.deep.include({ name: "in-love", source: "cupid" });
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[0]._id);
-                expect(game.history[0].play.targets[1].player._id).to.equals(players[3]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[0]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equal(players[3]._id);
                 done();
             });
     });
     it("💕 Lovers meet each other (POST /games/:id/play)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "lovers", action: "meet-each-other" })
@@ -103,19 +106,19 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
     });
     it("🐺 Vile father of wolves can't infect if he is not in the game (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id, isInfected: true }] })
             .end((err, res) => {
                 expect(res).to.have.status(400);
-                expect(res.body.type).to.equals("ABSENT_VILE_FATHER_OF_WOLVES");
+                expect(res.body.type).to.equal("ABSENT_VILE_FATHER_OF_WOLVES");
                 done();
             });
     });
     it("🐺 Werewolf eats the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[2]._id }] })
@@ -126,13 +129,13 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[2].isAlive).to.be.false;
         done();
     });
     it("👪 All vote for cupid (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[1]._id }] })
@@ -145,10 +148,10 @@ describe("J - Tiny game of 4 players in which lovers win despite they're not on 
             });
     });
     it("🎲 Game is WON by lovers!", done => {
-        expect(game.status).to.equals("done");
-        expect(game.won.by).to.equals("lovers");
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("lovers");
         expect(game.won.players).to.be.an("array");
-        expect(game.won.players.length).to.equals(2);
+        expect(game.won.players.length).to.equal(2);
         done();
     });
 });

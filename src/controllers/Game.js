@@ -64,15 +64,20 @@ exports.fillTickData = game => {
     game.turn = 1;
 };
 
-exports.checkAdditionalCardsData = ({ players, additionalCards }) => {
+exports.checkAdditionalCardsData = ({ players, additionalCards, options }) => {
+    const { additionalCardsCount: thiefAdditionalCardsCount } = options.roles.thief;
     if (additionalCards && !getPlayerWithRole("thief", { players })) {
         throw generateError("ADDITIONAL_CARDS_NOT_ALLOWED", "`additionalCards` is not allowed when there is no `thief` in game.");
     } else if (!additionalCards && getPlayerWithRole("thief", { players })) {
-        throw generateError("NEED_ADDITIONAL_CARDS_FOR_THIEF", "2 additional cards are needed for thief.");
+        throw generateError("NEED_ADDITIONAL_CARDS_FOR_THIEF", `${thiefAdditionalCardsCount} additional cards are needed for thief.`);
     }
     if (additionalCards) {
         const additionalCardsThiefRoleNames = getAdditionalCardsThiefRoleNames();
         const roles = getRoles();
+        const thiefAdditionalCards = additionalCards.filter(({ for: recipient }) => recipient === "thief");
+        if (thiefAdditionalCards.length !== thiefAdditionalCardsCount) {
+            throw generateError("THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED", `Exactly ${thiefAdditionalCardsCount} additional cards are needed for thief.`);
+        }
         for (const { role: additionalRole, for: recipient } of additionalCards) {
             if (recipient === "thief" && !additionalCardsThiefRoleNames.includes(additionalRole)) {
                 throw generateError("FORBIDDEN_ADDITIONAL_CARD_ROLE_FOR_THIEF", `"${additionalRole}" is not allowed in additional cards for thief.`);
@@ -107,6 +112,7 @@ exports.checkRolesCompatibility = players => {
 };
 
 exports.fillPlayersData = players => {
+    let position = 0;
     for (const player of players) {
         player.name = filterOutHTMLTags(player.name);
         const role = getRoles().find(playerRole => playerRole.name === player.role);
@@ -115,13 +121,33 @@ exports.fillPlayersData = players => {
         if (role.name === "villager-villager") {
             player.role.isRevealed = true;
         }
+        if (player.position === undefined) {
+            player.position = position;
+        }
         player.isAlive = true;
+        position++;
+    }
+    players.sort((a, b) => a.position > b.position ? 1 : -1);
+};
+
+exports.checkPlayersPosition = players => {
+    const isOnePlayerPositionNotSet = !!players.find(({ position }) => position === undefined);
+    if (isOnePlayerPositionNotSet && !!players.find(({ position }) => position !== undefined)) {
+        throw generateError("ALL_PLAYERS_POSITION_NOT_SET", `Some players has a position and other not. You must define all position or none of them.`);
+    } else if (!isOnePlayerPositionNotSet) {
+        const playerPositionSet = [...new Set(players.map(({ position }) => position))];
+        const playerMaxPosition = players.length - 1;
+        if (playerPositionSet.length !== players.length) {
+            throw generateError("PLAYERS_POSITION_NOT_UNIQUE", "Players don't all have unique position.");
+        } else if (players.some(({ position }) => position > playerMaxPosition)) {
+            throw generateError("PLAYER_POSITION_TOO_HIGH", `One player's position exceeds the maximum (${playerMaxPosition}).`);
+        }
     }
 };
 
 exports.checkUniqueNameInPlayers = players => {
-    const playerSet = [...new Set(players.map(player => player.name))];
-    if (playerSet.length !== players.length) {
+    const playerNameSet = [...new Set(players.map(({ name }) => name))];
+    if (playerNameSet.length !== players.length) {
         throw generateError("PLAYERS_NAME_NOT_UNIQUE", "Players don't all have unique name.");
     }
 };
@@ -129,11 +155,12 @@ exports.checkUniqueNameInPlayers = players => {
 exports.checkAndFillDataBeforeCreate = async data => {
     await this.checkUserCurrentGames(data.gameMaster);
     this.checkUniqueNameInPlayers(data.players);
+    this.checkPlayersPosition(data.players);
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
+    this.fillOptionsData(data);
     this.checkAdditionalCardsData(data);
     this.fillTickData(data);
-    this.fillOptionsData(data);
     data.waiting = await this.getWaitingQueueWithNightActions(data);
 };
 
@@ -387,8 +414,7 @@ exports.refreshNightWaitingQueue = async game => {
             "gameId": game._id, "turn": game.turn, "phase": "night",
             "play.source.name": waiting.for, "play.action": waiting.to,
         };
-        if (currentPlay.for !== waiting.for && currentPlay.to !== waiting.to &&
-            !await GameHistory.findOne(gameHistorySearch)) {
+        if (currentPlay.for !== waiting.for && currentPlay.to !== waiting.to && !await GameHistory.findOne(gameHistorySearch)) {
             newWaitingQueue.push(waiting);
         }
     }
@@ -427,6 +453,9 @@ exports.fillWaitingQueueWithDayActions = async(game, gameHistoryEntry) => {
             }
         }
     }
+    if (await this.isTimeToElectSheriff(game)) {
+        game.waiting.push({ for: "all", to: "elect-sheriff" });
+    }
 };
 
 exports.isGroupCallableDuringTheNight = (game, group) => {
@@ -435,16 +464,19 @@ exports.isGroupCallableDuringTheNight = (game, group) => {
         return !!cupidPlayer && !doesPlayerHaveAttribute(cupidPlayer, "powerless");
     } else if (group === "charmed") {
         const piedPiperPlayer = getPlayerWithRole("pied-piper", game);
-        return piedPiperPlayer?.isAlive && piedPiperPlayer.side.current !== "werewolves" && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
+        return piedPiperPlayer?.isAlive && (piedPiperPlayer.side.current === "villagers" || !game.options.roles.piedPiper.isPowerlessIfInfected) &&
+            !doesPlayerHaveAttribute(piedPiperPlayer, "powerless");
     }
     const players = getPlayersWithSide(group, game);
     return game.tick === 1 ? !!players.length : !!players.length && players.some(({ isAlive }) => isAlive);
 };
 
 exports.isWhiteWerewolfCallableDuringTheNight = async game => {
+    const { wakingUpInterval: whiteWerewolfWakingUpInterval } = game.options.roles.whiteWerewolf;
     const whiteWerewolfPlayer = getPlayerWithRole("white-werewolf", game);
     const lastWhiteWerewolfPlay = await GameHistory.getLastWhiteWerewolfPlay(game._id);
-    return whiteWerewolfPlayer?.isAlive && (!lastWhiteWerewolfPlay || game.turn - lastWhiteWerewolfPlay.turn > 1);
+    const turnsSinceLastWhiteWerewolfPlay = lastWhiteWerewolfPlay ? game.turn - lastWhiteWerewolfPlay.turn : undefined;
+    return whiteWerewolfPlayer?.isAlive && (!lastWhiteWerewolfPlay || turnsSinceLastWhiteWerewolfPlay >= whiteWerewolfWakingUpInterval);
 };
 
 exports.areThreeBrothersCallableDuringTheNight = async game => {
@@ -475,13 +507,13 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
     } else if (role === "three-brothers") {
         return this.areThreeBrothersCallableDuringTheNight(game);
     } else if (role === "big-bad-wolf") {
-        return player.isAlive && areAllWerewolvesAlive(game);
+        return player.isAlive && (!game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies || areAllWerewolvesAlive(game));
     } else if (role === "pied-piper") {
-        return player.isAlive && player.side.current === "villagers";
+        return player.isAlive && (player.side.current === "villagers" || !game.options.roles.piedPiper.isPowerlessIfInfected);
     } else if (role === "white-werewolf") {
         return this.isWhiteWerewolfCallableDuringTheNight(game);
     }
-    return game.tick === 1 ? !!player : !!player && player.isAlive;
+    return !!player && player.isAlive;
 };
 
 exports.isSheriffCallableDuringTheNight = game => {
@@ -492,9 +524,7 @@ exports.isSheriffCallableDuringTheNight = game => {
 
 exports.isSourceCallableDuringTheNight = (game, source, action) => {
     if (source === "all") {
-        if (action === "elect-sheriff") {
-            return getProp(game, "options.roles.sheriff.isEnabled", true);
-        } else if (action === "vote") {
+        if (action === "vote") {
             return !!getPlayerWithRole("angel", game);
         }
     } else if (source === "sheriff") {
@@ -502,6 +532,15 @@ exports.isSourceCallableDuringTheNight = (game, source, action) => {
     }
     const sourceType = getGroupNames().includes(source) ? "group" : "role";
     return sourceType === "group" ? this.isGroupCallableDuringTheNight(game, source) : this.isRoleCallableDuringTheNight(game, source);
+};
+
+exports.isTimeToElectSheriff = async game => {
+    const sheriffOptions = game.options.roles.sheriff;
+    if (sheriffOptions.isEnabled && game.turn === sheriffOptions.electedAt.turn && game.phase === sheriffOptions.electedAt.phase) {
+        const allElectSheriffPlays = await GameHistory.find({ "gameId": game._id, "play.source.name": "all", "play.action": "elect-sheriff" });
+        return !allElectSheriffPlays.length;
+    }
+    return false;
 };
 
 exports.getWaitingQueueWithNightActions = async game => {
@@ -512,6 +551,9 @@ exports.getWaitingQueueWithNightActions = async game => {
         actionsOrder = getGameTurnNightActionsOrder().filter(action => !action.isFirstNightOnly);
     }
     const waitingQueue = [];
+    if (await this.isTimeToElectSheriff(game)) {
+        waitingQueue.push({ for: "all", to: "elect-sheriff" });
+    }
     for (const { source, action } of actionsOrder) {
         if (await this.isSourceCallableDuringTheNight(game, source, action)) {
             waitingQueue.push({ for: source, to: action });
@@ -528,12 +570,14 @@ exports.fillWaitingQueue = async(game, gameHistoryEntry) => {
             game.waiting.push({ for: "all", to: "vote" });
         }
         this.decreasePlayersAttributesRemainingPhases(game);
+        Player.makeBearTamerGrowls(game);
         if (!game.waiting.length) {
             await this.fillWaitingQueue(game, gameHistoryEntry);
         }
     } else if (game.phase === "day") {
         await this.fillWaitingQueueWithDayActions(game, gameHistoryEntry);
         if (!game.waiting || !game.waiting.length) {
+            await Player.makeWerewolfDiesFromDisease(game, gameHistoryEntry);
             this.decreasePlayersAttributesRemainingPhases(game);
             game.phase = "night";
             game.turn++;
@@ -564,6 +608,7 @@ exports.generatePlayMethods = () => ({
     "white-werewolf": Player.whiteWerewolfPlays,
     "stuttering-judge": () => undefined,
     "thief": Player.thiefPlays,
+    "fox": Player.foxPlays,
 });
 
 exports.generateGameHistoryEntry = (game, { source, ...rest }) => ({

@@ -16,13 +16,16 @@ let players = [
     { name: "Dog", role: "werewolf" },
     { name: "Dœg", role: "angel" },
 ];
-let token, game;
+let server, token, game;
 
 describe("F - Game where raven marks a player who dies during the night", () => {
     before(done => resetDatabase(done));
+    before(done => {
+        server = app.listen(3000, done);
+    });
     after(done => resetDatabase(done));
     it("👤 Creates new user (POST /users)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/users")
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -32,7 +35,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             });
     });
     it("🔑 Logs in successfully (POST /users/login)", done => {
-        chai.request(app)
+        chai.request(server)
             .post(`/users/login`)
             .auth(Config.app.basicAuth.username, Config.app.basicAuth.password)
             .send(credentials)
@@ -43,7 +46,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             });
     });
     it("🎲 Creates game with JWT auth (POST /games)", done => {
-        chai.request(app)
+        chai.request(server)
             .post("/games")
             .set({ Authorization: `Bearer ${token}` })
             .send({ players })
@@ -55,7 +58,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("👪 All elect the raven as the sheriff (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({
@@ -70,16 +73,16 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 game = res.body;
                 expect(game.players[0].attributes).to.deep.include({ name: "sheriff", source: "all" });
                 expect(game.history[0].play.votes).to.exist;
-                expect(game.history[0].play.votes[0].from._id).to.equals(game.players[0]._id);
-                expect(game.history[0].play.votes[0].for._id).to.equals(game.players[1]._id);
+                expect(game.history[0].play.votes[0].from._id).to.equal(game.players[0]._id);
+                expect(game.history[0].play.votes[0].for._id).to.equal(game.players[1]._id);
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(game.players[0]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(game.players[0]._id);
                 done();
             });
     });
     it("👪 All vote for one werewolf (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[2]._id }] })
@@ -87,7 +90,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[2].isAlive).to.be.false;
-                expect(game.history[0].play.votesResult).to.equals("death");
+                expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.history[0].deadPlayers).to.be.an("array").lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.be.equals(game.players[2]._id);
                 done();
@@ -95,7 +98,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
     });
     it("🪶 Raven marks the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "raven", action: "mark", targets: [{ player: players[1]._id }] })
@@ -104,13 +107,13 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 game = res.body;
                 expect(game.players[1].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
     it("🐺 Werewolves eat the villager (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "werewolves", action: "eat", targets: [{ player: players[1]._id }] })
@@ -118,19 +121,19 @@ describe("F - Game where raven marks a player who dies during the night", () => 
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.targets).to.exist;
-                expect(game.history[0].play.targets[0].player._id).to.equals(players[1]._id);
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[1]._id);
                 done();
             });
     });
     it("☀️ Sun is rising and villager is dead", done => {
-        expect(game.phase).to.equals("day");
+        expect(game.phase).to.equal("day");
         expect(game.players[1].isAlive).to.be.false;
         expect(game.players[1].attributes).to.not.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 2 });
         done();
     });
     it("👪 One vote only for angel, dead villager is not nominated despite the fact he has two votes (POST /games/:id/play)", done => {
         players = game.players;
-        chai.request(app)
+        chai.request(server)
             .post(`/games/${game._id}/play`)
             .set({ Authorization: `Bearer ${token}` })
             .send({ source: "all", action: "vote", votes: [{ from: players[0]._id, for: players[4]._id }] })
@@ -144,7 +147,7 @@ describe("F - Game where raven marks a player who dies during the night", () => 
             });
     });
     it("🎲 Game is still playing because angel died from the SECOND vote", done => {
-        expect(game.status).to.equals("playing");
+        expect(game.status).to.equal("playing");
         done();
     });
 });

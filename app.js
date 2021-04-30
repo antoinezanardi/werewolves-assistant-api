@@ -8,6 +8,7 @@ const cors = require("cors");
 const Config = require("./config");
 const { sendError, generateError } = require("./src/helpers/functions/Error");
 const { connect: connectDatabase } = require("./src/helpers/functions/Mongoose");
+const routes = require("./src/routes");
 
 if (Config.sentry.enabled) {
     const Sentry = require("@sentry/node");
@@ -15,7 +16,9 @@ if (Config.sentry.enabled) {
 }
 console.log("Starting the application...");
 connectDatabase().then(() => {
-    console.log("✅ Connected to database.");
+    if (Config.app.nodeEnv !== "test") {
+        console.log("✅ Connected to database.");
+    }
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(cors({ origin: "*" }));
@@ -27,13 +30,13 @@ connectDatabase().then(() => {
             next();
         }
     });
-    const routes = require("./src/routes");
     routes(app);
     app.listen(Config.app.port);
-    console.log(`${bold("🐺 Werewolves Assistant API")} server started on port ${bold.blue(Config.app.port)} and running on database ${bold.green(Config.db.name)}.`);
-    console.log(`${bold("📚 API Documentation:")} http://localhost:${Config.app.port}/apidoc`);
+    if (Config.app.nodeEnv !== "test") {
+        console.log(`${bold("🐺 Werewolves Assistant API")} server started on port ${bold.blue(Config.app.port)} and running on database ${bold.green(Config.db.name)}.`);
+        console.log(`${bold("📚 API Documentation:")} http://localhost:${Config.app.port}/apidoc`);
+    }
     app.emit("ready");
-    app.prototype.isReady = true;
 });
 
 module.exports = app;

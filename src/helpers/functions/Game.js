@@ -28,10 +28,11 @@ exports.getRemainingWerewolvesToEat = game => game.players.filter(({ side, role,
     role.current !== "white-werewolf");
 
 exports.hasPiedPiperWon = game => {
+    const { isPowerlessIfInfected } = game.options.roles.piedPiper;
     const piedPiperPlayer = this.getPlayerWithRole("pied-piper", game);
     const remainingPlayersToCharm = this.getRemainingPlayersToCharm(game);
-    return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless") && piedPiperPlayer.side.current === "villagers" &&
-        !remainingPlayersToCharm.length;
+    return piedPiperPlayer?.isAlive && !doesPlayerHaveAttribute(piedPiperPlayer, "powerless") &&
+        (!isPowerlessIfInfected || piedPiperPlayer.side.current === "villagers") && !remainingPlayersToCharm.length;
 };
 
 exports.hasAngelWon = game => {
@@ -109,3 +110,26 @@ exports.getVotesResults = () => JSON.parse(JSON.stringify(votesResults));
 exports.getAdditionalCardsForRoleNames = () => JSON.parse(JSON.stringify(additionalCardsForRoleNames));
 
 exports.getAdditionalCardsThiefRoleNames = () => JSON.parse(JSON.stringify(additionalCardsThiefRoleNames));
+
+exports.getNearestNeighbor = (playerId, players, direction, options = {}) => {
+    let checkedNeighborsCount = 0;
+    const player = players.find(({ _id }) => _id.toString() === playerId.toString());
+    if (!player) {
+        return null;
+    }
+    let checkingNeighborPosition = player.position;
+    while (checkedNeighborsCount < players.length) {
+        const checkingNeighbor = players[checkingNeighborPosition];
+        if (checkingNeighbor.position !== player.position && (!options.isAlive || checkingNeighbor.isAlive) &&
+            (!options.side || checkingNeighbor.side.current === options.side)) {
+            return checkingNeighbor;
+        }
+        if (direction === "left") {
+            checkingNeighborPosition = checkingNeighborPosition + 1 === players.length ? 0 : checkingNeighborPosition + 1;
+        } else if (direction === "right") {
+            checkingNeighborPosition = checkingNeighborPosition - 1 === -1 ? players.length - 1 : checkingNeighborPosition - 1;
+        }
+        checkedNeighborsCount++;
+    }
+    return null;
+};

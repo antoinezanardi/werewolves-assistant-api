@@ -38,13 +38,13 @@ Two versions are available for testing this API:
 
 🔧 <a href="https://sandbox.werewolves-assistant-api.antoinezanardi.fr" target="_blank">**Sandbox API**</a> _(Base URL: https://sandbox.werewolves-assistant-api.antoinezanardi.fr)_
 
-**Sandbox API** may contains some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
+**Sandbox API** may contain some bugs and unexpected behaviors as its purpose is to test new features before deploying on **main API**.
 
 Both APIs are running on a server with the following configuration:
 - **OS**: `Debian GNU/Linux 10 (buster)` 
-- **NodeJS**: `v14.15.4`
-- **NPM**: `v7.5.2`
-- **MongoDB shell version**: `v4.4.3` 
+- **NodeJS**: `v14.16.1`
+- **NPM**: `v6.14.12`
+- **MongoDB shell version**: `v4.4.5` 
 
 The MongoDB database is protected under username and password authentication.
 
@@ -52,7 +52,7 @@ The MongoDB database is protected under username and password authentication.
 
 ## <a name="roles-available">🃏 Roles available</a>
 
-On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **24 different roles** are available to play:
+On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **27 different roles** are available to play:
 
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/big-bad-wolf.png" width="25"/> The Big Bad Wolf**
@@ -71,7 +71,10 @@ On this current version [![GitHub release](https://img.shields.io/github/release
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/idiot.png" width="25"/> The Idiot**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/two-sisters.png" width="25"/> The Two Sisters**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/three-brothers.png" width="25"/> The Three Brothers**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/fox.png" width="25"/> The Fox**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/bear-tamer.png" width="25"/> The Bear Tamer**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/stuttering-judge.png" width="25"/> The Stuttering Judge**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/rusty-sword-knight.png" width="25"/> The Rusty Sword Knight**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/wild-child.png" width="25"/> The Wild Child**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/dog-wolf.png" width="25"/> The Dog-Wolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/thief.png" width="25"/> The Thief**
@@ -137,6 +140,10 @@ Complete list of all enabled rules is available in the **[.eslintrc.js file](htt
       - _**Not required**_
     * **SENTRY_KEY**: Sentry secret key. 
       - _**Not required**_
+    * **FACEBOOK_APP_ID**: Facebook application ID if you want to enable Facebook authentication.
+      -  _**Not Required**_
+    * **GOOGLE_CLIENT_ID**: Google client ID if you want to enable Google authentication.
+      -  _**Not Required**_
 
 ## <a name="lets-go">🔌 Let's go</a>
 

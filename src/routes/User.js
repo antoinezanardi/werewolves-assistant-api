@@ -22,6 +22,8 @@ module.exports = app => {
      * @apiDefine UserResponse
      * @apiSuccess {ObjectID} _id User's ID.
      * @apiSuccess {String} email User's email.
+     * @apiSuccess {Object} registration User's registration data.
+     * @apiSuccess {String} registration.method How the user registered himself. (_Possibilities: `local`, `facebook` or `google`_)
      * @apiSuccess {Date} createdAt When the user is created.
      * @apiSuccess {Date} updatedAt When the user is updated.
      */
@@ -95,4 +97,30 @@ module.exports = app => {
             .isString().withMessage("Must be a string")
             .isLength({ min: 5, max: 50 }).withMessage("Must be at least 5 characters long"),
     ], User.login);
+
+    /**
+     * @api {POST} /users/login/facebook E] Login with Facebook
+     * @apiName LoginFacebookUser
+     * @apiGroup Users 👤
+     *
+     * @apiParam (Request Body Parameters) {String} accessToken Facebook user's access token for the Werewolves Assistant app.
+     * @apiSuccess {String} token JSON Web Token to keep for further route authentication.
+     */
+    app.post("/users/login/facebook", [
+        body("accessToken")
+            .isString().withMessage("Must be a valid string"),
+    ], User.loginWithFacebook);
+
+    /**
+     * @api {POST} /users/login/facebook F] Login with Google
+     * @apiName LoginGoogleUser
+     * @apiGroup Users 👤
+     *
+     * @apiParam (Request Body Parameters) {String} idToken Google user's id token for the Werewolves Assistant app.
+     * @apiSuccess {String} token JSON Web Token to keep for further route authentication.
+     */
+    app.post("/users/login/google", [
+        body("idToken")
+            .isString().withMessage("Must be a valid string"),
+    ], User.loginWithGoogle);
 };

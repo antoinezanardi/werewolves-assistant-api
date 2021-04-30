@@ -8,19 +8,58 @@ const {
 const { getPlayerActions } = require("../../helpers/functions/Player");
 
 const gameOptions = {
+    repartition: {
+        isHidden: {
+            type: Boolean,
+            default: false,
+        },
+    },
     roles: {
+        areRevealedOnDeath: {
+            type: Boolean,
+            default: true,
+        },
         sheriff: {
             isEnabled: {
                 type: Boolean,
                 default: true,
+            },
+            electedAt: {
+                turn: {
+                    type: Number,
+                    default: 1,
+                },
+                phase: {
+                    type: String,
+                    enum: getGamePhases(),
+                    default: "night",
+                },
             },
             hasDoubledVote: {
                 type: Boolean,
                 default: true,
             },
         },
+        bigBadWolf: {
+            isPowerlessIfWerewolfDies: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        whiteWerewolf: {
+            wakingUpInterval: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+        },
         seer: {
             isTalkative: {
+                type: Boolean,
+                default: true,
+            },
+            canSeeRoles: {
                 type: Boolean,
                 default: true,
             },
@@ -29,6 +68,24 @@ const gameOptions = {
             isProtectedByGuard: {
                 type: Boolean,
                 default: false,
+            },
+        },
+        guard: {
+            canProtectTwice: {
+                type: Boolean,
+                default: false,
+            },
+        },
+        ancient: {
+            livesCountAgainstWerewolves: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+            doesTakeHisRevenge: {
+                type: Boolean,
+                default: true,
             },
         },
         idiot: {
@@ -51,6 +108,62 @@ const gameOptions = {
                 default: 2,
                 min: 0,
                 max: 5,
+            },
+        },
+        fox: {
+            isPowerlessIfMissesWerewolf: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        bearTamer: {
+            doesGrowlIfInfected: {
+                type: Boolean,
+                default: true,
+            },
+        },
+        stutteringJudge: {
+            voteRequestsCount: {
+                type: Number,
+                default: 1,
+                min: 1,
+                max: 5,
+            },
+        },
+        wildChild: {
+            isTransformationRevealed: {
+                type: Boolean,
+                default: false,
+            },
+        },
+        dogWolf: {
+            isChosenSideRevealed: {
+                type: Boolean,
+                default: false,
+            },
+        },
+        thief: {
+            mustChooseBetweenWerewolves: {
+                type: Boolean,
+                default: true,
+            },
+            additionalCardsCount: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+        },
+        piedPiper: {
+            charmedPeopleCountPerNight: {
+                type: Number,
+                default: 2,
+                min: 1,
+                max: 5,
+            },
+            isPowerlessIfInfected: {
+                type: Boolean,
+                default: true,
             },
         },
         raven: {

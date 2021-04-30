@@ -7,7 +7,7 @@ const {
 } = require("../helpers/functions/Player");
 const {
     getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
-    getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat,
+    getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat, getNearestNeighbor,
 } = require("../helpers/functions/Game");
 const { getVillagerRoles, getWerewolfRoles, getRoles } = require("../helpers/functions/Role");
 const { generateError } = require("../helpers/functions/Error");
@@ -36,6 +36,13 @@ exports.checkPiedPiperTargets = target => {
         throw generateError("CANT_CHARM_HIMSELF", `Pied piper can't charm himself.`);
     } else if (doesPlayerHaveAttribute(target.player, "charmed")) {
         throw generateError("ALREADY_CHARMED", `Player with id ${target.player._id} is already charmed and so can't be charmed again.`);
+    }
+};
+
+exports.checkProtectTarget = async(target, game) => {
+    const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
+    if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString() && !game.options.roles.guard.canProtectTwice) {
+        throw generateError("CANT_PROTECT_TWICE", `Guard can't protect the same player twice in a row.`);
     }
 };
 
@@ -71,10 +78,7 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
             throw generateError("BAD_LIFE_POTION_USE", `Witch can only use life potion on a target eaten by "werewolves" of "big-bad-wolf".`);
         }
     } else if (action === "protect") {
-        const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
-        if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString()) {
-            throw generateError("CANT_PROTECT_TWICE", `Guard can't protect the same player twice in a row.`);
-        }
+        await this.checkProtectTarget(target, game);
     } else if (action === "settle-votes") {
         const lastVotePlay = await GameHistory.getLastVotePlay(game._id);
         if (lastVotePlay && !lastVotePlay.play.targets.find(({ player }) => player._id.toString() === target.player._id.toString())) {
@@ -97,6 +101,17 @@ exports.checkAndFillPlayerTarget = (target, game) => {
         throw generateError("NOT_TARGETABLE", `Target with id "${target.player}" is not targetable because the player is dead.`);
     }
     target.player = player;
+};
+
+exports.addFoxTargets = (targets, game) => {
+    const leftAliveNeighbor = getNearestNeighbor(targets[0].player, game.players, "left", { isAlive: true });
+    const rightAliveNeighbor = getNearestNeighbor(targets[0].player, game.players, "right", { isAlive: true });
+    if (leftAliveNeighbor) {
+        targets.unshift({ player: leftAliveNeighbor._id });
+    }
+    if (rightAliveNeighbor && leftAliveNeighbor !== rightAliveNeighbor) {
+        targets.push({ player: rightAliveNeighbor._id });
+    }
 };
 
 exports.checkTargetStructure = (target, action) => {
@@ -134,10 +149,15 @@ exports.checkAndFillTargets = async(targets, game, options) => {
     if (!targets || !targets.length) {
         return;
     }
-    for (let i = 0; i < targets.length; i++) {
-        this.checkTargetStructure(targets[i], options.play.action);
-        this.checkAndFillPlayerTarget(targets[i], game);
-        await this.checkTargetDependingOnPlay(targets[i], game, options.play);
+    for (const target of targets) {
+        this.checkTargetStructure(target, options.play.action);
+    }
+    if (options.play.action === "sniff") {
+        this.addFoxTargets(targets, game);
+    }
+    for (const target of targets) {
+        this.checkAndFillPlayerTarget(target, game);
+        await this.checkTargetDependingOnPlay(target, game, options.play);
     }
     this.checkUniqueTargets(targets);
     await this.checkAllTargetsDependingOnAction(targets, game, options.play.action);
@@ -205,7 +225,7 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
     if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionImmediately(game, { for: "hunter", to: "shoot" });
     } else if (player.role.current === "ancient") {
-        if (ancientRevengeActions.includes(action)) {
+        if (ancientRevengeActions.includes(action) && game.options.roles.ancient.doesTakeHisRevenge) {
             for (const { _id, isAlive, side } of game.players) {
                 if (isAlive && side.original === "villagers") {
                     this.addPlayerAttribute(_id, "powerless", game);
@@ -218,8 +238,14 @@ exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, gam
         if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
             await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
         }
-    } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1) {
+    } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1 &&
+        !doesPlayerHaveAttribute(player, "powerless")) {
         this.insertActionImmediately(game, { for: "scapegoat", to: "ban-voting" });
+    } else if (player.role.current === "rusty-sword-knight" && action === "eat" && !doesPlayerHaveAttribute(player, "powerless")) {
+        const leftAliveWerewolfNeighbor = getNearestNeighbor(player._id, game.players, "left", { isAlive: true, side: "werewolves" });
+        if (leftAliveWerewolfNeighbor) {
+            this.addPlayerAttribute(leftAliveWerewolfNeighbor._id, "contaminated", game);
+        }
     }
 };
 
@@ -234,7 +260,7 @@ exports.fillMurderedData = (player, action, gameHistoryEntry, options) => {
     }
 };
 
-exports.isAncientKillable = async(action, gameHistoryEntry) => {
+exports.isAncientKillable = async(action, game, gameHistoryEntry) => {
     if (action !== "eat") {
         return true;
     }
@@ -254,7 +280,7 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
         "play.source.name": "guard",
         "play.targets": { $elemMatch: { "player.role.current": "ancient" } },
     };
-    let livesCount = 2;
+    let livesCount = game.options.roles.ancient.livesCountAgainstWerewolves;
     for (const werewolvesPlay of werewolvesPlaysOnAncient) {
         if (werewolvesPlay.play.action === "eat" && werewolvesPlay.play.targets.find(({ player }) => player.role.current === "ancient") &&
             !await GameHistory.findOne({ ...ancientSavedByWitchPlaySearch, turn: werewolvesPlay.turn }) &&
@@ -265,15 +291,15 @@ exports.isAncientKillable = async(action, gameHistoryEntry) => {
     return livesCount <= 0;
 };
 
-exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, gameHistoryEntry) => role.current !== "ancient" &&
-    role.current !== "idiot" || role.current === "ancient" && await this.isAncientKillable(action, gameHistoryEntry) ||
+exports.isPlayerKillable = async({ role, attributes }, action, alreadyRevealed, game, gameHistoryEntry) => role.current !== "ancient" &&
+    role.current !== "idiot" || role.current === "ancient" && await this.isAncientKillable(action, game, gameHistoryEntry) ||
     role.current === "idiot" && isIdiotKillable(action, { attributes }, alreadyRevealed);
 
 exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {}) => {
     const player = getPlayerWithId(playerId, game);
     if (player?.isAlive && (action !== "eat" || canBeEaten(player, game))) {
         const alreadyRevealed = player.role.isRevealed;
-        if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, gameHistoryEntry))) {
+        if (!alreadyRevealed && (player.role.current !== "ancient" || await this.isAncientKillable(action, game, gameHistoryEntry))) {
             player.role.isRevealed = true;
             this.insertRevealedPlayerIntoGameHistoryEntry(player, gameHistoryEntry);
             if (player.role.current === "idiot" && !doesPlayerHaveAttribute(player, "powerless") &&
@@ -281,7 +307,7 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
                 this.addPlayerAttribute(player._id, "cant-vote", game, { source: "all" });
             }
         }
-        if (await this.isPlayerKillable(player, action, alreadyRevealed, gameHistoryEntry)) {
+        if (await this.isPlayerKillable(player, action, alreadyRevealed, game, gameHistoryEntry)) {
             player.isAlive = false;
             this.fillMurderedData(player, action, gameHistoryEntry, options);
             if (action === "vote") {
@@ -423,8 +449,8 @@ exports.checkJudgeSecondVoteRequest = async game => {
         throw generateError("STUTTERING_JUDGE_POWERLESS", "Stuttering judge is powerless and so can't request another vote.");
     } else if (!await GameHistory.didJudgeChooseSign(game._id)) {
         throw generateError("STUTTERING_JUDGE_DIDNT_CHOOSE_SIGN_YET", `Stuttering judge didn't choose his sign yet and so can't request another vote.`);
-    } else if (await GameHistory.isSecondVoteRequestUsed(game._id)) {
-        throw generateError("ONLY_ONE_SECOND_VOTE_REQUEST", "Second vote request has been already made.");
+    } else if (!await GameHistory.doesStutteringJudgeHaveVoteRequestsLeft(game)) {
+        throw generateError("VOTE_REQUESTS_EXCEEDED", "Stuttering judge doesn't have any vote request left.");
     }
 };
 
@@ -444,13 +470,24 @@ exports.checkAndFillVotes = async(votes, game, options) => {
     }
 };
 
+exports.foxPlays = async(play, game) => {
+    const { targets } = play;
+    await this.checkAndFillTargets(targets, game, { canBeUnset: true, canBeEmpty: true, expectedLength: 1, play });
+    if (targets?.length && !targets.find(({ player }) => player.side.current === "werewolves") &&
+        game.options.roles.fox.isPowerlessIfMissesWerewolf) {
+        const foxPlayer = getPlayerWithRole("fox", game);
+        this.addPlayerAttribute(foxPlayer._id, "powerless", game, { source: "fox" });
+    }
+};
+
 exports.checkAndGetChosenCard = (chosenCardId, game) => {
     const chosenCard = chosenCardId ? game.additionalCards.find(({ _id }) => _id.toString() === chosenCardId.toString()) : null;
     const werewolvesRoles = getWerewolfRoles();
     const thiefAdditionalCards = game.additionalCards.filter(({ for: recipient }) => recipient === "thief");
     if (chosenCardId && !chosenCard) {
         throw generateError("CHOSEN_CARD_NOT_FOUND", `The chosen card with id "${chosenCardId}" is not found in additional cards.`);
-    } else if (!chosenCard && thiefAdditionalCards.every(({ role: roleName }) => werewolvesRoles.find(({ name }) => name === roleName))) {
+    } else if (!chosenCard && thiefAdditionalCards.every(({ role: roleName }) => werewolvesRoles.find(({ name }) => name === roleName)) &&
+        game.options.roles.thief.mustChooseBetweenWerewolves) {
         throw generateError("THIEF_MUST_STEAL", `As all additional cards for thief are on the werewolves side, he must choose one of them.`);
     }
     if (chosenCard) {
@@ -482,7 +519,9 @@ exports.whiteWerewolfPlays = async(play, game) => {
 
 exports.piedPiperPlays = async(play, game) => {
     const { targets } = play;
-    const targetsExpectedLength = getRemainingPlayersToCharm(game).length === 1 ? 1 : 2;
+    const { charmedPeopleCountPerNight: maxCharmedPeople } = game.options.roles.piedPiper;
+    const remainingPlayersToCharmCount = getRemainingPlayersToCharm(game).length;
+    const targetsExpectedLength = remainingPlayersToCharmCount >= maxCharmedPeople ? maxCharmedPeople : remainingPlayersToCharmCount;
     await this.checkAndFillTargets(targets, game, { expectedLength: targetsExpectedLength, play });
     for (const { player } of targets) {
         this.addPlayerAttribute(player._id, "charmed", game);
@@ -558,11 +597,11 @@ exports.werewolvesPlay = async(play, game, gameHistoryEntry) => {
     if (targets[0].isInfected) {
         const infectedPlayer = getPlayerWithId(targets[0].player._id, game);
         if (infectedPlayer) {
-            if (infectedPlayer.role.current === "ancient" && !await this.isAncientKillable(play.action, gameHistoryEntry)) {
+            if (infectedPlayer.role.current === "ancient" && !await this.isAncientKillable(play.action, game, gameHistoryEntry)) {
                 this.addPlayerAttribute(targets[0].player._id, "eaten", game);
             } else {
                 infectedPlayer.side.current = "werewolves";
-                if (infectedPlayer.role.current === "pied-piper") {
+                if (infectedPlayer.role.current === "pied-piper" && game.options.roles.piedPiper.isPowerlessIfInfected) {
                     filterOutSourcesFromWaitingQueue(game, ["pied-piper", "charmed"]);
                 }
             }
@@ -672,4 +711,23 @@ exports.drankDeathPotion = async(game, play, gameHistoryEntry) => {
     const poisonedPlayer = getPlayerWithAttribute("drank-death-potion", game);
     await this.killPlayer(poisonedPlayer._id, "use-potion", game, gameHistoryEntry);
     this.removePlayerAttribute(poisonedPlayer._id, "drank-death-potion", game);
+};
+
+exports.makeBearTamerGrowls = game => {
+    const bearTamerPlayer = getPlayerWithRole("bear-tamer", game);
+    if (bearTamerPlayer && !doesPlayerHaveAttribute(bearTamerPlayer, "powerless")) {
+        const leftAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "left", { isAlive: true });
+        const rightAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "right", { isAlive: true });
+        if (bearTamerPlayer.side.current === "werewolves" && game.options.roles.bearTamer.doesGrowlIfInfected ||
+            leftAliveNeighbor?.side.current === "werewolves" || rightAliveNeighbor?.side.current === "werewolves") {
+            this.addPlayerAttribute(bearTamerPlayer._id, "growls", game);
+        }
+    }
+};
+
+exports.makeWerewolfDiesFromDisease = async(game, gameHistoryEntry) => {
+    const contaminatedWerewolf = getPlayerWithAttribute("contaminated", game);
+    if (contaminatedWerewolf) {
+        await this.killPlayer(contaminatedWerewolf._id, "disease", game, gameHistoryEntry);
+    }
 };

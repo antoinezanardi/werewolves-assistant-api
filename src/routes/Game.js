@@ -4,7 +4,7 @@ const Game = require("../controllers/Game");
 const GameHistory = require("../controllers/GameHistory");
 const { getRoleNames, getSideNames } = require("../helpers/functions/Role");
 const {
-    getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses,
+    getPatchableGameStatuses, getWaitingForPossibilities, getGameStatuses, getGamePhases,
     getGameRepartitionForbiddenRoleNames, getAdditionalCardsForRoleNames,
 } = require("../helpers/functions/Game");
 const { getPlayerActions } = require("../helpers/functions/Player");
@@ -26,16 +26,52 @@ module.exports = app => {
      * @apiSuccess {String} status Game's current status. (_Possibilities: [Codes - Game Statuses](#game-statuses)_)
      * @apiSuccess {AdditionalCard[]} [additionalCards] Game's additional cards. Set if `thief` is in the game. (_See: [Classes - Additional Card](#game-additional-card-class)_)
      * @apiSuccess {Object} options Game's options.
+     * @apiSuccess {Object} options.repartition Game role's repartition.
+     * @apiSuccess {Boolean} options.repartition.isHidden=false If set to `true`, game's repartition will be hidden to all players. Default is false.
      * @apiSuccess {Object} options.roles Game roles options.
+     * @apiSuccess {Boolean} options.roles.areRevealedOnDeath=true If set to `true`, player's role is revealed when he's dead. Default is `true`.
      * @apiSuccess {Object} options.roles.sheriff Game sheriff role's options.
      * @apiSuccess {Boolean} options.roles.sheriff.isEnabled=true If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
+     * @apiSuccess {Object} options.roles.sheriff.electedAt When the sheriff is elected during the game.
+     * @apiSuccess {Number} options.roles.sheriff.electedAt.turn=1 Game's turn when the sheriff is elected. Default is `1`.
+     * @apiSuccess {String} options.roles.sheriff.electedAt.phase="night" Game's phase when the sheriff is elected. Default is `night`.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiSuccess {Object} options.roles.bigBadWolf Game big bad wolf role's options.
+     * @apiSuccess {Boolean} options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
+     * @apiSuccess {Object} options.roles.whiteWerewolf Game white werewolf role's options.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.whiteWerewolf.wakingUpInterval=2 Since first `night`, interval of nights when the `white-werewolf` is waking up. Default is `2`, meaning he wakes up every other night.
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiSuccess {Boolean} options.roles.seer.canSeeRoles=true If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
+     * @apiSuccess {Object} options.roles.littleGirl Game little girl role's options.
+     * @apiSuccess {Boolean} options.roles.littleGirl.isProtectedByGuard=false If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
+     * @apiSuccess {Object} options.roles.guard Game guard role's options.
+     * @apiSuccess {Boolean} options.roles.guard.canProtectTwice=false If set to `true`, the guard can protect twice in a row the same target. Default is `false`.
+     * @apiSuccess {Object} options.roles.ancient Game ancient role's options.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.ancient.livesCountAgainstWerewolves=2 Number of lives ancient has against `werewolves`. Default is `2`.
+     * @apiSuccess {Boolean} options.roles.ancient.doesTakeHisRevenge=true If set to `true`, the `ancient` will make all players from the `villagers` side `powerless` if he dies from them. Default is `true`.
+     * @apiSuccess {Object} options.roles.idiot Game idiot role's options.
+     * @apiSuccess {Boolean} options.roles.idiot.doesDieOnAncientDeath=true If set to `true`, the idiot will die if he is revealed and the ancient is dead. Default is `true`.
      * @apiSuccess {Object} options.roles.twoSisters Game two sisters role's options.
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.twoSisters.wakingUpInterval=2 Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiSuccess {Object} options.roles.threeBrothers Game three brothers role's options.
      * @apiSuccess {Number{>= 0 && <= 5}} options.roles.threeBrothers.wakingUpInterval=2 Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
+     * @apiSuccess {Object} options.roles.fox Game fox role's options.
+     * @apiSuccess {Boolean} options.roles.fox.isPowerlessIfMissesWerewolf=true If set to `true`, the fox will loose his power if he doesn't find a player from the `werewolves` side during his turn if he doesn't skip. Default is `true`.
+     * @apiSuccess {Object} options.roles.bearTamer Game bear tamer role's options.
+     * @apiSuccess {Boolean} options.roles.bearTamer.doesGrowlIfInfected=true If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
+     * @apiSuccess {Object} options.roles.stutteringJudge Game stuttering judge role's options.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.stutteringJudge.voteRequestsCount=1 Number of vote requests that the `stuttering-judge` can make during the game. Default is `1`.
+     * @apiSuccess {Object} options.roles.wildChild Game wild child role's options.
+     * @apiSuccess {Boolean} options.roles.wildChild.isTransformationRevealed=false If set to `true`, when `wild-child` joins the `werewolves` side because his model died, the game master will announce his transformation to other players. Default is `false`.
+     * @apiSuccess {Object} options.roles.dogWolf Game dog wolf role's options.
+     * @apiSuccess {Boolean} options.roles.dogWolf.isChosenSideRevealed=false If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
+     * @apiSuccess {Object} options.roles.thief Game thief role's options.
+     * @apiSuccess {Boolean} options.roles.thief.mustChooseBetweenWerewolves=true If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.thief.additionalCardsCount=2 Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
+     * @apiSuccess {Object} options.roles.piedPiper Game pied piper role's options.
+     * @apiSuccess {Number{>= 1 && <= 5}} options.roles.piedPiper.charmedPeopleCountPerNight=2 Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
+     * @apiSuccess {Boolean} options.roles.piedPiper.isPowerlessIfInfected=true If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
      * @apiSuccess {Object} options.roles.raven Game raven role's options.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.raven.markPenalty=2 Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiSuccess {GameHistory[]} history Game's history. (_See: [Classes - Game History](#game-history-class)_)
@@ -165,24 +201,57 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Object[]} players Must contain between 4 and 40 players.
      * @apiParam (Request Body Parameters) {String{>= 1 && <= 30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
+     * @apiParam (Request Body Parameters) {Number{>= 0}} [players.position] Player's unique position among all players. Maximum is `players.length - 1`. Either all players position must be set or none of them. In that last case, it will be generated automatically.
      * @apiParam (Request Body Parameters) {Object[]} [additionalCards] Game's additional cards. Must be set if role `thief` is in the game and contain 2 cards.
      * @apiParam (Request Body Parameters) {String} additionalCards.role Additional card's role. The role must be still available compared to the game's composition. (_See [Codes - Player Roles](#player-roles)_)
      * @apiParam (Request Body Parameters) {String} additionalCards.for Additional card's recipient. Must be equal to `thief`.
      * @apiParam (Request Body Parameters) {Object} [options] Game's options.
+     * @apiParam (Request Body Parameters) {Object} [options.repartition] Game repartition's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.repartition.isHidden=false] If set to `true`, game's repartition will be hidden to all players.
      * @apiParam (Request Body Parameters) {Object} [options.roles] Game roles options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.areRevealedOnDeath=true] If set to `true`, player's role is revealed when he's dead.
      * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff] Game sheriff role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.isEnabled=true] If set to `true`, `sheriff` will be elected the first tick and the responsibility will be delegated when he dies. Otherwise, there will be no sheriff in the game and tie in votes will result in another vote between the tied players. In case of another equality, there will be no vote.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.sheriff.electedAt] When the sheriff is elected during the game.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.sheriff.electedAt.turn=1] When the sheriff is elected during the game.
+     * @apiParam (Request Body Parameters) {String{"night", "day"}} [options.roles.sheriff.electedAt.phase="night"] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.bigBadWolf] Game big bad wolf role's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true] If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.whiteWerewolf] Game white werewolf role's options.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.whiteWerewolf.wakingUpInterval=2] Since first `night`, interval of nights when the `white-werewolf` is waking up. Default is `2`, meaning he wakes up every other night.
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.littleGirl] Game little girl role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.isProtectedByGuard=false] If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.guard] Game guard role's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.guard.canProtectTwice=false] If set to `true`, the guard can protect twice in a row the same target. Default is `false`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.ancient] Game ancient role's options.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.ancient.livesCountAgainstWerewolves=2] Number of lives ancient has against `werewolves`. Default is `2`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.ancient.doesTakeHisRevenge=true] If set to `true`, the `ancient` will make all players from the `villagers` side `powerless` if he dies from them. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.idiot] Game idiot role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.idiot.doesDieOnAncientDeath=true] If set to `true`, the idiot will die if he is revealed and the ancient is dead. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.twoSisters] Game two sisters role's options.
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.twoSisters.wakingUpInterval=2] Since first `night`, interval of nights when the Two Sisters are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
      * @apiParam (Request Body Parameters) {Object} [options.roles.threeBrothers] Game three brothers role's options.
      * @apiParam (Request Body Parameters) {Number{>= 0 && <= 5}} [options.roles.threeBrothers.wakingUpInterval=2] Since first `night`, interval of nights when the Three Brothers are waking up. Default is `2`, meaning they wake up every other night. If set to `0`, they are waking up the first night only.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.fox] Game fox's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.fox.isPowerlessIfMissesWerewolf=true] If set to `true`, the fox will loose his power if he doesn't find a player from the `werewolves` side during his turn if he doesn't skip. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.bearTamer] Game bear tamer's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.bearTamer.doesGrowlIfInfected=true] If set to `true`, the bear tamer will have the `growls` attribute until he dies if he is `infected`. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.stutteringJudge] Game stuttering judge's role options.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.stutteringJudge.voteRequestsCount=1] Number of vote requests that the `stuttering-judge` can make during the game. Default is `1`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.wildChild] Game wild child's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.wildChild.isTransformationRevealed=false] If set to `true`, when `wild-child` joins the `werewolves` side because his model died, the game master will announce his transformation to other players. Default is `false`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.dogWolf] Game dog wolf's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.dogWolf.isChosenSideRevealed=false] If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.thief] Game thief's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.mustChooseBetweenWerewolves=true] If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.thief.additionalCardsCount =2] Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.piedPiper] Game pied piper's role options.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.piedPiper.charmedPeopleCountPerNight=2] Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.piedPiper.isPowerlessIfInfected=true] If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.raven] Game raven's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.raven.markPenalty=2] Penalty of votes against the player targeted by the raven mark for the next village's vote. Default is `2`, meaning that the raven marked player will have two votes against himself.
      * @apiUse GameResponse
@@ -199,30 +268,72 @@ module.exports = app => {
         body("players.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getRoleNames()).withMessage(`Must be equal to one of the following values: ${getRoleNames()}`),
+        body("players.*.position")
+            .optional()
+            .isInt({ min: 0 }).withMessage("Must be a valid integer greater or equal than 0")
+            .toInt(),
         body("additionalCards")
             .optional()
-            .isArray().withMessage("Must be a valid array")
-            .custom(value => value.length === 2 ? Promise.resolve() : Promise.reject(new Error()))
-            .withMessage("Must contain 2 cards"),
+            .isArray().withMessage("Must be a valid array"),
         body("additionalCards.*.role")
             .isString().withMessage("Must be a valid string")
             .isIn(getRoleNames()).withMessage(`Must be equal to one of the following values: ${getRoleNames()}`),
         body("additionalCards.*.for")
             .isString().withMessage("Must be a valid string")
             .isIn(getAdditionalCardsForRoleNames()).withMessage(`Must be equal to one of the following values: ${getAdditionalCardsForRoleNames()}`),
+        body("options.repartition.isHidden")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.areRevealedOnDeath")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.sheriff.isEnabled")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.sheriff.electedAt.turn")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
+        body("options.roles.sheriff.electedAt.phase")
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .isIn(getGamePhases()).withMessage(`Must be equal to one of the following values: ${getGamePhases()}`),
         body("options.roles.sheriff.hasDoubledVote")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.bigBadWolf.isPowerlessIfWerewolfDies")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.whiteWerewolf.wakingUpInterval")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
         body("options.roles.seer.isTalkative")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
+        body("options.roles.seer.canSeeRoles")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.littleGirl.isProtectedByGuard")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.guard.canProtectTwice")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.ancient.livesCountAgainstWerewolves")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
+            .toInt(),
+        body("options.roles.ancient.doesTakeHisRevenge")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
@@ -238,6 +349,42 @@ module.exports = app => {
             .optional()
             .isInt({ min: 0, max: 5 }).withMessage("Must be a valid integer between 0 and 5")
             .toInt(),
+        body("options.roles.fox.isPowerlessIfMissesWerewolf")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.bearTamer.doesGrowlIfInfected")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.stutteringJudge.voteRequestsCount")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
+        body("options.roles.wildChild.isTransformationRevealed")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.dogWolf.isChosenSideRevealed")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.thief.mustChooseBetweenWerewolves")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.thief.additionalCardsCount")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
+        body("options.roles.piedPiper.charmedPeopleCountPerNight")
+            .optional()
+            .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
+            .toInt(),
+        body("options.roles.piedPiper.isPowerlessIfInfected")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
         body("options.roles.raven.markPenalty")
             .optional()
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")

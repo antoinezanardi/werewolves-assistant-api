@@ -1,5 +1,58 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.11.0 (2021-04-30)
+
+### 🚀 New features
+
+* [#137](https://github.com/antoinezanardi/werewolves-assistant-api/issues/137) - `position` for each player.
+* [#138](https://github.com/antoinezanardi/werewolves-assistant-api/issues/138) - Facebook authentication.
+* [#139](https://github.com/antoinezanardi/werewolves-assistant-api/issues/139) - Google authentication.
+* [#141](https://github.com/antoinezanardi/werewolves-assistant-api/issues/141) - Fox role.
+* [#142](https://github.com/antoinezanardi/werewolves-assistant-api/issues/142) - Bear Tamer role.
+* [#143](https://github.com/antoinezanardi/werewolves-assistant-api/issues/143) - Hidden game repartition option.
+* [#144](https://github.com/antoinezanardi/werewolves-assistant-api/issues/144) - Role revealed on death option.
+* [#145](https://github.com/antoinezanardi/werewolves-assistant-api/issues/145) - Seer see exact role option.
+* [#146](https://github.com/antoinezanardi/werewolves-assistant-api/issues/146) - Guard can protect twice option.
+* [#147](https://github.com/antoinezanardi/werewolves-assistant-api/issues/147) - Fox not powerless if he misses a werewolf option.
+* [#148](https://github.com/antoinezanardi/werewolves-assistant-api/issues/148) - Bear Tamer growls if he is infected option.
+* [#149](https://github.com/antoinezanardi/werewolves-assistant-api/issues/149) - Number of vote requests for Stuttering Judge option.
+* [#150](https://github.com/antoinezanardi/werewolves-assistant-api/issues/150) - Time for the Sheriff to be elected option.
+* [#151](https://github.com/antoinezanardi/werewolves-assistant-api/issues/151) - Thief not obliged to choose between werewolves cards option.
+* [#152](https://github.com/antoinezanardi/werewolves-assistant-api/issues/152) - Wild Child transformation is revealed option.
+* [#153](https://github.com/antoinezanardi/werewolves-assistant-api/issues/153) - Dog Wolf chosen side is revealed option.
+* [#154](https://github.com/antoinezanardi/werewolves-assistant-api/issues/154) - Big Bad Wolf not powerless if one werewolf dies option.
+* [#155](https://github.com/antoinezanardi/werewolves-assistant-api/issues/155) - White Werewolf waking up interval option.
+* [#156](https://github.com/antoinezanardi/werewolves-assistant-api/issues/156) - Number of charmed people per night by Pied Piper option.
+* [#157](https://github.com/antoinezanardi/werewolves-assistant-api/issues/157) - Pied Piper not powerless if infected option.
+* [#158](https://github.com/antoinezanardi/werewolves-assistant-api/issues/158) - Lives count for the Ancient option.
+* [#159](https://github.com/antoinezanardi/werewolves-assistant-api/issues/159) - Ancient doesn't make all villagers powerless if murdered from them option.
+* [#160](https://github.com/antoinezanardi/werewolves-assistant-api/issues/160) - Number of additional cards for Thief option.
+* [#161](https://github.com/antoinezanardi/werewolves-assistant-api/issues/161) - Rusty Sword Knight role.
+
+### 🌟 Enhancements
+
+* [#162](https://github.com/antoinezanardi/werewolves-assistant-api/issues/162) - Role types.
+
+### ♻️ Refactoring
+
+* [#140](https://github.com/antoinezanardi/werewolves-assistant-api/issues/140) - Extend token's lifetime to infinity.
+
+### 📦 Packages
+
+* `axios` installed with version `0.21.1`.
+* `@sentry/node` updated to version `6.3.5`.
+* `apidoc` updated to version `0.26.0`.
+* `chai` updated to version `4.3.4`.
+* `eslint` updated to version `7.25.0`.
+* `express-validator` updated to version `6.10.1`.
+* `migrate-mongo` updated to version `8.2.2`.
+* `mocha` updated to version `8.3.2`.
+* `mongoose` updated to version `5.12.6`.
+* `qs` updated to version `6.10.1`.
+* `validator` updated to version `13.6.0`.
+
+---
+
 ## 0.10.0 (2021-03-03)
 
 ### 🚀 New features

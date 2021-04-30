@@ -1,3 +1,4 @@
+const axios = require("axios");
 const { flatten } = require("mongo-dot-notation");
 const { sign } = require("jsonwebtoken");
 const passport = require("passport");
@@ -8,7 +9,24 @@ const { checkJWTUserRights } = require("../helpers/functions/User");
 const { checkRequestData } = require("../helpers/functions/Express");
 const Config = require("../../config");
 
+exports.checkDataBeforeCreate = async data => {
+    const existingUser = await this.findOne({ email: data.email });
+    if (existingUser) {
+        if (existingUser.registration.method === data.registration.method) {
+            throw generateError("EMAIL_EXISTS", "The email provided already exists.");
+        }
+        if (existingUser.registration.method === "local") {
+            throw generateError("EMAIL_EXISTS_WITH_LOCAL_REGISTRATION", "The email provided already exists with local registration.");
+        } else if (existingUser.registration.method === "facebook") {
+            throw generateError("EMAIL_EXISTS_WITH_FACEBOOK_REGISTRATION", "The email provided already exists with facebook registration.");
+        } else if (existingUser.registration.method === "google") {
+            throw generateError("EMAIL_EXISTS_WITH_GOOGLE_REGISTRATION", "The email provided already exists with google registration.");
+        }
+    }
+};
+
 exports.create = async(data, options = {}) => {
+    await this.checkDataBeforeCreate(data);
     const { toJSON } = options;
     delete options.toJSON;
     if (!Array.isArray(data)) {
@@ -53,6 +71,7 @@ exports.postUser = async(req, res) => {
     try {
         const { body } = checkRequestData(req);
         await this.generateSaltAndHash(body);
+        body.registration = { method: "local" };
         const newUser = await this.create(body, { toJSON: true });
         delete newUser.password;
         res.status(200).json(newUser);
@@ -90,6 +109,8 @@ exports.getUser = async(req, res) => {
     }
 };
 
+exports.getJWT = user => sign({ userId: user._id }, Config.app.JWTSecret);
+
 exports.login = (req, res) => {
     try {
         checkRequestData(req);
@@ -101,10 +122,70 @@ exports.login = (req, res) => {
                 if (loginErr) {
                     res.status(500).send(loginErr);
                 }
-                const token = sign({ userId: user._id, exp: Math.floor(Date.now() / 1000) + 3600 * 24 }, Config.app.JWTSecret);
+                const token = this.getJWT(user);
                 return res.status(200).json({ token });
             });
         })(req, res);
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.getFacebookUser = async accessToken => {
+    try {
+        const { data: facebookApp } = await axios.get(`https://graph.facebook.com/app?access_token=${accessToken}`);
+        if (facebookApp.id !== Config.facebook.app.ID) {
+            throw generateError("BAD_FACEBOOK_ACCESS_TOKEN", `Access token "${accessToken}" doesn't belong to the Werewolves Assistant Facebook app.`);
+        }
+        const { data: facebookUser } = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${accessToken}`);
+        return facebookUser;
+    } catch (e) {
+        throw generateError("BAD_FACEBOOK_ACCESS_TOKEN", `Access token "${accessToken}" doesn't allow to get user info.`);
+    }
+};
+
+exports.loginWithFacebook = async(req, res) => {
+    try {
+        const { body } = checkRequestData(req);
+        const facebookUser = await this.getFacebookUser(body.accessToken);
+        if (!facebookUser.email) {
+            throw generateError("NEED_FACEBOOK_EMAIL_PERMISSION", `You need to share your email to login with Facebook.`);
+        }
+        const facebookUserData = { email: facebookUser.email, registration: { method: "facebook" } };
+        let user = await this.findOne(facebookUserData);
+        if (!user) {
+            user = await this.create(facebookUserData);
+        }
+        const token = this.getJWT(user);
+        res.status(200).json({ token });
+    } catch (e) {
+        sendError(res, e);
+    }
+};
+
+exports.getGoogleUser = async idToken => {
+    try {
+        const { data } = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${idToken}`);
+        if (data.azp !== Config.google.client.ID) {
+            throw generateError("BAD_GOOGLE_ID_TOKEN", `Id token "${idToken}" doesn't belong to the Werewolves Assistant Google app.`);
+        }
+        return data;
+    } catch (e) {
+        throw generateError("BAD_GOOGLE_ID_TOKEN", `Id token "${idToken}" doesn't allow to get user info.`);
+    }
+};
+
+exports.loginWithGoogle = async(req, res) => {
+    try {
+        const { body } = checkRequestData(req);
+        const googleUser = await this.getGoogleUser(body.idToken);
+        const googleUserData = { email: googleUser.email, registration: { method: "google" } };
+        let user = await this.findOne(googleUserData);
+        if (!user) {
+            user = await this.create(googleUserData);
+        }
+        const token = this.getJWT(user);
+        res.status(200).json({ token });
     } catch (e) {
         sendError(res, e);
     }

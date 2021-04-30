@@ -12,9 +12,12 @@ exports.playerAttributes = [
     { name: "in-love", source: "cupid" },
     { name: "worshiped", source: "wild-child" },
     { name: "powerless", source: "ancient" },
+    { name: "powerless", source: "fox" },
     { name: "cant-vote", source: "scapegoat", remainingPhases: 2 },
     { name: "cant-vote", source: "all" },
     { name: "charmed", source: "pied-piper" },
+    { name: "growls", source: "bear-tamer", remainingPhases: 1 },
+    { name: "contaminated", source: "rusty-sword-knight", remainingPhases: 2 },
 ];
 
 exports.playerActions = [
@@ -35,6 +38,7 @@ exports.playerActions = [
     "ban-voting",
     "choose-sign",
     "choose-card",
+    "sniff",
 ];
 
 exports.murderedPossibilities = [
@@ -47,4 +51,5 @@ exports.murderedPossibilities = [
     { by: "all", of: "vote" },
     { by: "cupid", of: "charm" },
     { by: "all", of: "reconsider" },
+    { by: "rusty-sword-knight", of: "disease" },
 ];

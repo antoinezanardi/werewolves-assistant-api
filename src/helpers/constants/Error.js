@@ -211,7 +211,7 @@ exports.errorMetadata = {
         code: 53,
         HTTPCode: 400,
     },
-    ONLY_ONE_SECOND_VOTE_REQUEST: {
+    VOTE_REQUESTS_EXCEEDED: {
         code: 54,
         HTTPCode: 400,
     },
@@ -257,6 +257,46 @@ exports.errorMetadata = {
     },
     THIEF_MUST_STEAL: {
         code: 65,
+        HTTPCode: 400,
+    },
+    ALL_PLAYERS_POSITION_NOT_SET: {
+        code: 66,
+        HTTPCode: 400,
+    },
+    PLAYERS_POSITION_NOT_UNIQUE: {
+        code: 67,
+        HTTPCode: 400,
+    },
+    PLAYER_POSITION_TOO_HIGH: {
+        code: 68,
+        HTTPCode: 400,
+    },
+    THIEF_ADDITIONAL_CARDS_COUNT_NOT_RESPECTED: {
+        code: 69,
+        HTTPCode: 400,
+    },
+    BAD_FACEBOOK_ACCESS_TOKEN: {
+        code: 70,
+        HTTPCode: 400,
+    },
+    NEED_FACEBOOK_EMAIL_PERMISSION: {
+        code: 71,
+        HTTPCode: 400,
+    },
+    EMAIL_EXISTS_WITH_LOCAL_REGISTRATION: {
+        code: 72,
+        HTTPCode: 400,
+    },
+    EMAIL_EXISTS_WITH_FACEBOOK_REGISTRATION: {
+        code: 73,
+        HTTPCode: 400,
+    },
+    EMAIL_EXISTS_WITH_GOOGLE_REGISTRATION: {
+        code: 74,
+        HTTPCode: 400,
+    },
+    BAD_GOOGLE_ID_TOKEN: {
+        code: 75,
         HTTPCode: 400,
     },
 };
