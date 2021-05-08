@@ -216,6 +216,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.sheriff.electedAt.turn=1] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {String{"night", "day"}} [options.roles.sheriff.electedAt.phase="night"] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.canSettleVotes=true] If set to `true`, `sheriff` can settle votes if there is a tie in votes and no alive and powerful `scapegoat`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.bigBadWolf] Game big bad wolf role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true] If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.whiteWerewolf] Game white werewolf role's options.
@@ -303,6 +304,10 @@ module.exports = app => {
             .isString().withMessage("Must be a valid string")
             .isIn(getGamePhases()).withMessage(`Must be equal to one of the following values: ${getGamePhases()}`),
         body("options.roles.sheriff.hasDoubledVote")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.sheriff.canSettleVotes")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

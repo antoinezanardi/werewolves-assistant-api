@@ -665,7 +665,7 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
     if (nominatedPlayers.length > 1) {
         if (scapegoatPlayer?.isAlive && !doesPlayerHaveAttribute(scapegoatPlayer, "powerless")) {
             await this.killPlayer(scapegoatPlayer._id, action, game, gameHistoryEntry, { nominatedPlayers });
-        } else if (sheriffPlayer?.isAlive) {
+        } else if (sheriffPlayer?.isAlive && game.options.roles.sheriff.canSettleVotes) {
             this.insertActionImmediately(game, { for: "sheriff", to: "settle-votes" });
             gameHistoryEntry.play.votesResult = "need-settlement";
         } else if (!await Game.isCurrentPlaySecondVoteAfterTie(game)) {

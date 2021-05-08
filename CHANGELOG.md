@@ -5,6 +5,7 @@
 ### 🚀 New features
 
 * [#170](https://github.com/antoinezanardi/werewolves-assistant-api/issues/170) - Dog-Wolf chosen side randomly option.
+* [#171](https://github.com/antoinezanardi/werewolves-assistant-api/issues/171) - Sheriff can settle votes option.
 
 ### 📦 Packages
 

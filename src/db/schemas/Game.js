@@ -39,6 +39,10 @@ const gameOptions = {
                 type: Boolean,
                 default: true,
             },
+            canSettleVotes: {
+                type: Boolean,
+                default: true,
+            },
         },
         bigBadWolf: {
             isPowerlessIfWerewolfDies: {

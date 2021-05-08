@@ -1046,8 +1046,15 @@ describe("K - Game options", () => {
                     { name: "Dåg", role: "cupid" },
                     { name: "Dªg", role: "werewolf" },
                     { name: "DUg", role: "villager" },
+                    { name: "DÎg", role: "villager" },
+                    { name: "D|g", role: "villager" },
                 ],
-                options: { roles: { dogWolf: { isChosenSideRandom: true } } },
+                options: {
+                    roles: {
+                        sheriff: { canSettleVotes: false },
+                        dogWolf: { isChosenSideRandom: true },
+                    },
+                },
             })
             .end((err, res) => {
                 expect(res).to.have.status(200);
@@ -1084,5 +1091,72 @@ describe("K - Game options", () => {
                 expect(game.history[0].play.side).to.equal(game.players[0].side.current);
                 done();
             });
+    });
+    it("🏹 Cupid charms the dog-wolf and the werewolf (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[0]._id },
+                    { player: players[2]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[0].attributes).to.deep.include({ name: "in-love", source: "cupid" });
+                expect(game.players[2].attributes).to.deep.include({ name: "in-love", source: "cupid" });
+                expect(game.history[0].play.targets[0].player._id).to.equal(players[0]._id);
+                expect(game.history[0].play.targets[1].player._id).to.equal(players[2]._id);
+                done();
+            });
+    });
+    it("💕 Lovers meet each other (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "lovers", action: "meet-each-other" })
+            .end((err, res) => {
+                game = res.body;
+                expect(res).to.have.status(200);
+                done();
+            });
+    });
+    it("🐺 Werewolf eats the first villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[3]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("👪 Tie in votes between the two villagers and sheriff can't settle votes because of options (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "vote", votes: [
+                    { from: players[1]._id, for: players[4]._id },
+                    { from: players[2]._id, for: players[5]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[4].isAlive).to.be.true;
+                expect(game.players[5].isAlive).to.be.true;
+                done();
+            });
+    });
+    it("🎲 Game is waiting for 'all' to 'vote' between the two players because sheriff can't settle votes", done => {
+        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        done();
     });
 });

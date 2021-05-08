@@ -51,6 +51,7 @@ exports.defaultGameOptions = {
             isEnabled: true,
             electedAt: { turn: 1, phase: "night" },
             hasDoubledVote: true,
+            canSettleVotes: true,
         },
         bigBadWolf: { isPowerlessIfWerewolfDies: true },
         whiteWerewolf: { wakingUpInterval: 2 },
