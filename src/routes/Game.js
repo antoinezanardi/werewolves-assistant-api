@@ -36,6 +36,9 @@ module.exports = app => {
      * @apiSuccess {Number} options.roles.sheriff.electedAt.turn=1 Game's turn when the sheriff is elected. Default is `1`.
      * @apiSuccess {String} options.roles.sheriff.electedAt.phase="night" Game's phase when the sheriff is elected. Default is `night`.
      * @apiSuccess {Boolean} options.roles.sheriff.hasDoubledVote=true If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
+     * @apiSuccess {Boolean} options.roles.sheriff.canSettleVotes=true If set to `true`, `sheriff` can settle votes if there is a tie in votes and no alive and powerful `scapegoat`. Default is `true`.
+     * @apiSuccess {Object} options.roles.lovers Game lovers options.
+     * @apiSuccess {Boolean} options.roles.lovers.doRevealRoleToEachOther If set to `true`, `lovers` reveal their role to each other when they wake up the first night. Default is `false`.
      * @apiSuccess {Object} options.roles.bigBadWolf Game big bad wolf role's options.
      * @apiSuccess {Boolean} options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
      * @apiSuccess {Object} options.roles.whiteWerewolf Game white werewolf role's options.
@@ -43,6 +46,8 @@ module.exports = app => {
      * @apiSuccess {Object} options.roles.seer Game seer role's options.
      * @apiSuccess {Boolean} options.roles.seer.isTalkative=true If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiSuccess {Boolean} options.roles.seer.canSeeRoles=true If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
+     * @apiSuccess {Object} options.roles.cupid Game cupid role's options.
+     * @apiSuccess {Boolean} options.roles.cupid.mustWinWithLovers=false If set to `true`, the cupid teams up with the `lovers` and can't target himself when charming. Default is `false`.
      * @apiSuccess {Object} options.roles.littleGirl Game little girl role's options.
      * @apiSuccess {Boolean} options.roles.littleGirl.isProtectedByGuard=false If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
      * @apiSuccess {Object} options.roles.guard Game guard role's options.
@@ -66,7 +71,9 @@ module.exports = app => {
      * @apiSuccess {Boolean} options.roles.wildChild.isTransformationRevealed=false If set to `true`, when `wild-child` joins the `werewolves` side because his model died, the game master will announce his transformation to other players. Default is `false`.
      * @apiSuccess {Object} options.roles.dogWolf Game dog wolf role's options.
      * @apiSuccess {Boolean} options.roles.dogWolf.isChosenSideRevealed=false If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
+     * @apiSuccess {Boolean} options.roles.dogWolf.isChosenSideRandom=false If set to `true`, the chosen side for the `dog-wolf` will be randomly defined by the API. Default is `false`.
      * @apiSuccess {Object} options.roles.thief Game thief role's options.
+     * @apiSuccess {Boolean} options.roles.thief.isChosenCardRevealed=true If set to `true`, when `thief` chooses a card or skips, game master must tell the `thief` choice. Default is `false`.
      * @apiSuccess {Boolean} options.roles.thief.mustChooseBetweenWerewolves=true If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
      * @apiSuccess {Number{>= 1 && <= 5}} options.roles.thief.additionalCardsCount=2 Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
      * @apiSuccess {Object} options.roles.piedPiper Game pied piper role's options.
@@ -217,6 +224,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String{"night", "day"}} [options.roles.sheriff.electedAt.phase="night"] When the sheriff is elected during the game.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.hasDoubledVote=true] If set to `true`, `sheriff` vote during the village's vote is doubled, otherwise, it's a regular vote.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.sheriff.canSettleVotes=true] If set to `true`, `sheriff` can settle votes if there is a tie in votes and no alive and powerful `scapegoat`. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.lovers] Game lovers options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.lovers.doRevealRoleToEachOther] If set to `true`, `lovers` reveal their role to each other when they wake up the first night. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.bigBadWolf] Game big bad wolf role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.bigBadWolf.isPowerlessIfWerewolfDies=true] If set to `true`, `big-bad-wolf` won't wake up anymore during the night if at least one player from the `werewolves` side died. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.whiteWerewolf] Game white werewolf role's options.
@@ -225,7 +234,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.cupid] Game cupid role's options.
-     * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.mustWinWithLovers=false] If set to `true`, the cupid teams up with the `lovers` and can't target himself when charming. Default is `false`.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.cupid.mustWinWithLovers=false] If set to `true`, the cupid teams up with the `lovers` and can't target himself when charming. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.littleGirl] Game little girl role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.isProtectedByGuard=false] If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.guard] Game guard role's options.
@@ -311,6 +320,10 @@ module.exports = app => {
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
         body("options.roles.sheriff.canSettleVotes")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.lovers.doRevealRoleToEachOther")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

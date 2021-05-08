@@ -44,6 +44,12 @@ const gameOptions = {
                 default: true,
             },
         },
+        lovers: {
+            doRevealRoleToEachOther: {
+                type: Boolean,
+                default: false,
+            },
+        },
         bigBadWolf: {
             isPowerlessIfWerewolfDies: {
                 type: Boolean,

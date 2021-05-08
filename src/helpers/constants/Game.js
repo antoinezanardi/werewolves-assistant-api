@@ -53,6 +53,7 @@ exports.defaultGameOptions = {
             hasDoubledVote: true,
             canSettleVotes: true,
         },
+        lovers: { doRevealRoleToEachOther: false },
         bigBadWolf: { isPowerlessIfWerewolfDies: true },
         whiteWerewolf: { wakingUpInterval: 2 },
         seer: { isTalkative: true, canSeeRoles: true },
