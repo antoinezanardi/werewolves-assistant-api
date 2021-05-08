@@ -26,3 +26,6 @@ exports.getPlayerAttributes = () => JSON.parse(JSON.stringify(playerAttributes))
 
 exports.isPlayerAttributeActive = ({ activeAt }, game) => !activeAt || activeAt.turn <= game.turn &&
     (!activeAt.phase || activeAt.phase === "night" || game.phase === "day");
+
+exports.isPlayerInLoversTeam = (player, { options }) => this.doesPlayerHaveAttribute(player, "in-love") ||
+    options.roles.cupid.mustWinWithLovers && player.role.current === "cupid";

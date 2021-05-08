@@ -56,6 +56,7 @@ exports.defaultGameOptions = {
         bigBadWolf: { isPowerlessIfWerewolfDies: true },
         whiteWerewolf: { wakingUpInterval: 2 },
         seer: { isTalkative: true, canSeeRoles: true },
+        cupid: { mustWinWithLovers: false },
         littleGirl: { isProtectedByGuard: false },
         guard: { canProtectTwice: false },
         ancient: { livesCountAgainstWerewolves: 2, doesTakeHisRevenge: true },

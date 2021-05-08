@@ -39,6 +39,14 @@ exports.checkPiedPiperTargets = target => {
     }
 };
 
+exports.checkCharmTarget = (target, game, source) => {
+    if (source === "pied-piper") {
+        this.checkPiedPiperTargets(target);
+    } else if (source === "cupid" && game.options.roles.cupid.mustWinWithLovers && target.player.role.current === "cupid") {
+        throw generateError("CANT_CHARM_HIMSELF", `Cupid can't charm himself.`);
+    }
+};
+
 exports.checkProtectTarget = async(target, game) => {
     const lastProtectedTarget = await GameHistory.getLastProtectedPlayer(game._id);
     if (lastProtectedTarget && lastProtectedTarget._id.toString() === target.player._id.toString() && !game.options.roles.guard.canProtectTwice) {
@@ -86,8 +94,8 @@ exports.checkTargetDependingOnPlay = async(target, game, { source, action }) => 
         }
     } else if (action === "choose-model" && target.player.role.current === "wild-child") {
         throw generateError("WILD_CHILD_CANT_CHOOSE_HIMSELF", `Wild child can't choose himself as a model.`);
-    } else if (source === "pied-piper" && action === "charm") {
-        this.checkPiedPiperTargets(target);
+    } else if (action === "charm") {
+        await this.checkCharmTarget(target, game, source);
     } else if (action === "ban-voting" && doesPlayerHaveAttribute(target.player, "cant-vote")) {
         throw generateError("CANT_VOTE_ALREADY", `Player with id ${target.player._id} is already banned of votes.`);
     }

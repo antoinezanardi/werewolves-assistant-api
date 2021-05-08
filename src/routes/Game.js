@@ -224,6 +224,8 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Object} [options.roles.seer] Game seer role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.isTalkative=true] If set to `true`, the game master must say out loud what the seer saw during her night, otherwise, he must mime the seen role to the seer. Default is `true`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.seer.canSeeRoles=true] If set to `true`, the seer can the exact `role` of the target, otherwise, she only sees the `side`. Default is `true`.
+     * @apiParam (Request Body Parameters) {Object} [options.roles.cupid] Game cupid role's options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.mustWinWithLovers=false] If set to `true`, the cupid teams up with the `lovers` and can't target himself when charming. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.littleGirl] Game little girl role's options.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.littleGirl.isProtectedByGuard=false] If set to `false`, the little girl won't be protected by the guard from the werewolves attacks. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.guard] Game guard role's options.
@@ -320,6 +322,10 @@ module.exports = app => {
             .isInt({ min: 1, max: 5 }).withMessage("Must be a valid integer between 1 and 5")
             .toInt(),
         body("options.roles.seer.isTalkative")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.cupid.mustWinWithLovers")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

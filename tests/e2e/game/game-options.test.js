@@ -1052,6 +1052,7 @@ describe("K - Game options", () => {
                 options: {
                     roles: {
                         sheriff: { canSettleVotes: false },
+                        cupid: { mustWinWithLovers: true },
                         dogWolf: { isChosenSideRandom: true },
                     },
                 },
@@ -1059,6 +1060,8 @@ describe("K - Game options", () => {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.options.roles.sheriff.canSettleVotes).to.be.false;
+                expect(game.options.roles.cupid.mustWinWithLovers).to.be.true;
                 expect(game.options.roles.dogWolf.isChosenSideRandom).to.be.true;
                 done();
             });
@@ -1089,6 +1092,23 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.history[0].play.side).to.equal(game.players[0].side.current);
+                done();
+            });
+    });
+    it("🏹 Cupid can't charm himself if he must win with lovers (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "cupid", action: "charm", targets: [
+                    { player: players[0]._id },
+                    { player: players[1]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("CANT_CHARM_HIMSELF");
                 done();
             });
     });
@@ -1155,8 +1175,37 @@ describe("K - Game options", () => {
                 done();
             });
     });
-    it("🎲 Game is waiting for 'all' to 'vote' between the two players because sheriff can't settle votes", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+    it("👪 All vote for the last villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[1]._id, for: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[5].isAlive).to.be.false;
+                expect(game.players[5].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🐺 Werewolf eats the last alive villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[4]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🎲 Game is WON by lovers and cupid (thanks to game options)!", done => {
+        expect(game.status).to.equal("done");
+        expect(game.won.by).to.equal("lovers");
+        expect(game.won.players).to.be.an("array");
+        expect(game.won.players.length).to.equal(3);
         done();
     });
 });

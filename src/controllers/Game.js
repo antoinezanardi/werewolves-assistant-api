@@ -7,7 +7,7 @@ const GameHistory = require("./GameHistory");
 const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
-    isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersWithAttribute, getPlayersWithRole, getGameTurnNightActionsOrder,
+    isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersInLoversTeam, getPlayersWithRole, getGameTurnNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
     getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon, isWhiteWerewolfOnlyAlive, hasAngelWon,
     getAdditionalCardsThiefRoleNames,
@@ -389,7 +389,7 @@ exports.checkGameWinners = game => {
         } else if (hasAngelWon(game)) {
             game.won = { by: "angel", players: getPlayersWithRole("angel", game) };
         } else if (areLoversTheOnlyAlive(game)) {
-            game.won = { by: "lovers", players: getPlayersWithAttribute("in-love", game) };
+            game.won = { by: "lovers", players: getPlayersInLoversTeam(game) };
         } else if (hasPiedPiperWon(game)) {
             game.won = { by: "pied-piper", players: getPlayersWithRole("pied-piper", game) };
         } else if (isWhiteWerewolfOnlyAlive(game)) {

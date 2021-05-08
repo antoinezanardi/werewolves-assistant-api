@@ -68,6 +68,12 @@ const gameOptions = {
                 default: true,
             },
         },
+        cupid: {
+            mustWinWithLovers: {
+                type: Boolean,
+                default: false,
+            },
+        },
         littleGirl: {
             isProtectedByGuard: {
                 type: Boolean,

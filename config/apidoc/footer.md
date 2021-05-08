@@ -188,7 +188,7 @@ Description for each case below :
 | 44   | TARGET_MUST_BE_EATEN_BY_WEREWOLVES         |    400    | Target must be eaten by the werewolves in order to be infected.                                           |
 | 45   | ABSENT_VILE_FATHER_OF_WOLVES               |    400    | Target can't be infected because the vile father of wolves is either not in the game or dead.             |
 | 46   | ONLY_ONE_INFECTION                         |    400    | Vile father of wolves can infect only one target per game.                                                |
-| 47   | CANT_CHARM_HIMSELF                         |    400    | Pied piper can't charm himself.                                                                           |
+| 47   | CANT_CHARM_HIMSELF                         |    400    | Pied piper or cupid can't charm himself.                                                                  |
 | 48   | ALREADY_CHARMED                            |    400    | Target is already charmed by the pied piper and can't be charmed twice.                                   |
 | 49   | CANT_VOTE_ALREADY                          |    400    | Player is already banned and so can't vote.                                                               |
 | 50   | MUST_EAT_WEREWOLF                          |    400    | Werewolves target can't be a player with current side "villager".                                         |

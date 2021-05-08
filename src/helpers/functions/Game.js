@@ -2,7 +2,7 @@ const {
     patchableGameStatuses, waitingForPossibilities, gameStatuses, turnNightActionsOrder, findFields, defaultGameOptions, waitingForCauses,
     gamePhases, wonByPossibilities, gameRepartitionForbiddenRoleNames, votesResults, additionalCardsForRoleNames, additionalCardsThiefRoleNames,
 } = require("../constants/Game");
-const { doesPlayerHaveAttribute } = require("./Player");
+const { doesPlayerHaveAttribute, isPlayerInLoversTeam } = require("./Player");
 
 exports.isWerewolfSideAlive = game => game.players.some(player => player.side.current === "werewolves" && player.isAlive);
 
@@ -12,8 +12,8 @@ exports.isVillagerSideAlive = game => game.players.some(player => player.side.cu
 
 exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive);
 
-exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) &&
-                                    game.players.every(player => doesPlayerHaveAttribute(player, "in-love") ? player.isAlive : !player.isAlive);
+exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) && !!this.getPlayersWithAttribute("in-love", game) &&
+                                    game.players.every(player => isPlayerInLoversTeam(player, game) ? player.isAlive : !player.isAlive);
 
 exports.isWhiteWerewolfOnlyAlive = game => !!this.getPlayerWithRole("white-werewolf", game) &&
     game.players.every(({ isAlive, role }) => role.current === "white-werewolf" && isAlive || role.current !== "white-werewolf" && !isAlive);
@@ -133,3 +133,5 @@ exports.getNearestNeighbor = (playerId, players, direction, options = {}) => {
     }
     return null;
 };
+
+exports.getPlayersInLoversTeam = game => game.players.filter(player => isPlayerInLoversTeam(player, game));
