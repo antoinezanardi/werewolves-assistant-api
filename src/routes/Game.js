@@ -251,8 +251,9 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.dogWolf.isChosenSideRevealed=false] If set to `true`, when `dog-wolf` chooses his side at the beginning of the game, the game master will announce the chosen side to other players. Default is `false`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.dogWolf.isChosenSideRandom=false] If set to `true`, the chosen side for the `dog-wolf` will be randomly defined by the API. Default is `false`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.thief] Game thief's role options.
+     * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.isChosenCardRevealed=false] If set to `true`, when `thief` chooses a card or skips, game master must tell the `thief` choice. Default is `false`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.thief.mustChooseBetweenWerewolves=true] If set to `true`, if all `thief` additional cards are from the `werewolves` side, he can't skip and must choose one. Default is `true`.
-     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.thief.additionalCardsCount =2] Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
+     * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.thief.additionalCardsCount=2] Number of additional cards for the `thief` at the beginning of the game. Default is `2`.
      * @apiParam (Request Body Parameters) {Object} [options.roles.piedPiper] Game pied piper's role options.
      * @apiParam (Request Body Parameters) {Number{>= 1 && <= 5}} [options.roles.piedPiper.charmedPeopleCountPerNight=2] Number of charmed people by the `pied-piper` per night if there are enough targets (or number of not charmed players otherwise). Default is `2`.
      * @apiParam (Request Body Parameters) {Boolean} [options.roles.piedPiper.isPowerlessIfInfected=true] If set to `true`, `pied-piper` will be powerless if he is infected by the `vile-father-of-wolves`. Default is `true`.
@@ -382,6 +383,10 @@ module.exports = app => {
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),
         body("options.roles.dogWolf.isChosenSideRandom")
+            .optional()
+            .isBoolean().withMessage("Must be a valid boolean")
+            .toBoolean(),
+        body("options.roles.thief.isChosenCardRevealed")
             .optional()
             .isBoolean().withMessage("Must be a valid boolean")
             .toBoolean(),

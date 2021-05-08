@@ -74,7 +74,7 @@ describe("K - Game options", () => {
                         stutteringJudge: { voteRequestsCount: 2 },
                         wildChild: { isTransformationRevealed: true },
                         dogWolf: { isChosenSideRevealed: true },
-                        thief: { mustChooseBetweenWerewolves: false, additionalCardsCount: 3 },
+                        thief: { isChosenCardRevealed: true, mustChooseBetweenWerewolves: false, additionalCardsCount: 3 },
                         raven: { markPenalty: 3 },
                     },
                 },
@@ -88,6 +88,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.sheriff.hasDoubledVote).to.be.false;
                 expect(game.options.roles.seer.isTalkative).to.be.false;
                 expect(game.options.roles.seer.canSeeRoles).to.be.false;
+                expect(game.options.roles.cupid.mustWinWithLovers).to.be.false;
                 expect(game.options.roles.guard.canProtectTwice).to.be.true;
                 expect(game.options.roles.twoSisters.wakingUpInterval).to.equal(1);
                 expect(game.options.roles.threeBrothers.wakingUpInterval).to.equal(1);
@@ -96,6 +97,7 @@ describe("K - Game options", () => {
                 expect(game.options.roles.stutteringJudge.voteRequestsCount).to.equal(2);
                 expect(game.options.roles.wildChild.isTransformationRevealed).to.be.true;
                 expect(game.options.roles.dogWolf.isChosenSideRevealed).to.be.true;
+                expect(game.options.roles.thief.isChosenCardRevealed).to.be.true;
                 expect(game.options.roles.thief.mustChooseBetweenWerewolves).to.be.false;
                 expect(game.options.roles.thief.additionalCardsCount).to.be.equal(3);
                 expect(game.options.roles.raven.markPenalty).to.equal(3);

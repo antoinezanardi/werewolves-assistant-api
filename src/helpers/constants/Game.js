@@ -68,7 +68,7 @@ exports.defaultGameOptions = {
         stutteringJudge: { voteRequestsCount: 1 },
         wildChild: { isTransformationRevealed: false },
         dogWolf: { isChosenSideRevealed: false, isChosenSideRandom: false },
-        thief: { mustChooseBetweenWerewolves: true, additionalCardsCount: 2 },
+        thief: { isChosenCardRevealed: false, mustChooseBetweenWerewolves: true, additionalCardsCount: 2 },
         piedPiper: { charmedPeopleCountPerNight: 2, isPowerlessIfInfected: true },
         raven: { markPenalty: 2 },
     },

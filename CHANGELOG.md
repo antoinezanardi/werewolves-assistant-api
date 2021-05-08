@@ -7,6 +7,7 @@
 * [#170](https://github.com/antoinezanardi/werewolves-assistant-api/issues/170) - Dog-Wolf chosen side randomly option.
 * [#171](https://github.com/antoinezanardi/werewolves-assistant-api/issues/171) - Sheriff can settle votes option.
 * [#172](https://github.com/antoinezanardi/werewolves-assistant-api/issues/172) - Cupid must win with lovers option.
+* [#173](https://github.com/antoinezanardi/werewolves-assistant-api/issues/173) - Thief chosen card is revealed option.
 
 ### 📦 Packages
 

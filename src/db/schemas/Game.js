@@ -157,6 +157,10 @@ const gameOptions = {
             },
         },
         thief: {
+            isChosenCardRevealed: {
+                type: Boolean,
+                default: false,
+            },
             mustChooseBetweenWerewolves: {
                 type: Boolean,
                 default: true,
