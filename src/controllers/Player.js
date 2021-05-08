@@ -546,15 +546,19 @@ exports.bigBadWolfPlays = async(play, game) => {
     }
 };
 
-exports.dogWolfPlays = (play, game) => {
-    if (!play.side) {
+exports.dogWolfPlays = (play, game, gameHistoryEntry) => {
+    if (!game.options.roles.dogWolf.isChosenSideRandom && !play.side) {
         throw generateError("DOG_WOLF_MUST_CHOOSE_SIDE", "Dog-wolf must choose a side between `villagers` and `werewolves`.");
-    } else if (play.side === "werewolves") {
+    } else if (game.options.roles.dogWolf.isChosenSideRandom) {
+        play.side = Math.random() < 0.5 ? "werewolves" : "villagers";
+    }
+    if (play.side === "werewolves") {
         const dogWolfPlayer = getPlayerWithRole("dog-wolf", game);
         if (dogWolfPlayer) {
             dogWolfPlayer.side.current = "werewolves";
         }
     }
+    gameHistoryEntry.play.side = play.side;
 };
 
 exports.wildChildPlays = async(play, game) => {

@@ -3,7 +3,7 @@ awk -F'\"' '/\"version\": \".+\"/{ print $4; exit; }' package.json;
 printf "New version: ";
 read -r newVersion;
 if [[ ! "$newVersion" =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
-    echo "Invalid version format. Must be like \"[0-9].[0-9].[0-9]\"";
+    echo "Invalid version format. Must be like \"[0-9].[0-9]+.[0-9]\"";
     exit;
 fi
 sed "-i" "" "-e" "s/\(\"version\": *\"\).*\(\",\)/\1${newVersion}\2/g" package.json;

@@ -141,6 +141,10 @@ const gameOptions = {
                 type: Boolean,
                 default: false,
             },
+            isChosenSideRandom: {
+                type: Boolean,
+                default: false,
+            },
         },
         thief: {
             mustChooseBetweenWerewolves: {

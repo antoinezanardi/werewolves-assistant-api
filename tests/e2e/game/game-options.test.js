@@ -1024,4 +1024,65 @@ describe("K - Game options", () => {
                 done();
             });
     });
+    it("🎲 Cancels game (PATCH /games/:id)", done => {
+        chai.request(server)
+            .patch(`/games/${game._id}`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ status: "canceled" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.status).to.equal("canceled");
+                done();
+            });
+    });
+    it("🎲 Creates game with various options on dog wolf, sheriff and lovers (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: [
+                    { name: "D∆g", role: "dog-wolf" },
+                    { name: "Dåg", role: "cupid" },
+                    { name: "Dªg", role: "werewolf" },
+                    { name: "DUg", role: "villager" },
+                ],
+                options: { roles: { dogWolf: { isChosenSideRandom: true } } },
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.options.roles.dogWolf.isChosenSideRandom).to.be.true;
+                done();
+            });
+    });
+    it("👪 All elect the dog-wolf as the sheriff (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                source: "all", action: "elect-sheriff", votes: [
+                    { from: players[2]._id, for: players[0]._id },
+                    { from: players[3]._id, for: players[0]._id },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("🐕 Dog-wolf chooses its side randomly (POST /games/:id/play)", done => {
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "dog-wolf", action: "choose-side" })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.history[0].play.side).to.equal(game.players[0].side.current);
+                done();
+            });
+    });
 });

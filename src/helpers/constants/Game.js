@@ -65,7 +65,7 @@ exports.defaultGameOptions = {
         bearTamer: { doesGrowlIfInfected: true },
         stutteringJudge: { voteRequestsCount: 1 },
         wildChild: { isTransformationRevealed: false },
-        dogWolf: { isChosenSideRevealed: false },
+        dogWolf: { isChosenSideRevealed: false, isChosenSideRandom: false },
         thief: { mustChooseBetweenWerewolves: true, additionalCardsCount: 2 },
         piedPiper: { charmedPeopleCountPerNight: 2, isPowerlessIfInfected: true },
         raven: { markPenalty: 2 },

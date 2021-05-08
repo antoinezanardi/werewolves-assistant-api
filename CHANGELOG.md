@@ -1,5 +1,21 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
+## 0.12.0 (2021-04-30
+
+### 🚀 New features
+
+* [#170](https://github.com/antoinezanardi/werewolves-assistant-api/issues/170) - Dog-Wolf chosen side randomly option.
+
+### 📦 Packages
+
+* `dotenv` updated to version `9.0.0`.
+* `eslint` updated to version `7.26.0`.
+* `express-validator` updated to version `6.11.0`.
+* `mocha` updated to version `8.4.0`.
+* `xss` updated to version `1.0.9`.
+
+---
+
 ## 0.11.0 (2021-04-30)
 
 ### 🚀 New features
