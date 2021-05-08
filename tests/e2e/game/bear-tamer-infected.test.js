@@ -14,11 +14,12 @@ const originalPlayers = [
     { name: "Dig", role: "villager" },
     { name: "Deg", role: "bear-tamer" },
     { name: "Dog", role: "villager" },
+    { name: "D»g", role: "werewolf" },
     { name: "Døg", role: "villager" },
 ];
 let server, token, game, players;
 
-describe("X - Tiny game of 5 players in which the bear tamer is infected and so, growls every time", () => {
+describe("X - Tiny game of 6 players in which the bear tamer is infected and so, growls every time", () => {
     before(done => resetDatabase(done));
     before(done => {
         server = app.listen(3000, done);
@@ -100,6 +101,36 @@ describe("X - Tiny game of 5 players in which the bear tamer is infected and so,
     });
     it("☀️ Sun is rising and bear tamer growls because he is infected, even if he doesn't have any werewolves neighbors", done => {
         expect(game.players[2].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
+        done();
+    });
+    it("👪 All vote for the bear tamer (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "all", action: "vote", votes: [{ from: players[3]._id, for: players[2]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                expect(game.players[2].isAlive).to.be.false;
+                expect(game.players[2].murdered).to.deep.equals({ by: "all", of: "vote" });
+                done();
+            });
+    });
+    it("🐺 Werewolf eats the last villager (POST /games/:id/play)", done => {
+        players = game.players;
+        chai.request(server)
+            .post(`/games/${game._id}/play`)
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ source: "werewolves", action: "eat", targets: [{ player: players[5]._id }] })
+            .end((err, res) => {
+                expect(res).to.have.status(200);
+                game = res.body;
+                done();
+            });
+    });
+    it("☀️ Sun is rising and bear tamer doesn't growl because he is dead", done => {
+        expect(game.players[2].attributes).to.not.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
 });

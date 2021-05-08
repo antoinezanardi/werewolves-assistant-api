@@ -727,7 +727,7 @@ exports.drankDeathPotion = async(game, play, gameHistoryEntry) => {
 
 exports.makeBearTamerGrowls = game => {
     const bearTamerPlayer = getPlayerWithRole("bear-tamer", game);
-    if (bearTamerPlayer && !doesPlayerHaveAttribute(bearTamerPlayer, "powerless")) {
+    if (bearTamerPlayer?.isAlive && !doesPlayerHaveAttribute(bearTamerPlayer, "powerless")) {
         const leftAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "left", { isAlive: true });
         const rightAliveNeighbor = getNearestNeighbor(bearTamerPlayer._id, game.players, "right", { isAlive: true });
         if (bearTamerPlayer.side.current === "werewolves" && game.options.roles.bearTamer.doesGrowlIfInfected ||
