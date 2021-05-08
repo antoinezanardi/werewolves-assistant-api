@@ -373,25 +373,22 @@ exports.incrementPlayerVoteCount = (votedPlayers, playerId, game, inc = 1) => {
 
 exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
     const votedPlayers = [];
-    const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
-    for (const vote of votes) {
-        if (action === "vote" && sheriffPlayer && sheriffPlayer._id === vote.from._id && game.options.roles.sheriff.hasDoubledVote) {
-            this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game, 2);
-        } else {
-            this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game);
+    if (votes?.length) {
+        const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
+        for (const vote of votes) {
+            const voteInc = action === "vote" && sheriffPlayer?._id === vote.from._id && game.options.roles.sheriff.hasDoubledVote ? 2 : 1;
+            this.incrementPlayerVoteCount(votedPlayers, vote.for._id, game, voteInc);
         }
     }
     if (action === "vote") {
-        const ravenMarkedPlayers = getPlayerWithAttribute("raven-marked", game);
-        if (ravenMarkedPlayers) {
-            if (ravenMarkedPlayers.isAlive) {
-                this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayers._id, game, game.options.roles.raven.markPenalty);
-            }
-            this.removePlayerAttribute(ravenMarkedPlayers._id, "raven-marked", game);
+        const ravenMarkedPlayer = getPlayerWithAttribute("raven-marked", game);
+        if (ravenMarkedPlayer?.isAlive) {
+            this.incrementPlayerVoteCount(votedPlayers, ravenMarkedPlayer._id, game, game.options.roles.raven.markPenalty);
+            this.removePlayerAttribute(ravenMarkedPlayer._id, "raven-marked", game);
         }
     }
     const maxVotes = Math.max(...votedPlayers.map(player => player.vote));
-    const nominatedPlayers = votedPlayers.filter(player => player.vote === maxVotes);
+    const nominatedPlayers = maxVotes ? votedPlayers.filter(player => player.vote === maxVotes) : [];
     if (!allowTie && nominatedPlayers.length > 1) {
         throw generateError("TIE_IN_VOTES", "Tie in votes is not allowed for this action.");
     }
@@ -463,18 +460,20 @@ exports.checkJudgeSecondVoteRequest = async game => {
 };
 
 exports.checkAndFillVotes = async(votes, game, options) => {
-    if (!votes || !Array.isArray(votes)) {
+    if (options.action === "elect-sheriff" && (!votes || !Array.isArray(votes))) {
         throw generateError("VOTES_REQUIRED", "`votes` need to be set");
-    } else if (!votes.length) {
+    } else if (options.action === "elect-sheriff" && !votes.length) {
         throw generateError("VOTES_CANT_BE_EMPTY", "`votes` can't be empty");
     }
     if (options.doesJudgeRequestAnotherVote) {
         await this.checkJudgeSecondVoteRequest(game, options);
     }
-    await this.checkVotesSourceAndTarget(votes, game, options);
-    for (let i = 0; i < votes.length; i++) {
-        votes[i].from = getPlayerWithId(votes[i].from, game);
-        votes[i].for = getPlayerWithId(votes[i].for, game);
+    if (votes) {
+        await this.checkVotesSourceAndTarget(votes, game, options);
+        for (let i = 0; i < votes.length; i++) {
+            votes[i].from = getPlayerWithId(votes[i].from, game);
+            votes[i].for = getPlayerWithId(votes[i].for, game);
+        }
     }
 };
 
@@ -682,8 +681,10 @@ exports.allVote = async(play, game, gameHistoryEntry) => {
         } else {
             gameHistoryEntry.play.votesResult = "no-death";
         }
-    } else {
+    } else if (nominatedPlayers.length === 1) {
         await this.killPlayer(nominatedPlayers[0]._id, action, game, gameHistoryEntry);
+    } else {
+        gameHistoryEntry.play.votesResult = "no-death";
     }
     if (play.doesJudgeRequestAnotherVote) {
         game.waiting.push({ for: "all", to: "vote", cause: "stuttering-judge-request" });

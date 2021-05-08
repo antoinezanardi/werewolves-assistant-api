@@ -10,6 +10,10 @@
 * [#173](https://github.com/antoinezanardi/werewolves-assistant-api/issues/173) - Thief chosen card is revealed option.
 * [#174](https://github.com/antoinezanardi/werewolves-assistant-api/issues/174) - Lovers reveal their roles option.
 
+### 🌟 Enhancements
+
+* [#176](https://github.com/antoinezanardi/werewolves-assistant-api/issues/176) - Make votes skippable.
+
 ### 🐛 Bug fixes
 
 * [#175](https://github.com/antoinezanardi/werewolves-assistant-api/issues/175) - Bear Tamer keeps growls effect after death.

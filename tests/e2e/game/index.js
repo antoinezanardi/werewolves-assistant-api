@@ -25,4 +25,5 @@ describe("E2E - 🎲 Game tests", () => {
     require("./changes-during-night.test");
     require("./fox-lack-of-neighbors.test");
     require("./bear-tamer-infected.test");
+    require("./votes-skipped.test");
 });

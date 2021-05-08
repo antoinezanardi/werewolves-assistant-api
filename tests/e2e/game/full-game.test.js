@@ -1917,28 +1917,6 @@ describe("B - Full game of 31 players with all roles", () => {
                 done();
             });
     });
-    it("👪 All can't vote if votes are not set (POST /games/:id/play)", done => {
-        chai.request(server)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote" })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equal("VOTES_REQUIRED");
-                done();
-            });
-    });
-    it("👪 All can't vote if votes are empty (POST /games/:id/play)", done => {
-        chai.request(server)
-            .post(`/games/${game._id}/play`)
-            .set({ Authorization: `Bearer ${token}` })
-            .send({ source: "all", action: "vote", votes: [] })
-            .end((err, res) => {
-                expect(res).to.have.status(400);
-                expect(res.body.type).to.equal("VOTES_CANT_BE_EMPTY");
-                done();
-            });
-    });
     it("👪 All can't vote if one vote has same target and source (POST /games/:id/play)", done => {
         players = game.players;
         chai.request(server)
