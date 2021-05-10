@@ -13,6 +13,7 @@
 ### 🌟 Enhancements
 
 * [#176](https://github.com/antoinezanardi/werewolves-assistant-api/issues/176) - Make votes skippable.
+* [#178](https://github.com/antoinezanardi/werewolves-assistant-api/issues/178) - `powerless` attribute for Big Bad Wolf.
 
 ### 🐛 Bug fixes
 
@@ -20,9 +21,10 @@
 
 ### 📦 Packages
 
-* `dotenv` updated to version `9.0.0`.
+* `@sentry/node` updated to version `6.3.6`.
+* `dotenv` updated to version `9.0.2`.
 * `eslint` updated to version `7.26.0`.
-* `express-validator` updated to version `6.11.0`.
+* `express-validator` updated to version `6.11.1`.
 * `mocha` updated to version `8.4.0`.
 * `xss` updated to version `1.0.9`.
 

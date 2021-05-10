@@ -13,6 +13,7 @@ exports.playerAttributes = [
     { name: "worshiped", source: "wild-child" },
     { name: "powerless", source: "ancient" },
     { name: "powerless", source: "fox" },
+    { name: "powerless", source: "werewolves" },
     { name: "cant-vote", source: "scapegoat", remainingPhases: 2 },
     { name: "cant-vote", source: "all" },
     { name: "charmed", source: "pied-piper" },

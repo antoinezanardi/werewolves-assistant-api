@@ -262,7 +262,7 @@ describe("K - Game options", () => {
             });
     });
     it("🎲 Game is waiting for 'sheriff' to 'settle-votes' because his vote is a regular vote according to game options", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "settle-votes" });
+        expect(game.waiting[0]).to.deep.equal({ for: "sheriff", to: "settle-votes" });
         done();
     });
     it("🎖 Sheriff settles votes by choosing villager (POST /games/:id/play)", done => {
@@ -288,7 +288,7 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[10].isAlive).to.be.false;
-                expect(game.players[10].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[10].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -302,7 +302,7 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[12].isAlive).to.be.false;
-                expect(game.players[12].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[12].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -312,7 +312,7 @@ describe("K - Game options", () => {
         done();
     });
     it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other' because they wake up every night according to game options", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "two-sisters", to: "meet-each-other" });
         done();
     });
     it("👭 The two sisters meet each other (POST /games/:id/play)", done => {
@@ -327,7 +327,7 @@ describe("K - Game options", () => {
             });
     });
     it("🎲 Game is waiting for 'three-brothers' to 'meet-each-other' because they wake up every night according to game options", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "three-brothers", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "three-brothers", to: "meet-each-other" });
         done();
     });
     it("👨‍👨‍👦 The three brothers meet each other (POST /games/:id/play)", done => {
@@ -403,7 +403,7 @@ describe("K - Game options", () => {
         done();
     });
     it("🎲 Game is waiting for 'raven' to 'mark' because sisters and brothers are all alone", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
+        expect(game.waiting[0]).to.deep.equal({ for: "raven", to: "mark" });
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
@@ -633,6 +633,7 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[5].isAlive).to.be.false;
+                expect(game.players[14].attributes).to.not.deep.include({ name: "powerless", source: "werewolves" });
                 done();
             });
     });
@@ -881,7 +882,7 @@ describe("K - Game options", () => {
             });
     });
     it("🎲 Game is waiting for 'all' to 'vote' again because there is no sheriff to settle votes", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote" });
         done();
     });
     it("👪 All can't vote if one vote target is not one of the players in the previous tie in votes (POST /games/:id/play)", done => {
@@ -1189,7 +1190,7 @@ describe("K - Game options", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[5].isAlive).to.be.false;
-                expect(game.players[5].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[5].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });

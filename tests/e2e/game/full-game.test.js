@@ -144,7 +144,7 @@ describe("B - Full game of 31 players with all roles", () => {
         done();
     });
     it("🎲 Game is waiting for 'all' to 'elect-sheriff'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "elect-sheriff" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "elect-sheriff" });
         done();
     });
     it("👪 All can't elect sheriff if play's source is not 'all' (POST /games/:id/play)", done => {
@@ -306,7 +306,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'all' to 'vote' because angel is here", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote" });
         done();
     });
     it("👪 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
@@ -348,7 +348,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'thief' to 'choose-card'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "thief", to: "choose-card" });
+        expect(game.waiting[0]).to.deep.equal({ for: "thief", to: "choose-card" });
         done();
     });
     it("🦹 Thief can't choose card if play's source is not 'thief' (POST /games/:id/play)", done => {
@@ -406,12 +406,12 @@ describe("B - Full game of 31 players with all roles", () => {
                 additionalCards = game.additionalCards;
                 expect(game.players[27].role.current).to.equal("werewolf");
                 expect(game.players[27].side.current).to.equal("werewolves");
-                expect(game.history[0].play.card).to.deep.equals(additionalCards[0]);
+                expect(game.history[0].play.card).to.deep.equal(additionalCards[0]);
                 done();
             });
     });
     it("🎲 Game is waiting for 'dog-wolf' to 'choose-side'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "dog-wolf", to: "choose-side" });
+        expect(game.waiting[0]).to.deep.equal({ for: "dog-wolf", to: "choose-side" });
         done();
     });
     it("🐕 Dog-wolf can't choose side if play's source is not 'dog-wolf' (POST /games/:id/play)", done => {
@@ -466,7 +466,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'cupid' to 'charm'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "cupid", to: "charm" });
+        expect(game.waiting[0]).to.deep.equal({ for: "cupid", to: "charm" });
         done();
     });
     it("🏹 Cupid can't choose side if action is not 'choose-side' (POST /games/:id/play)", done => {
@@ -682,7 +682,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'seer' to 'look'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "seer", to: "look" });
+        expect(game.waiting[0]).to.deep.equal({ for: "seer", to: "look" });
         done();
     });
     it("🔮 Seer can't look if play's source is not 'seer' (POST /games/:id/play)", done => {
@@ -786,7 +786,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'fox' to 'sniff'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+        expect(game.waiting[0]).to.deep.equal({ for: "fox", to: "sniff" });
         done();
     });
     it("🦊 Fox can't sniff if play's source is not 'fox' (POST /games/:id/play)", done => {
@@ -857,7 +857,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'lovers' to 'meet-each-other'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "lovers", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "lovers", to: "meet-each-other" });
         done();
     });
     it("💕 Lovers can't meet each other if play's source is not 'lovers' (POST /games/:id/play)", done => {
@@ -895,7 +895,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'stuttering-judge' to 'choose-sign'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "stuttering-judge", to: "choose-sign" });
+        expect(game.waiting[0]).to.deep.equal({ for: "stuttering-judge", to: "choose-sign" });
         done();
     });
     it("⚖️ Stuttering judge can't choose sign if play's source is not 'stuttering-judge' (POST /games/:id/play)", done => {
@@ -932,7 +932,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'two-sisters' to 'meet-each-other'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "two-sisters", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "two-sisters", to: "meet-each-other" });
         done();
     });
     it("👭 The two sisters can't meet each other if play's source is not 'two-sisters' (POST /games/:id/play)", done => {
@@ -969,7 +969,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'three-brothers' to 'meet-each-other'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "three-brothers", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "three-brothers", to: "meet-each-other" });
         done();
     });
     it("👨‍👨‍👦 The three brothers can't meet each other if play's source is not 'three-brothers' (POST /games/:id/play)", done => {
@@ -1006,7 +1006,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'wild-child' to 'choose-model'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "wild-child", to: "choose-model" });
+        expect(game.waiting[0]).to.deep.equal({ for: "wild-child", to: "choose-model" });
         done();
     });
     it("🐒 Wild child can't choose model if play's source is not 'wild-child' (POST /games/:id/play)", done => {
@@ -1109,7 +1109,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'raven' to 'mark'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
+        expect(game.waiting[0]).to.deep.equal({ for: "raven", to: "mark" });
         done();
     });
     it("🪶 Raven can't mark if play's source is not 'raven' (POST /games/:id/play)", done => {
@@ -1178,7 +1178,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'guard' to 'protect'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "guard", to: "protect" });
+        expect(game.waiting[0]).to.deep.equal({ for: "guard", to: "protect" });
         done();
     });
     it("🛡 Guard can't protect if play's source is not 'guard' (POST /games/:id/play)", done => {
@@ -1269,7 +1269,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'werewolves' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "werewolves", to: "eat" });
         done();
     });
     it("🐺 Werewolves can't eat if play's source is not 'werewolves' (POST /games/:id/play)", done => {
@@ -1384,7 +1384,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'white-werewolf' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "white-werewolf", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "white-werewolf", to: "eat" });
         done();
     });
     it("🐺 White werewolf can't eat if play's source is not 'white-werewolf' (POST /games/:id/play)", done => {
@@ -1474,7 +1474,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'big-bad-wolf' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "big-bad-wolf", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "big-bad-wolf", to: "eat" });
         done();
     });
     it("🐺 Big bad wolf can't eat if play's source is not 'big-bad-wolf' (POST /games/:id/play)", done => {
@@ -1613,7 +1613,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'witch' to 'use-potion'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "witch", to: "use-potion" });
+        expect(game.waiting[0]).to.deep.equal({ for: "witch", to: "use-potion" });
         done();
     });
     it("🪄 Witch can't use potion if play's source is not 'witch' (POST /games/:id/play)", done => {
@@ -1723,7 +1723,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'pied-piper' to 'charm'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "pied-piper", to: "charm" });
+        expect(game.waiting[0]).to.deep.equal({ for: "pied-piper", to: "charm" });
         done();
     });
     it("📣 Pied piper can't charm if play's source is not 'pied-piper' (POST /games/:id/play)", done => {
@@ -1833,7 +1833,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'charmed' to 'meet-each-other'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "charmed", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "charmed", to: "meet-each-other" });
         done();
     });
     it("🕺️ Charmed players can't meet each other if play's source is not 'charmed' (POST /games/:id/play)", done => {
@@ -1892,7 +1892,7 @@ describe("B - Full game of 31 players with all roles", () => {
         done();
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote" });
         done();
     });
     it("👪 All can't vote if play's source is not 'all' (POST /games/:id/play)", done => {
@@ -2015,7 +2015,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'scapegoat' to 'ban-voting'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "scapegoat", to: "ban-voting" });
+        expect(game.waiting[0]).to.deep.equal({ for: "scapegoat", to: "ban-voting" });
         done();
     });
     it("🐐 Scapegoat can't ban voting if play's source is not 'scapegoat' (POST /games/:id/play)", done => {
@@ -2095,7 +2095,7 @@ describe("B - Full game of 31 players with all roles", () => {
         done();
     });
     it("🎲 Game is waiting for 'seer' to 'look'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "seer", to: "look" });
+        expect(game.waiting[0]).to.deep.equal({ for: "seer", to: "look" });
         done();
     });
     it("🔮 Seer can't look at dead target (POST /games/:id/play)", done => {
@@ -2126,7 +2126,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'fox' to 'sniff'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+        expect(game.waiting[0]).to.deep.equal({ for: "fox", to: "sniff" });
         done();
     });
     it("🦊 Fox can't sniff at a dead target (POST /games/:id/play)", done => {
@@ -2159,7 +2159,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'raven' to 'mark'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
+        expect(game.waiting[0]).to.deep.equal({ for: "raven", to: "mark" });
         done();
     });
     it("🪶 Raven can't mark a dead target (POST /games/:id/play)", done => {
@@ -2187,7 +2187,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'guard' to 'protect'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "guard", to: "protect" });
+        expect(game.waiting[0]).to.deep.equal({ for: "guard", to: "protect" });
         done();
     });
     it("🛡 Guard can't protect a dead target (POST /games/:id/play)", done => {
@@ -2230,7 +2230,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'werewolves' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "werewolves", to: "eat" });
         done();
     });
     it("🐺 Werewolves can't eat a dead target (POST /games/:id/play)", done => {
@@ -2261,7 +2261,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'big-bad-wolf' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "big-bad-wolf", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "big-bad-wolf", to: "eat" });
         done();
     });
     it("🐺 Big bad wolf can't eat a dead target (POST /games/:id/play)", done => {
@@ -2292,7 +2292,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'witch' to 'use-potion'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "witch", to: "use-potion" });
+        expect(game.waiting[0]).to.deep.equal({ for: "witch", to: "use-potion" });
         done();
     });
     it("🪄 Witch can't use death potion on dead target (POST /games/:id/play)", done => {
@@ -2385,7 +2385,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'charmed' to 'meet-each-other'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "charmed", to: "meet-each-other" });
+        expect(game.waiting[0]).to.deep.equal({ for: "charmed", to: "meet-each-other" });
         done();
     });
     it("🕺️ Charmed players meet each other (POST /games/:id/play)", done => {
@@ -2407,10 +2407,10 @@ describe("B - Full game of 31 players with all roles", () => {
         expect(game.players[2].attributes).to.not.deep.include({ name: "protected", source: "guard", remainingPhases: 1 });
         expect(game.players[30].attributes).to.not.exist;
         expect(game.players[1].isAlive).to.be.false;
-        expect(game.players[1].murdered).to.deep.equals({ by: "witch", of: "use-potion" });
+        expect(game.players[1].murdered).to.deep.equal({ by: "witch", of: "use-potion" });
         expect(game.players[2].isAlive).to.be.true;
         expect(game.players[11].isAlive).to.be.false;
-        expect(game.players[11].murdered).to.deep.equals({ by: "big-bad-wolf", of: "eat" });
+        expect(game.players[11].murdered).to.deep.equal({ by: "big-bad-wolf", of: "eat" });
         expect(game.history[0].deadPlayers).to.be.an("array").to.be.lengthOf(2);
         const cantVoteAttribute = { name: "cant-vote", source: "scapegoat", remainingPhases: 1, activeAt: { turn: 2 } };
         expect(game.players[0].attributes).to.exist;
@@ -2420,7 +2420,7 @@ describe("B - Full game of 31 players with all roles", () => {
         done();
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote" });
         done();
     });
     it("👪 All can't vote if one vote has a dead source (POST /games/:id/play)", done => {
@@ -2495,7 +2495,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'sheriff' to 'settle-votes'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "settle-votes" });
+        expect(game.waiting[0]).to.deep.equal({ for: "sheriff", to: "settle-votes" });
         done();
     });
     it("🎖 Sheriff can't settle votes if play's source is not 'sheriff' (POST /games/:id/play)", done => {
@@ -2593,11 +2593,11 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.players[8].isAlive).to.be.true;
                 expect(game.players[22].isAlive).to.be.false;
-                expect(game.players[22].murdered).to.deep.equals({ by: "sheriff", of: "settle-votes" });
+                expect(game.players[22].murdered).to.deep.equal({ by: "sheriff", of: "settle-votes" });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].deadPlayers).to.be.an("array").to.be.lengthOf(1);
                 expect(game.history[0].deadPlayers[0]._id).to.equal(players[22]._id);
-                expect(game.history[0].deadPlayers[0].murdered).to.deep.equals({ by: "sheriff", of: "settle-votes" });
+                expect(game.history[0].deadPlayers[0].murdered).to.deep.equal({ by: "sheriff", of: "settle-votes" });
                 done();
             });
     });
@@ -2611,7 +2611,7 @@ describe("B - Full game of 31 players with all roles", () => {
         done();
     });
     it("🎲 Game is waiting for 'fox' to 'sniff'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "fox", to: "sniff" });
+        expect(game.waiting[0]).to.deep.equal({ for: "fox", to: "sniff" });
         done();
     });
     it("🦊 Fox sniffs the ancient on the 19th position which has a werewolf neighbor and a dead neighbor (POST /games/:id/play)", done => {
@@ -2632,7 +2632,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'raven' to 'mark'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "raven", to: "mark" });
+        expect(game.waiting[0]).to.deep.equal({ for: "raven", to: "mark" });
         done();
     });
     it("🪶 Raven marks the hunter (POST /games/:id/play)", done => {
@@ -2651,7 +2651,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'guard' to 'protect'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "guard", to: "protect" });
+        expect(game.waiting[0]).to.deep.equal({ for: "guard", to: "protect" });
         done();
     });
     it("🛡 Guard protects the little girl (POST /games/:id/play)", done => {
@@ -2670,7 +2670,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'werewolves' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "werewolves", to: "eat" });
         done();
     });
     it("🐺 Werewolves eat the little girl (POST /games/:id/play)", done => {
@@ -2689,7 +2689,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'white-werewolf' to 'eat'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "white-werewolf", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "white-werewolf", to: "eat" });
         done();
     });
     it("🐺 White werewolf skips (POST /games/:id/play)", done => {
@@ -2720,7 +2720,7 @@ describe("B - Full game of 31 players with all roles", () => {
             });
     });
     it("🎲 Game is waiting for 'witch' to 'use-potion'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "witch", to: "use-potion" });
+        expect(game.waiting[0]).to.deep.equal({ for: "witch", to: "use-potion" });
         done();
     });
     it("🪄 Witch can't use death potion twice (POST /games/:id/play)", done => {
@@ -2751,15 +2751,15 @@ describe("B - Full game of 31 players with all roles", () => {
         expect(game.phase).to.equal("day");
         expect(game.players[4].attributes).to.deep.include({ name: "raven-marked", source: "raven", remainingPhases: 1 });
         expect(game.players[7].isAlive).to.be.false;
-        expect(game.players[7].murdered).to.deep.equals({ by: "werewolves", of: "eat" });
+        expect(game.players[7].murdered).to.deep.equal({ by: "werewolves", of: "eat" });
         expect(game.players[9].isAlive).to.be.false;
-        expect(game.players[9].murdered).to.deep.equals({ by: "cupid", of: "charm" });
+        expect(game.players[9].murdered).to.deep.equal({ by: "cupid", of: "charm" });
         expect(game.players[7].attributes).to.not.deep.include({ name: "eaten", source: "werewolves", remainingPhases: 1 });
         expect(game.players[30].attributes).to.not.exist;
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
+        expect(game.waiting[0]).to.deep.equal({ for: "sheriff", to: "delegate" });
         done();
     });
     it("🎖 Sheriff can't delegate if play's source is not 'sheriff' (POST /games/:id/play)", done => {
@@ -2873,17 +2873,17 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[4].isAlive).to.be.false;
-                expect(game.players[4].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[4].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate' and 'hunter' to 'shoot'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
-        expect(game.waiting[1]).to.deep.equals({ for: "hunter", to: "shoot" });
+        expect(game.waiting[0]).to.deep.equal({ for: "sheriff", to: "delegate" });
+        expect(game.waiting[1]).to.deep.equal({ for: "hunter", to: "shoot" });
         done();
     });
     it("🎲 Game is waiting for 'sheriff' to 'delegate'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "sheriff", to: "delegate" });
+        expect(game.waiting[0]).to.deep.equal({ for: "sheriff", to: "delegate" });
         done();
     });
     it("🎖 Sheriff delegates to the raven (POST /games/:id/play)", done => {
@@ -2996,7 +2996,8 @@ describe("B - Full game of 31 players with all roles", () => {
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[5].isAlive).to.be.false;
-                expect(game.players[5].murdered).to.deep.equals({ by: "hunter", of: "shoot" });
+                expect(game.players[5].murdered).to.deep.equal({ by: "hunter", of: "shoot" });
+                expect(game.players[17].attributes).to.deep.include({ name: "powerless", source: "werewolves" });
                 expect(game.history[0].play.targets).to.exist;
                 expect(game.history[0].play.targets[0].player._id).to.equal(game.players[5]._id);
                 done();
@@ -3008,7 +3009,7 @@ describe("B - Full game of 31 players with all roles", () => {
         done();
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote", cause: "stuttering-judge-request" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote", cause: "stuttering-judge-request" });
         done();
     });
     it("⚖️ Stuttering judge can't request another vote if he already requested it (POST /games/:id/play)", done => {
@@ -3034,7 +3035,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[25].isAlive).to.be.false;
-                expect(game.players[25].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[25].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -3201,7 +3202,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[15].isAlive).to.be.false;
-                expect(game.players[15].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[15].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -3322,7 +3323,7 @@ describe("B - Full game of 31 players with all roles", () => {
         expect(game.players[10].isAlive).to.be.false;
         expect(game.players[24].attributes).to.not.deep.include({ name: "eaten", source: "white-werewolf", remainingPhases: 1 });
         expect(game.players[24].isAlive).to.be.false;
-        expect(game.players[24].murdered).to.deep.equals({ by: "white-werewolf", of: "eat" });
+        expect(game.players[24].murdered).to.deep.equal({ by: "white-werewolf", of: "eat" });
         expect(game.players[30].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
@@ -3337,7 +3338,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[18].isAlive).to.be.false;
-                expect(game.players[18].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[18].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -3447,7 +3448,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[17].isAlive).to.be.false;
-                expect(game.players[17].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[17].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -3524,7 +3525,7 @@ describe("B - Full game of 31 players with all roles", () => {
         expect(game.phase).to.equal("day");
         expect(game.players[3].isAlive).to.be.true;
         expect(game.players[16].isAlive).to.be.false;
-        expect(game.players[16].murdered).to.deep.equals({ by: "white-werewolf", of: "eat" });
+        expect(game.players[16].murdered).to.deep.equal({ by: "white-werewolf", of: "eat" });
         expect(game.players[30].attributes).to.deep.include({ name: "growls", source: "bear-tamer", remainingPhases: 1 });
         done();
     });
@@ -3539,7 +3540,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[23].isAlive).to.be.false;
-                expect(game.players[23].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[23].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -3721,7 +3722,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[21].isAlive).to.be.false;
-                expect(game.players[21].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[21].murdered).to.deep.equal({ by: "all", of: "vote" });
                 expect(game.players[21].attributes).to.deep.includes({ name: "sheriff", source: "sheriff" });
                 done();
             });
@@ -3790,9 +3791,9 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[0].isAlive).to.be.false;
-                expect(game.players[0].murdered).to.deep.equals({ by: "rusty-sword-knight", of: "disease" });
+                expect(game.players[0].murdered).to.deep.equal({ by: "rusty-sword-knight", of: "disease" });
                 expect(game.players[12].isAlive).to.be.false;
-                expect(game.players[12].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[12].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -3849,7 +3850,7 @@ describe("B - Full game of 31 players with all roles", () => {
                 game = res.body;
                 expect(game.history[0].play.votesResult).to.equal("death");
                 expect(game.players[27].isAlive).to.be.false;
-                expect(game.players[27].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[27].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });

@@ -8,7 +8,7 @@ const { generateError, sendError } = require("../helpers/functions/Error");
 const { checkRequestData } = require("../helpers/functions/Express");
 const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersInLoversTeam, getPlayersWithRole, getGameTurnNightActionsOrder,
-    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, areAllWerewolvesAlive, getAlivePlayers, getPlayersExpectedToPlay,
+    areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, getAlivePlayers, getPlayersExpectedToPlay,
     getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon, isWhiteWerewolfOnlyAlive, hasAngelWon,
     getAdditionalCardsThiefRoleNames,
 } = require("../helpers/functions/Game");
@@ -506,8 +506,6 @@ exports.isRoleCallableDuringTheNight = (game, role) => {
         return this.areTwoSistersCallableDuringTheNight(game);
     } else if (role === "three-brothers") {
         return this.areThreeBrothersCallableDuringTheNight(game);
-    } else if (role === "big-bad-wolf") {
-        return player.isAlive && (!game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies || areAllWerewolvesAlive(game));
     } else if (role === "pied-piper") {
         return player.isAlive && (player.side.current === "villagers" || !game.options.roles.piedPiper.isPowerlessIfInfected);
     } else if (role === "white-werewolf") {

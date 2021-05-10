@@ -220,6 +220,44 @@ exports.insertActionBeforeAllVote = (game, play) => {
     }
 };
 
+exports.applyWerewolvesSideDeathConsequences = game => {
+    const bigBadWolfPlayer = getPlayerWithRole("big-bad-wolf", game);
+    if (bigBadWolfPlayer?.isAlive && game.options.roles.bigBadWolf.isPowerlessIfWerewolfDies &&
+        !doesPlayerHaveAttribute(bigBadWolfPlayer, "powerless")) {
+        this.addPlayerAttribute(bigBadWolfPlayer._id, "powerless", game, { source: "werewolves" });
+    }
+};
+
+exports.applyConsequencesDependingOnKilledPlayerSide = (player, game) => {
+    if (player.side.current === "werewolves") {
+        this.applyWerewolvesSideDeathConsequences(game);
+    }
+};
+
+exports.applyRustySwordKnightDeathConsequences = (rustySwordKnightPlayer, game) => {
+    const leftAliveWerewolfNeighbor = getNearestNeighbor(rustySwordKnightPlayer._id, game.players, "left", { isAlive: true, side: "werewolves" });
+    if (leftAliveWerewolfNeighbor) {
+        this.addPlayerAttribute(leftAliveWerewolfNeighbor._id, "contaminated", game);
+    }
+};
+
+exports.applyAncientDeathConsequences = async(action, game, gameHistoryEntry) => {
+    const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
+    if (ancientRevengeActions.includes(action) && game.options.roles.ancient.doesTakeHisRevenge) {
+        for (const { _id, isAlive, side } of game.players) {
+            if (isAlive && side.original === "villagers") {
+                this.addPlayerAttribute(_id, "powerless", game);
+            }
+        }
+        const villagerRoleNames = getVillagerRoles().map(({ name }) => name);
+        filterOutSourcesFromWaitingQueue(game, [...villagerRoleNames, "charmed", "lovers"]);
+    }
+    const idiotPlayer = getPlayerWithRole("idiot", game);
+    if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
+        await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
+    }
+};
+
 exports.insertActionImmediately = (game, play) => {
     if (game.waiting.length) {
         game.waiting.splice(1, 0, play);
@@ -229,31 +267,16 @@ exports.insertActionImmediately = (game, play) => {
 };
 
 exports.applyConsequencesDependingOnKilledPlayerRole = async(player, action, game, gameHistoryEntry, options) => {
-    const ancientRevengeActions = ["vote", "settle-votes", "shoot", "use-potion"];
-    if (player.role.current === "hunter" && !doesPlayerHaveAttribute(player, "powerless")) {
+    const { current: playerRole } = player.role;
+    const isPlayerPowerful = !doesPlayerHaveAttribute(player, "powerless");
+    if (playerRole === "hunter" && isPlayerPowerful) {
         this.insertActionImmediately(game, { for: "hunter", to: "shoot" });
-    } else if (player.role.current === "ancient") {
-        if (ancientRevengeActions.includes(action) && game.options.roles.ancient.doesTakeHisRevenge) {
-            for (const { _id, isAlive, side } of game.players) {
-                if (isAlive && side.original === "villagers") {
-                    this.addPlayerAttribute(_id, "powerless", game);
-                }
-            }
-            const villagerRoleNames = getVillagerRoles().map(({ name }) => name);
-            filterOutSourcesFromWaitingQueue(game, [...villagerRoleNames, "charmed", "lovers"]);
-        }
-        const idiotPlayer = getPlayerWithRole("idiot", game);
-        if (idiotPlayer?.isAlive && idiotPlayer.role.isRevealed && game.options.roles.idiot.doesDieOnAncientDeath) {
-            await this.killPlayer(idiotPlayer._id, "reconsider", game, gameHistoryEntry);
-        }
-    } else if (player.role.current === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1 &&
-        !doesPlayerHaveAttribute(player, "powerless")) {
+    } else if (playerRole === "ancient") {
+        await this.applyAncientDeathConsequences(action, game, gameHistoryEntry);
+    } else if (playerRole === "scapegoat" && action === "vote" && options?.nominatedPlayers?.length > 1 && isPlayerPowerful) {
         this.insertActionImmediately(game, { for: "scapegoat", to: "ban-voting" });
-    } else if (player.role.current === "rusty-sword-knight" && action === "eat" && !doesPlayerHaveAttribute(player, "powerless")) {
-        const leftAliveWerewolfNeighbor = getNearestNeighbor(player._id, game.players, "left", { isAlive: true, side: "werewolves" });
-        if (leftAliveWerewolfNeighbor) {
-            this.addPlayerAttribute(leftAliveWerewolfNeighbor._id, "contaminated", game);
-        }
+    } else if (playerRole === "rusty-sword-knight" && action === "eat" && isPlayerPowerful) {
+        this.applyRustySwordKnightDeathConsequences(player, game);
     }
 };
 
@@ -322,6 +345,7 @@ exports.killPlayer = async(playerId, action, game, gameHistoryEntry, options = {
                 gameHistoryEntry.play.votesResult = "death";
             }
             await this.applyConsequencesDependingOnKilledPlayerRole(player, action, game, gameHistoryEntry, options);
+            this.applyConsequencesDependingOnKilledPlayerSide(player, game);
             await this.applyConsequencesDependingOnKilledPlayerAttributes(player, game, gameHistoryEntry);
             this.purgePlayerAttributes(player);
             if (game.phase === "night") {
