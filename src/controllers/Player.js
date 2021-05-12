@@ -6,7 +6,7 @@ const {
     isPlayerAttributeActive, isIdiotKillable,
 } = require("../helpers/functions/Player");
 const {
-    getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue,
+    getPlayerWithAttribute, getPlayerWithRole, getPlayerWithId, filterOutSourcesFromWaitingQueue, getAlivePlayers,
     getRemainingPlayersToCharm, getRemainingVillagersToEat, getRemainingWerewolvesToEat, getNearestNeighbor,
 } = require("../helpers/functions/Game");
 const { getVillagerRoles, getWerewolfRoles, getRoles } = require("../helpers/functions/Role");
@@ -395,7 +395,7 @@ exports.incrementPlayerVoteCount = (votedPlayers, playerId, game, inc = 1) => {
     }
 };
 
-exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
+exports.getNominatedPlayers = (votes, game, { action }) => {
     const votedPlayers = [];
     if (votes?.length) {
         const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
@@ -412,11 +412,7 @@ exports.getNominatedPlayers = (votes, game, { action, allowTie = false }) => {
         }
     }
     const maxVotes = Math.max(...votedPlayers.map(player => player.vote));
-    const nominatedPlayers = maxVotes ? votedPlayers.filter(player => player.vote === maxVotes) : [];
-    if (!allowTie && nominatedPlayers.length > 1) {
-        throw generateError("TIE_IN_VOTES", "Tie in votes is not allowed for this action.");
-    }
-    return nominatedPlayers;
+    return maxVotes ? votedPlayers.filter(player => player.vote === maxVotes) : [];
 };
 
 exports.checkPlayerMultipleVotes = (votes, { players }) => {
@@ -484,11 +480,6 @@ exports.checkJudgeSecondVoteRequest = async game => {
 };
 
 exports.checkAndFillVotes = async(votes, game, options) => {
-    if (options.action === "elect-sheriff" && (!votes || !Array.isArray(votes))) {
-        throw generateError("VOTES_REQUIRED", "`votes` need to be set");
-    } else if (options.action === "elect-sheriff" && !votes.length) {
-        throw generateError("VOTES_CANT_BE_EMPTY", "`votes` can't be empty");
-    }
     if (options.doesJudgeRequestAnotherVote) {
         await this.checkJudgeSecondVoteRequest(game, options);
     }
@@ -690,7 +681,7 @@ exports.seerPlays = async(play, game) => {
 exports.allVote = async(play, game, gameHistoryEntry) => {
     const { votes, action, doesJudgeRequestAnotherVote } = play;
     await this.checkAndFillVotes(votes, game, { action, doesJudgeRequestAnotherVote });
-    const nominatedPlayers = this.getNominatedPlayers(votes, game, { action, allowTie: true });
+    const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
     gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
     const scapegoatPlayer = getPlayerWithRole("scapegoat", game);
     const sheriffPlayer = getPlayerWithAttribute("sheriff", game);
@@ -720,8 +711,10 @@ exports.allElectSheriff = async(play, game, gameHistoryEntry) => {
     const { votes, action } = play;
     await this.checkAndFillVotes(votes, game, { action });
     const nominatedPlayers = this.getNominatedPlayers(votes, game, { action });
-    this.addPlayerAttribute(nominatedPlayers[0]._id, "sheriff", game);
-    gameHistoryEntry.play.targets = nominatedPlayers.map(nominatedPlayer => ({ player: nominatedPlayer }));
+    const electablePlayers = nominatedPlayers.length ? nominatedPlayers : getAlivePlayers(game);
+    const electedSheriffPlayer = electablePlayers[Math.floor(Math.random() * electablePlayers.length)];
+    this.addPlayerAttribute(electedSheriffPlayer._id, "sheriff", game);
+    gameHistoryEntry.play.targets = [{ player: electedSheriffPlayer }];
     gameHistoryEntry.play.votesResult = "election";
 };
 
