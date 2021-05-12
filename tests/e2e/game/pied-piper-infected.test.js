@@ -119,7 +119,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[3].isAlive).to.be.false;
-                expect(game.players[3].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[3].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -132,11 +132,12 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 game = res.body;
+                expect(game.players[1].attributes).to.deep.include({ name: "powerless", source: "vile-father-of-wolves" });
                 done();
             });
     });
     it("🎲 Game is waiting for 'all' to 'vote' because pied piper lost his powers due to the infection", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote" });
         done();
     });
     it("👪 All vote for the vile father of wolves (POST /games/:id/play)", done => {
@@ -149,12 +150,12 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[0].isAlive).to.be.false;
-                expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[0].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
     it("🎲 Game is not won by pied piper even if all alive players are charmed because he is infected", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "werewolves", to: "eat" });
+        expect(game.waiting[0]).to.deep.equal({ for: "werewolves", to: "eat" });
         expect(game.status).to.equal("playing");
         expect(game.players.every(({ isAlive, role, attributes }) => !isAlive || role.current === "pied-piper" ||
             attributes?.find(({ name }) => name === "charmed"))).to.be.true;
@@ -205,7 +206,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[0].isAlive).to.be.false;
-                expect(game.players[0].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[0].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });
@@ -222,7 +223,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
             });
     });
     it("🎲 Game is waiting for 'all' to 'vote'", done => {
-        expect(game.waiting[0]).to.deep.equals({ for: "all", to: "vote" });
+        expect(game.waiting[0]).to.deep.equal({ for: "all", to: "vote" });
         done();
     });
     it("🎲 Cancels game (PATCH /games/:id)", done => {
@@ -308,7 +309,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
                 expect(res).to.have.status(200);
                 game = res.body;
                 expect(game.players[5].isAlive).to.be.false;
-                expect(game.players[5].murdered).to.deep.equals({ by: "all", of: "vote" });
+                expect(game.players[5].murdered).to.deep.equal({ by: "all", of: "vote" });
                 done();
             });
     });

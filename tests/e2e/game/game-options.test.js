@@ -550,6 +550,7 @@ describe("K - Game options", () => {
                 game = res.body;
                 expect(game.players[16].role.current).to.equal("pied-piper");
                 expect(game.players[16].side.current).to.equal("werewolves");
+                expect(game.players[16].attributes).to.not.exist;
                 done();
             });
     });

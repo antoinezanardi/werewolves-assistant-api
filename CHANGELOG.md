@@ -1,6 +1,6 @@
 # 📈 LIST OF CHANGES FOR WEREWOLVES ASSISTANT API
 
-## 0.12.0 (2021-04-30
+## 0.12.0 (2021-??-??)
 
 ### 🚀 New features
 
@@ -14,6 +14,7 @@
 
 * [#176](https://github.com/antoinezanardi/werewolves-assistant-api/issues/176) - Make votes skippable.
 * [#178](https://github.com/antoinezanardi/werewolves-assistant-api/issues/178) - `powerless` attribute for Big Bad Wolf.
+* [#179](https://github.com/antoinezanardi/werewolves-assistant-api/issues/179) - `powerless` attribute for Pied Piper.
 
 ### 🐛 Bug fixes
 

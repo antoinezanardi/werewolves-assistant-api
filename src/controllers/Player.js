@@ -637,6 +637,7 @@ exports.werewolvesPlay = async(play, game, gameHistoryEntry) => {
             } else {
                 infectedPlayer.side.current = "werewolves";
                 if (infectedPlayer.role.current === "pied-piper" && game.options.roles.piedPiper.isPowerlessIfInfected) {
+                    this.addPlayerAttribute(infectedPlayer._id, "powerless", game, { source: "vile-father-of-wolves" });
                     filterOutSourcesFromWaitingQueue(game, ["pied-piper", "charmed"]);
                 }
             }
