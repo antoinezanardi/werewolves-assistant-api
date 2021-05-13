@@ -9,6 +9,7 @@
 * [#172](https://github.com/antoinezanardi/werewolves-assistant-api/issues/172) - Cupid must win with lovers option.
 * [#173](https://github.com/antoinezanardi/werewolves-assistant-api/issues/173) - Thief chosen card is revealed option.
 * [#174](https://github.com/antoinezanardi/werewolves-assistant-api/issues/174) - Lovers reveal their roles option.
+* [#181](https://github.com/antoinezanardi/werewolves-assistant-api/issues/181) - Abominable Sectarian role.
 
 ### 🌟 Enhancements
 

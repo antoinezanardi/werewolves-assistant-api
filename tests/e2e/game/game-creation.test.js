@@ -47,6 +47,13 @@ const playersWithOnlyTwoBrothers = [
     { name: "Dug", role: "werewolf" },
 ];
 
+const playersWithAbominableSectarian = [
+    { name: "Dig", role: "abominable-sectarian", group: "Male" },
+    { name: "Doug", role: "villager", group: "Male" },
+    { name: "Dag", role: "werewolf", group: "Male" },
+    { name: "Dug", role: "werewolf", group: "Male" },
+];
+
 const tooMuchPlayers = [
     { name: "1", role: "villager" },
     { name: "2", role: "villager" },
@@ -365,6 +372,56 @@ describe("A - Game creation", () => {
             .end((err, res) => {
                 expect(res).to.have.status(400);
                 expect(res.body.type).to.equal("NEED_ADDITIONAL_CARDS_FOR_THIEF");
+                done();
+            });
+    });
+    it("👥 Can't create game if one player has a group and abominable sectarian is absent (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...players, { name: "Bob", role: "villager", group: "Boy", position: 6 }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("PLAYERS_GROUP_NOT_ALLOWED");
+                done();
+            });
+    });
+    it("👥 Can't create game if abominable sectarian is here and all players don't have a group (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: [...playersWithAbominableSectarian, { name: "Bob", role: "villager" }] })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("ALL_PLAYERS_GROUP_NOT_SET");
+                done();
+            });
+    });
+    it("👥 Can't create game if abominable sectarian is here and there is only one group among players (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({ players: playersWithAbominableSectarian })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("BAD_PLAYER_GROUPS_COUNT");
+                done();
+            });
+    });
+    it("👥 Can't create game if abominable sectarian is here and all players don't have a group (POST /games)", done => {
+        chai.request(server)
+            .post("/games")
+            .set({ Authorization: `Bearer ${token}` })
+            .send({
+                players: [
+                    ...playersWithAbominableSectarian,
+                    { name: "Bob", role: "villager", group: "Female" },
+                    { name: "Bab", role: "villager", group: "Female2" },
+                ],
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body.type).to.equal("BAD_PLAYER_GROUPS_COUNT");
                 done();
             });
     });

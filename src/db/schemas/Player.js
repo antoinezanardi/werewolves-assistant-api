@@ -89,6 +89,7 @@ const PlayerSchema = new Schema({
         type: Number,
         min: 0,
     },
+    group: { type: String },
     isAlive: {
         type: Boolean,
         default: true,

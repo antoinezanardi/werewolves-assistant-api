@@ -13,7 +13,7 @@ exports.isVillagerSideAlive = game => game.players.some(player => player.side.cu
 exports.areAllPlayersDead = game => game.players.every(player => !player.isAlive);
 
 exports.areLoversTheOnlyAlive = game => !!this.getPlayerWithRole("cupid", game) && !!this.getPlayersWithAttribute("in-love", game) &&
-                                    game.players.every(player => isPlayerInLoversTeam(player, game) ? player.isAlive : !player.isAlive);
+    game.players.every(player => isPlayerInLoversTeam(player, game) ? player.isAlive : !player.isAlive);
 
 exports.isWhiteWerewolfOnlyAlive = game => !!this.getPlayerWithRole("white-werewolf", game) &&
     game.players.every(({ isAlive, role }) => role.current === "white-werewolf" && isAlive || role.current !== "white-werewolf" && !isAlive);
@@ -26,6 +26,13 @@ exports.getRemainingVillagersToEat = game => game.players.filter(({ side, attrib
 
 exports.getRemainingWerewolvesToEat = game => game.players.filter(({ side, role, isAlive }) => isAlive && side.current === "werewolves" &&
     role.current !== "white-werewolf");
+
+exports.hasAbominableSectarianWon = game => {
+    const abominableSectarianPlayer = this.getPlayerWithRole("abominable-sectarian", game);
+    return abominableSectarianPlayer?.isAlive && abominableSectarianPlayer.side.current === "villagers" &&
+        !doesPlayerHaveAttribute(abominableSectarianPlayer, "powerless") &&
+        !game.players.filter(player => player.isAlive && player.group !== abominableSectarianPlayer.group).length;
+};
 
 exports.hasPiedPiperWon = game => {
     const { isPowerlessIfInfected } = game.options.roles.piedPiper;
@@ -42,8 +49,9 @@ exports.hasAngelWon = game => {
 };
 
 exports.isGameDone = game => this.areAllPlayersDead(game) || this.hasAngelWon(game) ||
-        (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game) ||
-            this.hasPiedPiperWon(game) || this.isWhiteWerewolfOnlyAlive(game)) && !this.isActionInWaitingQueue(game, "shoot");
+    (!this.isVillagerSideAlive(game) || !this.isWerewolfSideAlive(game) || this.areLoversTheOnlyAlive(game) ||
+        this.hasPiedPiperWon(game) || this.isWhiteWerewolfOnlyAlive(game) || this.hasAbominableSectarianWon(game)) &&
+    !this.isActionInWaitingQueue(game, "shoot");
 
 exports.isActionInWaitingQueue = (game, action) => game.waiting.some(({ to }) => to === action);
 

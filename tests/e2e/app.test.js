@@ -9,7 +9,9 @@ let server;
 
 describe("E2E - Testing main route", () => {
     before(done => {
-        server = app.listen(3000, done);
+        setTimeout(() => {
+            server = app.listen(3000, done);
+        }, 200);
     });
     it("👋 Welcomes user with API name", done => {
         chai.request(server)

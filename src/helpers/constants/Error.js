@@ -299,4 +299,16 @@ exports.errorMetadata = {
         code: 75,
         HTTPCode: 400,
     },
+    PLAYERS_GROUP_NOT_ALLOWED: {
+        code: 76,
+        HTTPCode: 400,
+    },
+    ALL_PLAYERS_GROUP_NOT_SET: {
+        code: 77,
+        HTTPCode: 400,
+    },
+    BAD_PLAYER_GROUPS_COUNT: {
+        code: 78,
+        HTTPCode: 400,
+    },
 };

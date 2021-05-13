@@ -29,6 +29,7 @@ exports.roles = [
     { name: "dog-wolf", side: "villagers", maxInGame: 1, type: "ambiguous" },
     { name: "angel", side: "villagers", maxInGame: 1, type: "lonely" },
     { name: "pied-piper", side: "villagers", maxInGame: 1, recommendedMinPlayers: 12, type: "lonely" },
+    { name: "abominable-sectarian", side: "villagers", maxInGame: 1, recommendedMinPlayers: 12, type: "lonely" },
     { name: "raven", side: "villagers", maxInGame: 1, type: "villager" },
 ];
 

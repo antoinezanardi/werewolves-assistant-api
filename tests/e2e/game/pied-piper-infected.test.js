@@ -337,7 +337,7 @@ describe("O - Tiny game of 5 players in which the pied piper is infected and so,
                 done();
             });
     });
-    it("🎲 Game is won by the pied piper even if he is infected thanks to game option", done => {
+    it("🎲 Game is WON by the pied piper even if he is infected thanks to game option", done => {
         expect(game.status).to.equal("done");
         expect(game.won.by).to.equal("pied-piper");
         done();

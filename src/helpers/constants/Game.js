@@ -10,7 +10,7 @@ exports.waitingForPossibilities = [...roleNames, ...groupNames, "sheriff", "all"
 
 exports.waitingForCauses = ["stuttering-judge-request"];
 
-exports.wonByPossibilities = ["werewolves", "villagers", "lovers", "pied-piper"];
+exports.wonByPossibilities = ["werewolves", "villagers", "lovers", "pied-piper", "abominable-sectarian"];
 
 exports.gameRepartitionForbiddenRoleNames = roleNames.filter(roleName => roleName !== "villager" && roleName !== "werewolf");
 

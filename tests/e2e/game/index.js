@@ -27,4 +27,6 @@ describe("E2E - 🎲 Game tests", () => {
     require("./bear-tamer-infected.test");
     require("./votes-skipped.test");
     require("./random-sheriff-election.test");
+    require("./game-won-by-abominable-sectarian.test");
+    require("./abominable-sectarian-infected.test");
 });

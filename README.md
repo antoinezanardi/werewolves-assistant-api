@@ -52,7 +52,7 @@ The MongoDB database is protected under username and password authentication.
 
 ## <a name="roles-available">🃏 Roles available</a>
 
-On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **27 different roles** are available to play:
+On this current version [![GitHub release](https://img.shields.io/github/release/antoinezanardi/werewolves-assistant-api.svg)](https://GitHub.com/antoinezanardi/werewolves-assistant-api/releases/), **28 different roles** are available to play:
 
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/werewolf.png" width="25"/> The Werewolf**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/big-bad-wolf.png" width="25"/> The Big Bad Wolf**
@@ -80,6 +80,7 @@ On this current version [![GitHub release](https://img.shields.io/github/release
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/thief.png" width="25"/> The Thief**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/angel.png" width="25"/> The Angel**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/pied-piper.png" width="25"/> The Pied Piper**
+- **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/abominable-sectarian.png" width="25"/> The Abominable Sectarian**
 - **<img src="https://werewolves-assistant-api.antoinezanardi.fr/img/roles/raven.png" width="25"/> The Raven**
 
 Please check the <a href="https://werewolves-assistant-api.antoinezanardi.fr/apidoc/#player-roles" target="_blank">**Player role section on API documentation**</a> or the <a href="https://werewolves-assistant.antoinezanardi.fr/about" target="_blank">**Available Roles section on the official website**</a> for more details about each role.

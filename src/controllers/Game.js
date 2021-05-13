@@ -10,7 +10,7 @@ const {
     isVillagerSideAlive, isWerewolfSideAlive, areAllPlayersDead, getPlayersInLoversTeam, getPlayersWithRole, getGameTurnNightActionsOrder,
     areLoversTheOnlyAlive, isGameDone, getPlayerWithRole, getPlayersWithSide, getAlivePlayers, getPlayersExpectedToPlay,
     getFindFields, getPlayerWithAttribute, getDefaultGameOptions, isVotePossible, hasPiedPiperWon, isWhiteWerewolfOnlyAlive, hasAngelWon,
-    getAdditionalCardsThiefRoleNames,
+    getAdditionalCardsThiefRoleNames, hasAbominableSectarianWon,
 } = require("../helpers/functions/Game");
 const { getPlayerAttribute, doesPlayerHaveAttribute, isPlayerAttributeActive } = require("../helpers/functions/Player");
 const { getRoles, getGroupNames } = require("../helpers/functions/Role");
@@ -124,10 +124,26 @@ exports.fillPlayersData = players => {
         if (player.position === undefined) {
             player.position = position;
         }
+        if (player.group) {
+            player.group = filterOutHTMLTags(player.group);
+        }
         player.isAlive = true;
         position++;
     }
     players.sort((a, b) => a.position > b.position ? 1 : -1);
+};
+
+exports.checkPlayersGroup = players => {
+    const abominableSectarianPlayer = players.find(({ role }) => role === "abominable-sectarian");
+    if (!abominableSectarianPlayer && players.some(({ group }) => !!group)) {
+        throw generateError("PLAYERS_GROUP_NOT_ALLOWED", "Players group are not allowed if `abominable-sectarian` is not in the game.");
+    } else if (abominableSectarianPlayer) {
+        if (!players.every(({ group }) => !!group)) {
+            throw generateError("ALL_PLAYERS_GROUP_NOT_SET", `Some players doesn't have a group which is mandatory if \`abominable-sectarian\` is in the game.`);
+        } else if ([...new Set(players.map(({ group }) => group))].length !== 2) {
+            throw generateError("BAD_PLAYER_GROUPS_COUNT", `There are more or less than 2 groups among all players.`);
+        }
+    }
 };
 
 exports.checkPlayersPosition = players => {
@@ -156,6 +172,7 @@ exports.checkAndFillDataBeforeCreate = async data => {
     await this.checkUserCurrentGames(data.gameMaster);
     this.checkUniqueNameInPlayers(data.players);
     this.checkPlayersPosition(data.players);
+    this.checkPlayersGroup(data.players);
     this.fillPlayersData(data.players);
     this.checkRolesCompatibility(data.players);
     this.fillOptionsData(data);
@@ -394,6 +411,8 @@ exports.checkGameWinners = game => {
             game.won = { by: "pied-piper", players: getPlayersWithRole("pied-piper", game) };
         } else if (isWhiteWerewolfOnlyAlive(game)) {
             game.won = { by: "white-werewolf", players: getPlayersWithRole("white-werewolf", game) };
+        } else if (hasAbominableSectarianWon(game)) {
+            game.won = { by: "abominable-sectarian", players: getPlayerWithRole("abominable-sectarian", game) };
         } else if (!isVillagerSideAlive(game)) {
             game.won = { by: "werewolves", players: getPlayersWithSide("werewolves", game) };
         } else if (!isWerewolfSideAlive(game)) {

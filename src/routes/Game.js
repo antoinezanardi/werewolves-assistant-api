@@ -209,6 +209,7 @@ module.exports = app => {
      * @apiParam (Request Body Parameters) {String{>= 1 && <= 30}} players.name Player's name. Must be unique in the array and between 1 and 30 characters long.
      * @apiParam (Request Body Parameters) {String} players.role Player's role. (_See [Codes - Player Roles](#player-roles)_)
      * @apiParam (Request Body Parameters) {Number{>= 0}} [players.position] Player's unique position among all players. Maximum is `players.length - 1`. Either all players position must be set or none of them. In that last case, it will be generated automatically.
+     * @apiParam (Request Body Parameters) {String{>= 1 && <= 30}} [players.group] Player's group. Only set and required if the `abominable-sectarian` is in the game, forbidden otherwise. If set, all players must be in a group or another, meaning that there are only two possible values among all players.
      * @apiParam (Request Body Parameters) {Object[]} [additionalCards] Game's additional cards. Must be set if role `thief` is in the game and contain 2 cards.
      * @apiParam (Request Body Parameters) {String} additionalCards.role Additional card's role. The role must be still available compared to the game's composition. (_See [Codes - Player Roles](#player-roles)_)
      * @apiParam (Request Body Parameters) {String} additionalCards.for Additional card's recipient. Must be equal to `thief`.
@@ -286,6 +287,11 @@ module.exports = app => {
             .optional()
             .isInt({ min: 0 }).withMessage("Must be a valid integer greater or equal than 0")
             .toInt(),
+        body("players.*.group")
+            .optional()
+            .isString().withMessage("Must be a valid string")
+            .trim()
+            .isLength({ min: 1, max: 30 }).withMessage("Must be between 1 and 30 characters long"),
         body("additionalCards")
             .optional()
             .isArray().withMessage("Must be a valid array"),
