@@ -54,7 +54,7 @@
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "qs": "^6.9.6",
+    "qs": "^6.10.3",
     "requirejs": "^2.3.6",
     "validator": "^13.6.0",
     "xss": "^1.0.8"
